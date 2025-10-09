@@ -67,126 +67,15 @@ socket.on('map_update', (payload) => {
 });
 
 function blindCodeMode() {
-  BOMBERS.push({
-    x: 40,
-    y: 40,
-    speed: 1,
-    type: 1,
-    uid: '1sEo7KS7efpHtJViAAAB',
-    orient: 'UP',
-    isAlive: true,
-    size: 35,
-    name: 'bobao',
-    movable: true,
-    score: 0,
-    color: 1,
-    explosionRange: 2,
-    bombCount: 1,
-    speedCount: 0
-  })
+  const sampleBomber = require('./sample/bomber');
+  const sampleChest = require('./sample/chest');
+  const sampleMap = require('./sample/map');
+  const sampleItem = require('./sample/item');
 
-  CHESTS.push({
-    x: 40, y: 120, size: 40, type: 'C', isDestroyed: false
-  })
-
-  MAP = [
-    [
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W'
-    ],
-    [
-      'W', null, null, 'C',
-      'C', null, 'C',  'C',
-      'C', null, 'C',  'C',
-      'C', null, null, 'W'
-    ],
-    [
-      'W', null, 'W',  null,
-      'W', 'W',  'C',  'W',
-      'W', 'C',  null, null,
-      'C', 'W',  null, 'W'
-    ],
-    [
-      'W',  null, 'W',  'C',
-      null, 'C',  'C',  'C',
-      null, 'C',  'C',  'C',
-      null, 'W',  null, 'W'
-    ],
-    [
-      'W', 'R',  'C',  null,
-      'C', 'C',  null, 'W',
-      'W', null, null, null,
-      'C', 'C',  null, 'W'
-    ],
-    [
-      'W', null, 'C', 'W',
-      'W', null, 'W', 'C',
-      'C', 'W',  'C', 'W',
-      'W', 'C',  'C', 'W'
-    ],
-    [
-      'W',  'C',  'C',  null,
-      'C',  'C',  null, 'C',
-      null, 'C',  'C',  null,
-      'C',  null, 'C',  'W'
-    ],
-    [
-      'W',  'W',  null, 'W',
-      null, 'C',  'C',  'W',
-      'W',  'C',  null, 'C',
-      'W',  null, 'W',  'W'
-    ],
-    [
-      'W', 'W',  'C', 'W',
-      'W', null, 'C', 'W',
-      'W', null, 'C', 'W',
-      'W', 'C',  'W', 'W'
-    ],
-    [
-      'W',  null, 'C',  'C',
-      null, 'C',  'C',  null,
-      'C',  'W',  null, 'C',
-      'C',  'C',  null, 'W'
-    ],
-    [
-      'W',  null, 'C',  'C',
-      'C',  null, 'W',  'C',
-      null, 'C',  'C',  null,
-      null, 'C',  null, 'W'
-    ],
-    [
-      'W', 'C',  null, 'W',
-      'W', 'C',  null, 'W',
-      'W', null, 'C',  'W',
-      'W', null, 'C',  'W'
-    ],
-    [
-      'W',  'C', 'W',  'C',
-      null, 'C', 'C',  null,
-      'C',  'C', null, 'C',
-      'C',  'W', 'C',  'W'
-    ],
-    [
-      'W', null, 'W',  null,
-      'W', 'W',  null, 'W',
-      'W', null, 'W',  'W',
-      'C', 'W',  null, 'W'
-    ],
-    [
-      'W',  null, null, 'C',
-      'C',  null, 'C',  'C',
-      null, 'C',  'C',  'C',
-      null, null, null, 'W'
-    ],
-    [
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W'
-    ]
-  ]
+  BOMBERS.push({ ...sampleBomber });
+  CHESTS.push({ ...sampleChest });
+  MAP = sampleMap;
+  ITEMS.push({ ...sampleItem });
 }
 
 socket.on('connect', async () => {
@@ -209,9 +98,9 @@ socket.on('connect', async () => {
   while(true) {
     const chest = findNearestChest();
     const item = findNearestItem();
+
     if (item) {
       const path = findPathToTarget(item);
-      console.log('path', path)
       if (path && path.length > 1) {
         move(nextStep(path));
       }
@@ -224,8 +113,10 @@ socket.on('connect', async () => {
         const step = nextStep(path);
         if (step) move(step);
       } else if (path && path.length === 1) {
+        console.log('touch nearest chest', )
         // already on the chest tile
         placeBoom();
+        console.log('placed boom', )
         // moveToSafeArea();
       }
     }
@@ -377,7 +268,6 @@ function findPathToTarget(target) {
   const open = [{ ...start, h: heuristic(start, goal) }];
 
   while (open.length > 0) {
-    // Lấy node có heuristic nhỏ nhất
     open.sort((a, b) => a.h - b.h);
     const current = open.shift();
 
@@ -388,7 +278,7 @@ function findPathToTarget(target) {
         path.push({ x: step.x, y: step.y });
         step = cameFrom.get(`${step.x},${step.y}`);
       }
-      if (target.type == "C") return path.reverse().slice(0, -1)
+      if (target.type === 'C') return path.reverse().slice(0, -1)
       return path.reverse();
     }
 

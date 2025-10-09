@@ -1,4 +1,4 @@
-sample = {
+module.exports = {
   x: 40,
   y: 40,
   speed: 1,
@@ -14,4 +14,4 @@ sample = {
   explosionRange: 2,
   bombCount: 1,
   speedCount: 0
-}
+};
