@@ -55,7 +55,6 @@ socket.on('item_collected', (payload) => {
   ITEMS = ITEMS.filter(i => i.x !== payload.item.x && i.y !== payload.item.y);
 });
 
-
 socket.on('bomb_explode', (payload) => {
   //remove bomb from BOMBS
   BOMBS = BOMBS.filter(b => b.id !== payload.id);
@@ -67,6 +66,129 @@ socket.on('map_update', (payload) => {
   // ITEMS = payload.items;
 });
 
+function blindCodeMode() {
+  BOMBERS.push({
+    x: 40,
+    y: 40,
+    speed: 1,
+    type: 1,
+    uid: '1sEo7KS7efpHtJViAAAB',
+    orient: 'UP',
+    isAlive: true,
+    size: 35,
+    name: 'bobao',
+    movable: true,
+    score: 0,
+    color: 1,
+    explosionRange: 2,
+    bombCount: 1,
+    speedCount: 0
+  })
+
+  CHESTS.push({
+    x: 40, y: 120, size: 40, type: 'C', isDestroyed: false
+  })
+
+  MAP = [
+    [
+      'W', 'W', 'W', 'W',
+      'W', 'W', 'W', 'W',
+      'W', 'W', 'W', 'W',
+      'W', 'W', 'W', 'W'
+    ],
+    [
+      'W', null, null, 'C',
+      'C', null, 'C',  'C',
+      'C', null, 'C',  'C',
+      'C', null, null, 'W'
+    ],
+    [
+      'W', null, 'W',  null,
+      'W', 'W',  'C',  'W',
+      'W', 'C',  null, null,
+      'C', 'W',  null, 'W'
+    ],
+    [
+      'W',  null, 'W',  'C',
+      null, 'C',  'C',  'C',
+      null, 'C',  'C',  'C',
+      null, 'W',  null, 'W'
+    ],
+    [
+      'W', 'R',  'C',  null,
+      'C', 'C',  null, 'W',
+      'W', null, null, null,
+      'C', 'C',  null, 'W'
+    ],
+    [
+      'W', null, 'C', 'W',
+      'W', null, 'W', 'C',
+      'C', 'W',  'C', 'W',
+      'W', 'C',  'C', 'W'
+    ],
+    [
+      'W',  'C',  'C',  null,
+      'C',  'C',  null, 'C',
+      null, 'C',  'C',  null,
+      'C',  null, 'C',  'W'
+    ],
+    [
+      'W',  'W',  null, 'W',
+      null, 'C',  'C',  'W',
+      'W',  'C',  null, 'C',
+      'W',  null, 'W',  'W'
+    ],
+    [
+      'W', 'W',  'C', 'W',
+      'W', null, 'C', 'W',
+      'W', null, 'C', 'W',
+      'W', 'C',  'W', 'W'
+    ],
+    [
+      'W',  null, 'C',  'C',
+      null, 'C',  'C',  null,
+      'C',  'W',  null, 'C',
+      'C',  'C',  null, 'W'
+    ],
+    [
+      'W',  null, 'C',  'C',
+      'C',  null, 'W',  'C',
+      null, 'C',  'C',  null,
+      null, 'C',  null, 'W'
+    ],
+    [
+      'W', 'C',  null, 'W',
+      'W', 'C',  null, 'W',
+      'W', null, 'C',  'W',
+      'W', null, 'C',  'W'
+    ],
+    [
+      'W',  'C', 'W',  'C',
+      null, 'C', 'C',  null,
+      'C',  'C', null, 'C',
+      'C',  'W', 'C',  'W'
+    ],
+    [
+      'W', null, 'W',  null,
+      'W', 'W',  null, 'W',
+      'W', null, 'W',  'W',
+      'C', 'W',  null, 'W'
+    ],
+    [
+      'W',  null, null, 'C',
+      'C',  null, 'C',  'C',
+      null, 'C',  'C',  'C',
+      null, null, null, 'W'
+    ],
+    [
+      'W', 'W', 'W', 'W',
+      'W', 'W', 'W', 'W',
+      'W', 'W', 'W', 'W',
+      'W', 'W', 'W', 'W'
+    ]
+  ]
+}
+
 socket.on('connect', async () => {
   console.log('Connected to server');
   socket.emit('join', {});
@@ -77,6 +199,8 @@ socket.on('connect', async () => {
   while(!GAME_START) {
     await sleep(100)
   }
+
+  blindCodeMode()
 
   while(BOMBERS.length === 0) {
     await sleep(100)
@@ -95,11 +219,12 @@ socket.on('connect', async () => {
 
     if (chest) {
       const path = findPathToTarget(chest);
-      console.log('path', path)
-      if (path && path.length > 0) {
-        console.log('moving to nearest chest', )
-        move(nextStep(path));
-      } else if (path && path.length === 0) {
+      if (path && path.length > 1) {
+        console.log('moving to nearest chest');
+        const step = nextStep(path);
+        if (step) move(step);
+      } else if (path && path.length === 1) {
+        // already on the chest tile
         placeBoom();
         // moveToSafeArea();
       }
@@ -116,6 +241,14 @@ const move = (orient) => {
   socket.emit('move', {
     orient: orient
   })
+
+  //blind code mode
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  if (!myBomber) return;
+  if (orient === 'UP') myBomber.y -= 2
+  if (orient === 'DOWN') myBomber.y += 2
+  if (orient === 'LEFT') myBomber.x -= 2
+  if (orient === 'RIGHT') myBomber.x += 2
 }
 
 const placeBoom = () => {
@@ -200,34 +333,24 @@ const DIRS = [
   {dx: -1, dy: 0}
 ];
 
+function nextStep(path) {
+  // Expect path as an array of grid nodes from current -> ... -> target.
+  // If there's no next step (path shorter than 2), return null.
+  if (!path || path.length < 2) return null;
+  const current = path[0];
+  const next = path[1];
+  if (next.x > current.x) return 'RIGHT';
+  if (next.x < current.x) return 'LEFT';
+  if (next.y > current.y) return 'DOWN';
+  if (next.y < current.y) return 'UP';
+
+  return null;
+}
+
 function isWalkable(x, y) {
   const v = MAP[y][x];
   // Walls and chest are NOT walkable before destroyed
   return v === null || v === 'B' || v === 'R' || v === 'S';
-}
-
-function nextStep(path) {
-  if (!path || path.length >= 2) {
-    const current = path[0];
-    const next = path[1];
-    if (next.x > current.x) return 'RIGHT';
-    if (next.x < current.x) return 'LEFT';
-    if (next.y > current.y) return 'DOWN';
-    if (next.y < current.y) return 'UP';
-
-    return null;
-  } else if (path && path.length === 1) {
-    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-    if (!myBomber) return null;
-
-    const target = path[0];
-    if (target.x * WALL_SIZE > myBomber.x) return 'RIGHT';
-    if (target.x * WALL_SIZE < myBomber.x) return 'LEFT';
-    if (target.y * WALL_SIZE > myBomber.y) return 'DOWN';
-    if (target.y * WALL_SIZE < myBomber.y) return 'UP';
-
-    return null;
-  }
 }
 
 function heuristic(a, b) {
@@ -235,18 +358,17 @@ function heuristic(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
+function toGridCoord(pos) {
+  return { x: Math.floor(pos.x / WALL_SIZE), y: Math.floor(pos.y / WALL_SIZE) };
+}
+
+// Greedy Best-First Search
 function findPathToTarget(target) {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   if (!myBomber || !target) return null;
 
-  const start = {
-    x: Math.floor(myBomber.x / WALL_SIZE),
-    y: Math.floor(myBomber.y / WALL_SIZE)
-  };
-  const goal = {
-    x: Math.floor(target.x / WALL_SIZE),
-    y: Math.floor(target.y / WALL_SIZE)
-  };
+  const start = toGridCoord(myBomber);
+  const goal = toGridCoord(target);
 
   const visited = new Set();
   const cameFrom = new Map();
@@ -266,6 +388,7 @@ function findPathToTarget(target) {
         path.push({ x: step.x, y: step.y });
         step = cameFrom.get(`${step.x},${step.y}`);
       }
+      if (target.type == "C") return path.reverse().slice(0, -1)
       return path.reverse();
     }
 
@@ -274,12 +397,12 @@ function findPathToTarget(target) {
     for (const dir of DIRS) {
       const nx = current.x + dir.dx;
       const ny = current.y + dir.dy;
-      const key = `${nx},${ny}`;
-
-      if (!isWalkable(nx, ny) || visited.has()) continue;
-
-      cameFrom.set(key, current);
-      open.push({ x: nx, y: ny, h: heuristic({ x: nx, y: ny }, goal) });
+      if (!isWalkable(nx, ny) && !(nx === goal.x && ny === goal.y)) continue;
+      if (visited.has(`${nx},${ny}`)) continue;
+      if (!open.find(n => n.x === nx && n.y === ny)) {
+        cameFrom.set(`${nx},${ny}`, current);
+        open.push({ x: nx, y: ny, h: heuristic({ x: nx, y: ny }, goal) });
+      }
     }
   }
 
