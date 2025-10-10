@@ -1,98 +1,19 @@
+const N = null
 module.exports = [
-    [
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W'
-    ],
-    [
-      'W', null, null, 'C',
-      'C', null, 'C',  'C',
-      'C', null, 'C',  'C',
-      'C', null, null, 'W'
-    ],
-    [
-      'W', null, 'W',  null,
-      'W', 'W',  'C',  'W',
-      'W', 'C',  null, null,
-      'C', 'W',  null, 'W'
-    ],
-    [
-      'W',  null, 'W',  'C',
-      null, 'C',  'C',  'C',
-      null, 'C',  'C',  'C',
-      null, 'W',  null, 'W'
-    ],
-    [
-      'W', 'R',  'C',  null,
-      'C', 'C',  null, 'W',
-      'W', null, null, null,
-      'C', 'C',  null, 'W'
-    ],
-    [
-      'W', null, 'C', 'W',
-      'W', null, 'W', 'C',
-      'C', 'W',  'C', 'W',
-      'W', 'C',  'C', 'W'
-    ],
-    [
-      'W',  'C',  'C',  null,
-      'C',  'C',  null, 'C',
-      null, 'C',  'C',  null,
-      'C',  null, 'C',  'W'
-    ],
-    [
-      'W',  'W',  null, 'W',
-      null, 'C',  'C',  'W',
-      'W',  'C',  null, 'C',
-      'W',  null, 'W',  'W'
-    ],
-    [
-      'W', 'W',  'C', 'W',
-      'W', null, 'C', 'W',
-      'W', null, 'C', 'W',
-      'W', 'C',  'W', 'W'
-    ],
-    [
-      'W',  null, 'C',  'C',
-      null, 'C',  'C',  null,
-      'C',  'W',  null, 'C',
-      'C',  'C',  null, 'W'
-    ],
-    [
-      'W',  null, 'C',  'C',
-      'C',  null, 'W',  'C',
-      null, 'C',  'C',  null,
-      null, 'C',  null, 'W'
-    ],
-    [
-      'W', 'C',  null, 'W',
-      'W', 'C',  null, 'W',
-      'W', null, 'C',  'W',
-      'W', null, 'C',  'W'
-    ],
-    [
-      'W',  'C', 'W',  'C',
-      null, 'C', 'C',  null,
-      'C',  'C', null, 'C',
-      'C',  'W', 'C',  'W'
-    ],
-    [
-      'W', null, 'W',  null,
-      'W', 'W',  null, 'W',
-      'W', null, 'W',  'W',
-      'C', 'W',  null, 'W'
-    ],
-    [
-      'W',  null, null, 'C',
-      'C',  null, 'C',  'C',
-      null, 'C',  'C',  'C',
-      null, null, null, 'W'
-    ],
-    [
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W',
-      'W', 'W', 'W', 'W'
-    ]
+  ['W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W'],
+  ['W', N , N ,'C','C', N ,'C','C','C', N ,'C','C','C', N , N ,'W'],
+  ['W', N ,'W', N ,'W','W','C','W','W','C', N , N ,'C','W', N ,'W'],
+  ['W', N ,'W','C', N ,'C','C','C', N ,'C','C','C', N ,'W', N ,'W'],
+  ['W', N, 'R', N ,'C','C', N ,'W','W', N , N , N ,'C','C', N ,'W'],
+  ['W', N ,'C','W','W', N ,'W','C','C','W','C','W','W','C','C','W'],
+  ['W','C','C', N ,'C','C', N ,'C', N ,'C','C', N ,'C', N ,'C','W'],
+  ['W','W', N ,'W', N ,'C','C','W','W','C', N ,'C','W', N ,'W','W'],
+  ['W','W','C','W','W', N ,'C','W','W', N ,'C','W','W','C','W','W'],
+  ['W', N ,'C','C', N ,'C','C', N ,'C','W', N ,'C','C','C', N ,'W'],
+  ['W', N ,'C','C','C', N ,'W','C', N ,'C','C', N , N ,'C', N ,'W'],
+  ['W','C', N ,'W','W','C', N ,'W','W', N ,'C','W','W', N ,'C','W'],
+  ['W','C','W','C', N ,'C','C', N ,'C','C', N ,'C','C','W','C','W'],
+  ['W', N ,'W', N ,'W','W', N ,'W','W', N ,'W','W','C','W', N ,'W'],
+  ['W', N , N ,'C','C', N ,'C','C', N ,'C','C','C', N , N , N ,'W'],
+  ['W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W']
 ];

@@ -1,0 +1,570 @@
+﻿HACKATHON DEV DOCUMENT - 2025
+### Các mục cần đội chơi chuẩn bị
+1. Dockerfile (*)
+2. File .env
+# Sẽ được sửa bởi btc khi thi đấu
+SOCKET_SERVER=SOCKET_SERVER:PORT
+	        
+3. docker-compose.yml
+version: '3.8'
+
+services:
+ bot:
+   build:
+     context: .
+     dockerfile: Dockerfile
+   env_file:
+     - .env
+   deploy:
+     mode: replicated
+     replicas: 1
+     resources:
+       limits:
+         cpus: '1'
+         memory: 1G
+       reservations:
+         cpus: '0.25'
+         memory: 250M
+	        
+Start BOT
+        
+docker compose start bot
+	        
+Stop BOT
+        
+docker compose stop bot
+	
+
+(*) Tùy thuộc vào ngôn ngữ lập trình mà các team lựa chọn, vui lòng chuẩn bị Dockerfile tương ứng hỗ trợ chạy ngôn ngữ đó.
+### Lưu ý chung
+* Có 2 loại môi trường cho các đội chơi lập trình là môi trường luyện tập và môi trường thi đấu. 
+* Để phục vụ việc luyện tập và cải tiến liên tục, môi trường luyện tập có kiểu chơi hồi sinh. Mỗi game đấu kéo dài 5 phút, bot bị hạ gục sẽ được hồi sinh và thi đấu tiếp. Sau 5 phút game sẽ kết thúc và trạng thái bản đồ được reset về trạng thái ban đầu.
+* Môi trường thi đấu có khác biệt như sau:
+   * Thể thức thi đấu sinh tồn, Bot bị hạ gục trong trận đấu sẽ bị loại khỏi trận đấu đó, không thể hồi sinh. 
+   * Bot chỉ có thể di chuyển và thi đấu sau khi nhận được event start (được mô tả kĩ bên dưới)
+   * Trận đấu kết thúc khi thoả mãn 1 trong 2 điều kiện sau: hết 5 phút hoặc chỉ còn 1 bot duy nhất trên bản đồ. Bot sẽ nhận được event finish khi trận đấu kết thúc.
+Do có 2 môi trường khác nhau, các đội lưu ý code nộp cho BTC phải là code của MÔI TRƯỜNG THI ĐẤU.
+### Danh sách sự kiện
+Các sự kiện gửi từ Bot
+LƯU Ý:
+(*) Các trường màu xám là các state của BOT phục vụ visualize BOT trên màn hình/quản lý state của BOT, các đội chơi có thể bỏ qua nếu thấy không cần thiết.
+Đăng nhập
+- Mô tả: Khi bot muốn khởi tạo kết nối tới socket server, cần gửi lên token để có thể authenticate như sau:
+# Example JS code
+const auth = {
+ token: YOUR_TOKEN,
+};
+const socket = io(SOCKET_SERVER_ADDR, {
+ auth: auth
+});
+	
+
+	
+
+#
+	Dữ liệu gửi đi
+	Mô tả
+	1
+	token
+	TOKEN cung cấp bởi BTC
+	
+
+Tham gia phòng chơi
+- Mô tả: Sự kiện được gửi đi khi client muốn đăng ký tham gia vào phòng chơi.
+- Event name: join
+- Data:
+   {}
+	
+
+	
+
+Di chuyển
+- Mô tả: Sự kiện được gửi đi khi bot muốn thực hiện di chuyển
+  - Event name: move
+ - Data:
+   {
+     "orient": UP // UP, DOWN, LEFT, RIGHT
+   }
+	
+
+#
+	Dữ liệu gửi đi
+	Mô tả
+	1
+	orient
+	Hướng đi của BOT, dữ liệu gửi lên là UP | DOWN | LEFT | RIGHT
+	
+
+Đặt bom
+- Mô tả: Sự kiện được gửi đi khi bot muốn thực hiện đặt bom. Bom sẽ được đặt dựa trên vị trí hiện tại của bot.
+- Event name: place_bomb
+- Data:
+   {}
+	
+
+Các sự kiện nhận từ server
+User
+Khi bot tham gia vào phòng sẽ nhận được response chứa các thông tin về phòng chơi  như sau:
+
+
+- Event name: user
+- Response data:    
+{
+   "map": [
+     [
+       "W", // wall
+       "C", // chest
+       null, // free space
+      ],
+     [
+       "W", // wall
+       "C", // chest
+       null, // free space
+      ],
+      [
+       "W", // wall
+       "C", // chest
+       null, // free space
+      ],
+   ],
+   "bombers": [
+     {
+       x: 568,
+        y: 568,
+        speed: 1,
+        type: 1,
+        uid: '1sEo7KS7efpHtJViAAAB',
+        orient: 'UP',
+        isAlive: true,
+        size: 35,
+        name: 'zarenabot',
+        movable: true,
+        score: 0,
+        color: 1,
+        explosionRange: 2,
+        bombCount: 1,
+        speedCount: 0
+     },
+     ...
+   ],
+   "bombs": [
+     {
+       "x": 599.5,
+       "y": 33.5,
+       "orient": "RIGHT",
+       "speed": 1,
+       "type": 1,
+       "size": 8,
+       "uid": "UID",
+       "id": 691,
+     },
+     ...
+   ],
+    "chests": [
+     {
+       "x": 80,
+       "y": 160,
+       "size": 40,
+       "type": C,
+       "isDestroyed": false
+     },
+     ...
+   ],
+     "items": [
+     {
+       "x": 40,
+       "y": 160,
+       "type": SPEED,
+       "size": 8,
+       "isCollected": false,
+     },
+     ...
+   ],
+}
+	
+
+	
+
+Và các bot còn lại trong phòng nhận được message:
+
+
+- Event name: new_enemy
+- Response data: 
+{
+  bomber: bomber(2), // new bomer tham khảo mục bomber 2 ở bảng dưới đây
+  bombers: [bomber(2)] 
+}
+	
+
+
+
+
+
+map (1)
+Dữ liệu trả về trong map là 1 mảng 2 chiều, các phần tử có ý nghĩa như bảng dưới đây
+	#
+	Dữ liệu trả về
+	Mô tả
+	1
+	W
+	Các bức tường
+	2
+	C
+	Các hòm đồ, có thể bị phá bởi bom.
+	3
+	B
+	Item thêm số lượng bom, rơi ra từ việc phá hòm đồ.
+	4
+	R
+	Item tăng thêm phạm vi nổ của bom, rơi ra từ việc phá hòm đồ.
+	5
+	S
+	Item tăng tốc độ di chuyển, rơi ra từ việc phá hòm đồ.
+	6
+	null
+	Các khoảng trống.
+	
+
+bombers (2)
+Dữ liệu trả về là 1 mảng chứa các object bomber, mô tả dưới đây dành cho 1 object
+	#
+	Dữ liệu trả về
+	Mô tả
+	1
+	x
+	Tọa độ x của BOT trên bản đồ
+	2
+	y
+	Tọa độ y của BOT trên bản đồ
+	3
+	speed
+	Tốc độ di chuyển của BOT
+	4
+	type
+	Loại bot
+	5
+	uid
+	UID của BOT 
+	6
+	orient
+	Hướng đi hiện tại của BOT
+	7
+	isAlive
+	Trạng thái sống/chết của BOT
+	8
+	size
+	Kích thước của BOT
+	9
+	name
+	Tên của BOT
+	10
+	movable
+	State để server quản lý tốc độ của BOT
+	11
+	score
+	Điểm số của BOT
+	12
+	color
+	State để hiển thị màu sắc của BOT
+	13
+	explosionRange
+	Độ dài nổ của bom đặt bởi BOT
+	14
+	bombCount
+	Số lượng bom có thể đặt
+	15
+	speedCount
+	Số lượng item tăng tốc hiện tại
+	
+
+
+
+
+
+bomb (3)
+	#
+	Dữ liệu trả về
+	Mô tả
+	1
+	x
+	Tọa độ x của bom trên bản đồ
+	2
+	y
+	Tọa độ y của bom trên bản đồ
+	3
+	uid
+	UID của BOT đã đặt bom
+	4
+	lifeTime
+	Thời gian bom nổ
+	5
+	createdAt
+	Thời gian đặt bom
+	6
+	isExploded
+	Trạng thái bom đã nổ/chưa
+	7
+	bomberPassedThrough
+	Trạng thái bomber đã rời khỏi bom/chưa
+	8
+	id
+	ID của bom
+	
+
+
+
+item (4)
+	#
+	Dữ liệu trả về
+	Mô tả
+	1
+	x
+	Tọa độ x của bom trên bản đồ
+	2
+	y
+	Tọa độ y của bom trên bản đồ
+	3
+	type
+	Loại item, gồm SPEED (S), EXPLOSION_RANGE (R), BOMB_COUNT (B)
+	4
+	size
+	Kích thước item
+	5
+	isCollected
+	Trạng thái item đã được thu thập hay chưa
+	
+
+
+
+Bắt đầu game (*)
+(*) Sự kiện chỉ có ở bot trên môi trường thi đấu, các đội chơi khi tham gia server dev thì thực hiện join và thi đấu đến khi disconnect, game sẽ tự động kết thúc và reset sau mỗi 5 phút, không cần bắt đầu.
+
+
+- Event name: start
+- Response data:
+{
+  start_at: 2025-10-08T06:47:50.731Z
+}
+	
+
+Di chuyển
+Khi bot di chuyển, tất        cả các bot trong phòng sẽ nhận được thông báo 
+- Event name: player_move
+- Response data:
+{
+ x: 568,
+  y: 568,
+  speed: 1,
+  type: 1,
+  uid: '1sEo7KS7efpHtJViAAAB',
+  orient: 'UP',
+  isAlive: true,
+  size: 35,
+  name: 'zarenabot',
+  movable: true,
+  score: 0,
+  color: 1,
+  explosionRange: 2,
+  bombCount: 1,
+  speedCount: 0
+}
+	
+
+*Lưu ý: Mô tả dữ liệu trả về tham khảo mục bomber(2)
+Đặt bom
+Khi bot thực hiện đặt bom, các bot còn lại trong phòng sẽ nhận được sự kiện
+- Event name: new_bomb
+- Response data:
+{
+   "x": 579.5,
+   "y": 295.5,
+   "ownerName":zarenabot,
+   "uid": "xxx",
+   "id": 4708,
+}
+	*Lưu ý: Mô tả dữ liệu trả về tham khảo mục bomb (3)
+Bom phát nổ
+Sau 5 giây kể từ khi được đặt, bom sẽ phát nổ, các bot nhận được 2 sự kiện bao gồm “bom_explode” và “map_update” (do việc bom nổ có thể khiến map thay đổi, map update sẽ trả về thông tin danh sách chests và items hiện tại còn active)
+- Event name: bomb_explode
+- Response data:
+{
+  x: 160,
+  y: 160,
+  "uid": "xxx",
+ "id": 4708,
+  "explosionArea": [{x:120,y:120},{x:180,y:180}],
+
+
+ }
+
+
+
+
+- Event name: map_update
+- Response data:
+{
+ "chests": [
+     {
+       "x": 80,
+       "y": 160,
+       "size": 40,
+     },
+     ...
+   ],
+ "items": [
+     {
+       "x": 40,
+       "y": 160,
+       "type": SPEED,
+     },
+     ...
+   ],
+}
+Hạ gục đối phương (*)
+(*) Sự kiện new_life  chỉ có ở bot trên môi trường luyện tập. Để các đội chơi có thể liên tục điều khiển bot và kiểm tra chiến thuật. Trên môi trường thi đấu, bot bị hạ gục là bị loại khỏi ván đó.
+
+
+Khi 1 bot bị hạ gục, các bot khác sẽ nhận được các sự kiện:
+- Event name: new_life
+- Response data:
+ Giống với mục user_die_update
+	
+
+*Lưu ý: Mô tả dữ liệu trả về tham khảo mục bomber (2)
+
+
+
+
+Và
+- Event name: user_die_update
+- Response data:
+{
+ "killer": {
+ x: 568,
+  y: 568,
+  speed: 1,
+  type: 1,
+  uid: '1sEo7KS7efpHtJViAAAB',
+  orient: 'UP',
+  isAlive: true,
+  size: 35,
+  name: 'zarenabot',
+  movable: true,
+  score: 0,
+  color: 1,
+  explosionRange: 2,
+  bombCount: 1,
+  speedCount: 0
+ },
+ "killed": {
+ x: 568,
+  y: 568,
+  speed: 1,
+  type: 1,
+  uid: '1sEo7KS7efpHtJViAAAB',
+  orient: 'UP',
+  isAlive: true,
+  size: 35,
+  name: 'zarenabot',
+  movable: true,
+  score: 0,
+  color: 1,
+  explosionRange: 2,
+  bombCount: 1,
+  speedCount: 0
+ },
+ "bomb": {
+     "x": 299.5,
+     "y": 481.5,
+     "orient": "DOWN",
+     "speed": 1,
+     "type": 1,
+     "size": 8,
+     "uid": "wMxL4X9C-Z-rNS4nAAAe",
+     "id": 9908,
+ },
+ "bombers": [
+     {
+       "x": 739,
+       "y": 527,
+       "speed": 1,
+       "type": 1,
+       "uid": "hks6XsCBLoRgqqJSAAAE",
+       "orient": "UP",
+       "isAlive": true,
+       "size": 35,
+       "name": "BOT-575",
+       "score": 63,
+       "color": 2,
+     },
+     ...
+   ],
+}
+	
+
+	
+
+
+
+*Lưu ý: Mô tả dữ liệu trả về tham khảo mục bomber (2)
+Hòm đồ bị phá.
+Mỗi khi hòm đồ bị bom phá huỷ, các bot trong phòng sẽ nhận được thông tin cập nhật qua event. Nếu hòm đồ có vật phẩm bên trong, thông tin vật phẩm được trả về ở trường item, nếu không có vật phẩm thì trường này là null.
+- Event name: chest_destroyed
+- Response data:
+{
+  x: 160,
+  y: 160,
+  item: {
+          x: 160,
+          y: 160,
+          type: SPEED
+        }
+}
+Bot nhặt được item (*)
+Trong quá trình thi đấu, mỗi khi bot nhặt được item cải tiến sức mạnh, các bot khác trong phòng sẽ nhận được thông tin cập nhật qua event.
+(*)  Item có thể bị phá huỷ bởi bom, trong trường hợp này bomber sẽ là null
+
+
+- Event name: item_collected
+- Response data:
+{
+ bomber: bomber(2),  // lưu ý tình huống bị destroy bởi bom nổ thì chỗ này là null
+  item: {
+    x: 160,
+    y: 160,
+    type: SPEED
+  }
+}
+Bot thoát khỏi phòng chơi (*)
+(*) Ở môi trường dev, khi socket disconnect bot sẽ bị xoá khỏi server đó. Với môi trường thi đấu, bot sẽ đứng yên tại vị trí hiện tại.
+- Event name: user_disconnect
+- Response data:   
+{
+     "uid": "UID",
+      "bomber": bomber(2), // trả lại data này chủ yếu để phần visualize update lại Score
+}
+	                
+
+
+#
+	Dữ liệu trả về
+	Mô tả
+	1
+	uid
+	UID của bot, được tạo ra từ phía server
+	
+
+
+
+Kết thúc game  (*)
+(*) Sự kiện chỉ có ở bot thi đấu bởi BTC, các đội chơi khi tham gia server dev thì thực hiện join và thi đấu đến khi disconnect, không có kết thúc.
+
+
+- Event name: finish
+- Response data:
+{
+    
+}
+	
+
+ZINZA HACKATHON 2025

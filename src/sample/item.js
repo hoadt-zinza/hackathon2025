@@ -1,7 +1,7 @@
 module.exports = {
-  x: 160,
+  x: 80,
   y: 160,
-  type: 'SPEED',
+  type: 'RANGE',
   size: 1,
   isCollected: false
 };
