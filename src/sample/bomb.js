@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   x: 6,
   y: 4,
   uid: 'bot_12345',

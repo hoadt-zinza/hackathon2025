@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   x: 80,
   y: 160,
   type: 'RANGE',

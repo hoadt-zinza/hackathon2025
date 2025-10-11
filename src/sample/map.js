@@ -1,5 +1,5 @@
 const N = null
-module.exports = [
+export default [
   ['W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W'],
   ['W', N , N ,'C','C', N ,'C','C','C', N ,'C','C','C', N , N ,'W'],
   ['W', N ,'W', N ,'W','W','C','W','W','C', N , N ,'C','W', N ,'W'],

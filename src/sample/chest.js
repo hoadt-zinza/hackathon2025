@@ -1,1 +1,1 @@
-module.exports = { x: 40, y: 120, size: 40, type: 'C', isDestroyed: false };
+export default { x: 40, y: 120, size: 40, type: 'C', isDestroyed: false };

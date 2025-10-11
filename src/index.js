@@ -1,6 +1,12 @@
-require('dotenv').config();
-const helpers = require('./helpers');
-const io = require('socket.io-client');
+import dotenv from 'dotenv';
+import * as helpers from './helpers.js';
+import { io } from 'socket.io-client';
+import sampleBomber from './sample/bomber.js';
+import sampleChest from './sample/chest.js';
+import sampleMap from './sample/map.js';
+import sampleItem from './sample/item.js';
+
+dotenv.config();
 const auth = { token: process.env.TOKEN };
 const socket = io(process.env.SOCKET_SERVER, {
   auth: auth,
@@ -12,9 +18,8 @@ let BOMBS=[]
 let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
-const { MAP_SIZE, BOMBER_SIZE, WALL_SIZE } = helpers;
 const DANGER_ZONE = []
-let SPEED = 1
+let SPEED = 2
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -70,11 +75,6 @@ socket.on('map_update', (payload) => {
 });
 
 function blindCodeMode() {
-  const sampleBomber = require('./sample/bomber');
-  const sampleChest = require('./sample/chest');
-  const sampleMap = require('./sample/map');
-  const sampleItem = require('./sample/item');
-
   BOMBERS.push({ ...sampleBomber });
   CHESTS.push({ ...sampleChest });
   MAP = sampleMap;
@@ -104,18 +104,24 @@ socket.on('connect', async () => {
       console.log('DANGER', DANGER_ZONE)
     }
 
+    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+
     // Check if we're in danger and need to move to safety
-    if (isInDanger()) {
+    while (isInDanger()) {
       console.log('In danger! Moving to safety zone...');
-      const safetyZone = findNearestSafetyZone();
+      const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
-        const path = findPathToTarget(safetyZone);
+        const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
+        console.log('path_to_safe', path);
         if (path && path.length > 1) {
           const step = nextStep(path);
           if (step) {
             move(step);
-            await (sleep(1000/60/SPEED));
-            continue; // Skip normal behavior when escaping danger
+            console.log('moving out danger zone', step);
+            console.log('bomber', myBomber.x, myBomber.y);
+            // Skip the rest of the loop to give time to move out of danger
+            await sleep(1000 / 60 / SPEED);
+            continue;
           }
         }
       }
@@ -124,7 +130,6 @@ socket.on('connect', async () => {
     const chest = findNearestChest();
     const item = findNearestItem();
     const path_to_item = item ? findPathToTarget(item) : null;
-    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
     if (item && path_to_item && path_to_item.length > 1) {
       console.log('moving to nearest item', myBomber.x, myBomber.y);
@@ -140,7 +145,7 @@ socket.on('connect', async () => {
       } else if (path && path.length === 1) {
         console.log('touch nearest chest', )
         placeBoom();
-        console.log('placed boom', )
+        console.log('placed boom', myBomber.x, myBomber.y)
       }
     }}
     await (sleep(1000/60/SPEED));
@@ -172,6 +177,7 @@ const placeBoom = () => {
 // Add danger zones for a specific bomb using bomber.explosionRange
 function addDangerZonesForBomb(bomb) {
   if (!bomb) return;
+
   const placingBomber = BOMBERS.find(b => b && b.uid === bomb.uid);
   const newZones = helpers.createDangerZonesForBomb(bomb, placingBomber, MAP);
   for (const z of newZones) DANGER_ZONE.push(z);
@@ -262,7 +268,6 @@ function nextStep(path) {
   const current = path[0];
   const next = path[1];
 
-  if (DANGER_ZONE.some(zone => zone.x === next.x && zone.y === next.y)) return null;
   if (next.x > current.x) return 'RIGHT';
   if (next.x < current.x) return 'LEFT';
   if (next.y > current.y) return 'DOWN';
@@ -275,19 +280,14 @@ function nextStep(path) {
 function isInDanger() {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   if (!myBomber) return false;
-  // Use bombs/bombers to determine if current bomber is inside any bomb cross area
-  return helpers.isInDanger(myBomber, BOMBS, BOMBERS);
-}
 
-// Find nearest safety zone from current position
-function findNearestSafetyZone() {
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  if (!myBomber) return null;
-  return helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+  // Use bombs/bombers to determine if current bomber is inside any bomb cross area
+  return helpers.isInDanger(myBomber, DANGER_ZONE);
 }
 
 // Wrapper to compute path using helpers with correct inputs
-function findPathToTarget(target) {
+function findPathToTarget(target, isGrid = true) {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  return helpers.findPathToTarget(myBomber, target, MAP);
+
+  return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
 }

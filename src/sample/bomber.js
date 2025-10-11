@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   x: 40,
   y: 40,
   speed: 1,

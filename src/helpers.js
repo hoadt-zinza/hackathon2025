@@ -1,4 +1,6 @@
 // Helper utilities extracted from index.js to keep main logic clean.
+import { MinHeap } from './MinHeap.js';
+
 const DIRS = [
   {dx: 0, dy: -1},
   {dx: 1, dy: 0},
@@ -13,7 +15,7 @@ const WALL_SIZE = 40;
 
 function isWalkable(map, x, y) {
   if (!map || y < 0 || x < 0) return false;
-  if (!map[y] || typeof map[y][x] === 'undefined') return false;
+  // if (!map[y] || typeof map[y][x] === 'undefined') return false;
   const v = map[y][x];
   // Walls and chest are NOT walkable before destroyed
   return v === null || v === 'B' || v === 'R' || v === 'S';
@@ -24,15 +26,22 @@ function heuristic(a, b) {
 }
 
 function toGridCoord(pos) {
-  return { x: Math.floor(pos.x / WALL_SIZE), y: Math.floor(pos.y / WALL_SIZE) };
+  return { x: Math.round(pos.x / WALL_SIZE), y: Math.round(pos.y / WALL_SIZE) };
+}
+
+function toMapCoord(gridPos) {
+  return { x: gridPos.x * WALL_SIZE, y: gridPos.y * WALL_SIZE };
 }
 
 // Greedy Best-First Search (kept simple and as in original)
-function findPathToTarget(myBomber, target, map) {
+function findPathToTarget(myBomber, target, map, isGrid = true) {
   if (!myBomber || !target || !map) return null;
 
-  const start = toGridCoord(myBomber, WALL_SIZE);
-  const goal = toGridCoord(target, WALL_SIZE);
+  const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
+  const goal = isGrid ? toGridCoord(target, WALL_SIZE) : { x: target.x, y: target.y };
+
+  console.log('start', start);
+  console.log('goal', goal);
 
   const visited = new Set();
   const cameFrom = new Map();
@@ -59,7 +68,11 @@ function findPathToTarget(myBomber, target, map) {
     for (const dir of DIRS) {
       const nx = current.x + dir.dx;
       const ny = current.y + dir.dy;
-      if (!isWalkable(map, nx, ny) && !(nx === goal.x && ny === goal.y)) continue;
+      if (isGrid) {
+        if (!isWalkable(map, nx, ny) && !(nx === goal.x && ny === goal.y)) continue;
+      } else {
+        if (!isWalkable(map, Math.round(nx / WALL_SIZE), Math.round(ny / WALL_SIZE)) && !(nx === goal.x && ny === goal.y)) continue;
+      }
       if (visited.has(`${nx},${ny}`)) continue;
       if (!open.find(n => n.x === nx && n.y === ny)) {
         cameFrom.set(`${nx},${ny}`, current);
@@ -74,20 +87,16 @@ function findPathToTarget(myBomber, target, map) {
 function createDangerZonesForBomb(bomb, placingBomber, map) {
   if (!bomb) return [];
 
-  const explosionRange = placingBomber && typeof placingBomber.explosionRange === 'number'
-    ? placingBomber.explosionRange
-    : 2;
-
-  const bombX = bomb.x; // already grid coords
-  const bombY = bomb.y;
+  const explosionRange = placingBomber.explosionRange;
+  const { x, y } = toGridCoord(bomb);
 
   const zones = [];
-  zones.push({ bombId: bomb.id, x: bombX, y: bombY });
+  zones.push({ bombId: bomb.id, x: x, y: y });
 
   for (const dir of DIRS) {
     for (let i = 1; i <= explosionRange; i++) {
-      const nx = bombX + dir.dx * i;
-      const ny = bombY + dir.dy * i;
+      const nx = x + dir.dx * i;
+      const ny = y + dir.dy * i;
       if (!isWalkable(map, nx, ny)) break;
       zones.push({ bombId: bomb.id, x: nx, y: ny });
     }
@@ -157,44 +166,64 @@ function findNearestItem(myBomber, items) {
   return nearest;
 }
 
-function isInDanger(myBomber, bombsArr, bombersArr) {
+function isInDanger(myBomber, DANGER_ZONE) {
   if (!myBomber) return false;
-  if (!Array.isArray(bombsArr) || bombsArr.length === 0) return false;
 
-  for (const bomb of bombsArr) {
-    if (!bomb) continue;
-    // determine explosion range from the placing bomber if available
-    const placingBomber = Array.isArray(bombersArr) ? bombersArr.find(b => b && b.uid === bomb.uid) : null;
-    const range = placingBomber && typeof placingBomber.explosionRange === 'number' ? placingBomber.explosionRange : 2;
-    if (isBomberInBombCross(myBomber, bomb, range)) return true;
-  }
-
-  return false;
+  const bomberGrid = toGridCoord(myBomber);
+  return DANGER_ZONE.some(zone => zone.x === bomberGrid.x && zone.y === bomberGrid.y);
 }
 
 function findNearestSafetyZone(myBomber, map, dangerArr) {
   const currentGridPos = toGridCoord(myBomber, WALL_SIZE);
+
   if (!Array.isArray(dangerArr) || dangerArr.length === 0) return currentGridPos;
-  const safePositions = [];
-  for (let y = 0; y < map.length; y++) {
-    for (let x = 0; x < map[y].length; x++) {
-      if (!isWalkable(map, x, y)) continue;
-      const isSafe = !dangerArr.some(zone => zone.x === x && zone.y === y);
-      if (isSafe) safePositions.push({ x, y });
+
+  const dangerSet = new Set(dangerArr.map(z => `${z.x},${z.y}`));
+  const openSet = new MinHeap((a, b) => a.f - b.f); // hàng đợi ưu tiên theo f = g + h
+  const visited = new Set();
+
+  const start = {
+    x: currentGridPos.x,
+    y: currentGridPos.y,
+    g: 0,
+    h: 0,
+    f: 0,
+  };
+  openSet.push(start);
+
+  while (!openSet.isEmpty()) {
+    const node = openSet.pop();
+    const key = `${node.x},${node.y}`;
+    if (visited.has(key)) continue;
+    visited.add(key);
+
+    // Nếu node hiện tại là safe => return
+    if (!dangerSet.has(key)) {
+      return { x: node.x, y: node.y };
+    }
+
+    for (const dir of DIRS) {
+      const nx = node.x + dir.dx;
+      const ny = node.y + dir.dy;
+      const nextKey = `${nx},${ny}`;
+
+      if (
+        ny >= 0 &&
+        ny < map.length &&
+        nx >= 0 &&
+        nx < map[0].length &&
+        isWalkable(map, nx, ny) &&
+        !visited.has(nextKey)
+      ) {
+        const g = node.g + 1;
+        const h = heuristic({ x: nx, y: ny }, currentGridPos);
+        const f = g + h;
+        openSet.push({ x: nx, y: ny, g, h, f });
+      }
     }
   }
-  let nearestSafe = null;
-  let bestDist2 = Infinity;
-  for (const safePos of safePositions) {
-    const dx = safePos.x - currentGridPos.x;
-    const dy = safePos.y - currentGridPos.y;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist2) {
-      bestDist2 = d2;
-      nearestSafe = safePos;
-    }
-  }
-  return nearestSafe;
+
+  return currentGridPos; // không tìm được safe zone reachable
 }
 
 // Return array of grid coords that form the cross-shaped danger area for a bomb.
@@ -230,7 +259,7 @@ function isBomberInBombCross(myBomber, bomb, range = 2) {
   return isPointInBombCross(grid, bomb, range);
 }
 
-module.exports = {
+export {
   DIRS,
   isWalkable,
   heuristic,
@@ -249,5 +278,6 @@ module.exports = {
   WALL_SIZE,
   getBombCrossZones,
   isPointInBombCross,
-  isBomberInBombCross
+  isBomberInBombCross,
+  toMapCoord,
 };
