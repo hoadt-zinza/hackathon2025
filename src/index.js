@@ -136,7 +136,7 @@ socket.on('connect', async () => {
       const path = findPathToTarget(chest);
       // console.log('path to chest', path)
       if (path && path.length > 1) {
-        if (helpers.isInDanger(path[1], DANGER_ZONE)) {
+        if (helpers.isInDanger(helpers.toMapCoord(path[1]), DANGER_ZONE)) {
           console.log('path 1 in danger zone so dont move', );
         } else {
           const step = nextStep(path);
