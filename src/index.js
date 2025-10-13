@@ -105,16 +105,14 @@ socket.on('connect', async () => {
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
-    console.log('myboy', myBomber.x, myBomber.y)
+    // console.log('myboy', myBomber.x, myBomber.y)
 
     // Check if we're in danger and need to move to safety
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      console.log('In danger! Moving to safety zone...');
+      // console.log('In danger! Moving to safety zone...');
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
-        console.log('safety zone found', safetyZone)
         const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
-        console.log('path_to_safety', path)
         if (path && path.length > 1) {
           const step = nextStep(path);
           if (step) {
@@ -131,21 +129,18 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      console.log('moving to reachable item', myBomber.x, myBomber.y);
+      // console.log('moving to reachable item', myBomber.x, myBomber.y);
       move(nextStep(reachableItem.path));
     } else {
 
     const chest = findNearestChest();
     if (chest) {
       const path_to_chest = findPathToTarget(chest);
-      console.log('path_to_chest', path_to_chest)
       if (path_to_chest && path_to_chest.length > 1) {
         if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
           console.log('path 1 in danger zone so dont move', );
         } else {
-          console.log('getMidPoint(path_to_chest)', getMidPoint(path_to_chest))
           const path_to_perfect_point = findPathToTarget(getMidPoint(path_to_chest), false);
-          console.log('path_to_perfect_point', path_to_perfect_point)
 
           if (path_to_perfect_point) {
             if (path_to_perfect_point.length === 1) {
@@ -309,10 +304,21 @@ function findPathToTarget(target, isGrid = true) {
 function getMidPoint(path) {
   const a = path[path.length - 2];
   const b = path[path.length - 1];
+  const bias = 1; // lệch 1px về phía b
 
   if (a.x === b.x) {
-    return { x: a.x * 40, y: (a.y + b.y) / 2 * 40 - 1};
+    // di chuyển theo trục Y
+    const directionY = Math.sign(b.y - a.y);
+    return {
+      x: a.x * helpers.WALL_SIZE,
+      y: ((a.y + b.y) / 2) * helpers.WALL_SIZE + directionY * bias,
+    };
   } else {
-    return { x: (a.x + b.x) / 2 * 40 - 1, y: a.y * 40 };
+    // di chuyển theo trục X
+    const directionX = Math.sign(b.x - a.x);
+    return {
+      x: ((a.x + b.x) / 2) * helpers.WALL_SIZE + directionX * bias,
+      y: a.y * helpers.WALL_SIZE,
+    };
   }
 }

@@ -30,8 +30,8 @@ function isWalkable(map, x, y, isGrid = true) {
     // Calculate which grid tiles the bomber overlaps
     const gridLeft = Math.floor(x / WALL_SIZE);
     const gridTop = Math.floor(y / WALL_SIZE);
-    const gridRight = Math.floor(bomberRight / WALL_SIZE) - 0.5;
-    const gridBottom = Math.floor(bomberBottom / WALL_SIZE) - 0.5;
+    const gridRight = Math.floor((bomberRight - 0.5) / WALL_SIZE);
+    const gridBottom = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
 
     // Check all tiles that the bomber overlaps
     for (let gridY = gridTop; gridY <= gridBottom; gridY++) {
