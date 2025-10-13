@@ -19,7 +19,7 @@ let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
 const DANGER_ZONE = []
-let SPEED = 2
+let SPEED = 1
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -132,17 +132,16 @@ socket.on('connect', async () => {
 
     const chest = findNearestChest();
     if (chest) {
-      // console.log('chét', chest);
-      const path = findPathToTarget(chest);
-      // console.log('path to chest', path)
-      if (path && path.length > 1) {
-        if (helpers.isInDanger(helpers.toMapCoord(path[1]), DANGER_ZONE)) {
+      const path_to_chest = findPathToTarget(chest);
+      if (path_to_chest && path_to_chest.length > 1) {
+        if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
           console.log('path 1 in danger zone so dont move', );
         } else {
-          const step = nextStep(path);
+          const path_to_perfect_point = findPathToTarget(getMidPoint(path_to_chest), false);
+          const step = nextStep(path_to_perfect_point);
           if (step) move(step);
         }
-      } else if (path && path.length === 1) {
+      } else if (path_to_chest && path_to_chest.length === 1) {
         console.log('touch nearest chest', )
         placeBoom();
         console.log('placed boom', myBomber.x, myBomber.y)
@@ -288,4 +287,15 @@ function findPathToTarget(target, isGrid = true) {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
   return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
+}
+
+function getMidPoint(path) {
+  const a = path[path.length - 2];
+  const b = path[path.length - 1];
+
+  if (a.x === b.x) {
+    return { x: a.x * 40, y: (a.y + b.y) / 2 * 40 };
+  } else {
+    return { x: (a.x + b.x) / 2 * 40, y: a.y * 40 };
+  }
 }

@@ -78,8 +78,6 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 
   const open = [{ ...start, h: heuristic(start, goal) }];
 
-  // console.log('open', open);
-
   while (open.length > 0) {
     open.sort((a, b) => a.h - b.h);
     const current = open.shift();
