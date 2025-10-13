@@ -105,21 +105,26 @@ socket.on('connect', async () => {
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
+    console.log('myboy', myBomber.x, myBomber.y)
+
     // Check if we're in danger and need to move to safety
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      console.log('In danger! Moving to safety zone...', myBomber.x, myBomber.y, DANGER_ZONE.length);
+      console.log('In danger! Moving to safety zone...');
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
+        console.log('safety zone found', safetyZone)
         const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
+        console.log('path_to_safety', path)
         if (path && path.length > 1) {
           const step = nextStep(path);
           if (step) {
             move(step);
-            // Skip the rest of the loop to give time to move out of danger
             await sleep(1000 / 60 / SPEED);
             continue;
           }
         }
+      } else {
+        console.log('no safety zone', )
       }
     }
 
@@ -133,13 +138,25 @@ socket.on('connect', async () => {
     const chest = findNearestChest();
     if (chest) {
       const path_to_chest = findPathToTarget(chest);
+      console.log('path_to_chest', path_to_chest)
       if (path_to_chest && path_to_chest.length > 1) {
         if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
           console.log('path 1 in danger zone so dont move', );
         } else {
+          console.log('getMidPoint(path_to_chest)', getMidPoint(path_to_chest))
           const path_to_perfect_point = findPathToTarget(getMidPoint(path_to_chest), false);
-          const step = nextStep(path_to_perfect_point);
-          if (step) move(step);
+          console.log('path_to_perfect_point', path_to_perfect_point)
+
+          if (path_to_perfect_point) {
+            if (path_to_perfect_point.length === 1) {
+              console.log('touch path_to_perfect_point', )
+              placeBoom();
+              console.log('placed boom', myBomber.x, myBomber.y)
+            } else {
+              const step = nextStep(path_to_perfect_point);
+              if (step) move(step);
+            }
+          }
         }
       } else if (path_to_chest && path_to_chest.length === 1) {
         console.log('touch nearest chest', )
@@ -294,8 +311,8 @@ function getMidPoint(path) {
   const b = path[path.length - 1];
 
   if (a.x === b.x) {
-    return { x: a.x * 40, y: (a.y + b.y) / 2 * 40 };
+    return { x: a.x * 40, y: (a.y + b.y) / 2 * 40 - 1};
   } else {
-    return { x: (a.x + b.x) / 2 * 40, y: a.y * 40 };
+    return { x: (a.x + b.x) / 2 * 40 - 1, y: a.y * 40 };
   }
 }
