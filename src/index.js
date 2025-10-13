@@ -18,6 +18,7 @@ let BOMBS=[]
 let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
+const FROZEN_BOTS = []
 const DANGER_ZONE = []
 let SPEED = 1
 
@@ -105,11 +106,11 @@ socket.on('connect', async () => {
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
-    // console.log('myboy', myBomber.x, myBomber.y)
+    console.log('myboy', myBomber.x, myBomber.y)
 
     // Check if we're in danger and need to move to safety
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      // console.log('In danger! Moving to safety zone...');
+      console.log('In danger! Moving to safety zone...');
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
         const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
@@ -132,33 +133,41 @@ socket.on('connect', async () => {
       // console.log('moving to reachable item', myBomber.x, myBomber.y);
       move(nextStep(reachableItem.path));
     } else {
+      const chest = findNearestChest();
+      if (chest) {
+        const path_to_chest = findPathToTarget(chest);
+        if (path_to_chest && path_to_chest.length > 1) {
+          if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
+            console.log('path 1 in danger zone so dont move', path_to_chest[1], DANGER_ZONE);
+          } else {
+            const path_to_perfect_point = findPathToTarget(helpers.getMidPoint(path_to_chest), false);
 
-    const chest = findNearestChest();
-    if (chest) {
-      const path_to_chest = findPathToTarget(chest);
-      if (path_to_chest && path_to_chest.length > 1) {
-        if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
-          console.log('path 1 in danger zone so dont move', );
-        } else {
-          const path_to_perfect_point = findPathToTarget(getMidPoint(path_to_chest), false);
-
-          if (path_to_perfect_point) {
-            if (path_to_perfect_point.length === 1) {
-              console.log('touch path_to_perfect_point', )
-              placeBoom();
-              console.log('placed boom', myBomber.x, myBomber.y)
+            if (path_to_perfect_point) {
+              if (path_to_perfect_point.length === 1) {
+                console.log('touch path_to_perfect_point', )
+                placeBoom();
+                console.log('placed boom', myBomber.x, myBomber.y)
+              } else {
+                const step = nextStep(path_to_perfect_point);
+                if (step) {
+                  move(step);
+                } else {
+                  // console.log('no step', );
+                }
+              }
             } else {
-              const step = nextStep(path_to_perfect_point);
-              if (step) move(step);
+              // console.log('no path to perfect point', );
             }
           }
+        } else if (path_to_chest && path_to_chest.length === 1) {
+          console.log('touch nearest chest', )
+          placeBoom();
+          console.log('placed boom', myBomber.x, myBomber.y)
         }
-      } else if (path_to_chest && path_to_chest.length === 1) {
-        console.log('touch nearest chest', )
-        placeBoom();
-        console.log('placed boom', myBomber.x, myBomber.y)
+      } else {
+        // console.log('no chest', );
       }
-    }}
+    }
     await (sleep(1000 / 60 / SPEED));
   }
 });
@@ -199,6 +208,7 @@ function removeDangerZonesForBomb(bombId) {
   const filtered = DANGER_ZONE.filter(z => z.bombId !== bombId);
   DANGER_ZONE.length = 0;
   DANGER_ZONE.push(...filtered);
+  // console.log('DANGER ZONE AFTER REMOVE', DANGER_ZONE);
 }
 
 function upsertBomber(payload) {
@@ -301,24 +311,7 @@ function findPathToTarget(target, isGrid = true) {
   return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
 }
 
-function getMidPoint(path) {
-  const a = path[path.length - 2];
-  const b = path[path.length - 1];
-  const bias = 1; // lệch 1px về phía b
-
-  if (a.x === b.x) {
-    // di chuyển theo trục Y
-    const directionY = Math.sign(b.y - a.y);
-    return {
-      x: a.x * helpers.WALL_SIZE,
-      y: ((a.y + b.y) / 2) * helpers.WALL_SIZE + directionY * bias,
-    };
-  } else {
-    // di chuyển theo trục X
-    const directionX = Math.sign(b.x - a.x);
-    return {
-      x: ((a.x + b.x) / 2) * helpers.WALL_SIZE + directionX * bias,
-      y: a.y * helpers.WALL_SIZE,
-    };
-  }
-}
+setTimeout(() => {
+  const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
+  FROZEN_BOTS.push(...zeroScoreBombers);
+}, 30000); // 30 giây

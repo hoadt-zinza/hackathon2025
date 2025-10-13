@@ -299,6 +299,28 @@ function isBomberInBombCross(myBomber, bomb, range = 2) {
   return isPointInBombCross(grid, bomb, range);
 }
 
+function getMidPoint(path) {
+  const a = path[path.length - 2];
+  const b = path[path.length - 1];
+  const bias = 1; // lệch 1px về phía b
+
+  if (a.x === b.x) {
+    // di chuyển theo trục Y
+    const directionY = Math.sign(b.y - a.y);
+    return {
+      x: a.x * WALL_SIZE,
+      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias,
+    };
+  } else {
+    // di chuyển theo trục X
+    const directionX = Math.sign(b.x - a.x);
+    return {
+      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias,
+      y: a.y * WALL_SIZE,
+    };
+  }
+}
+
 export {
   DIRS,
   isWalkable,
@@ -320,4 +342,5 @@ export {
   isPointInBombCross,
   isBomberInBombCross,
   toMapCoord,
+  getMidPoint,
 };
