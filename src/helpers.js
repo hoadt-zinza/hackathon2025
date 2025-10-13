@@ -13,12 +13,42 @@ const MAP_SIZE = 640;
 const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
-function isWalkable(map, x, y) {
+function isWalkable(map, x, y, isGrid = true) {
   if (!map || y < 0 || x < 0) return false;
-  // if (!map[y] || typeof map[y][x] === 'undefined') return false;
-  const v = map[y][x];
-  // Walls and chest are NOT walkable before destroyed
-  return v === null || v === 'B' || v === 'R' || v === 'S';
+
+  if (isGrid) {
+    // Grid coordinate check - simple tile lookup
+    const v = map[y][x];
+    // Walls and chest are NOT walkable before destroyed
+    return v === null || v === 'B' || v === 'R' || v === 'S';
+  } else {
+    // Real coordinate check - check if bomber's bounding box overlaps with walls
+    // Position {x, y} is top-left corner of bomber (35x35 square)
+    const bomberRight = x + BOMBER_SIZE;
+    const bomberBottom = y + BOMBER_SIZE;
+
+    // Calculate which grid tiles the bomber overlaps
+    const gridLeft = Math.floor(x / WALL_SIZE);
+    const gridTop = Math.floor(y / WALL_SIZE);
+    const gridRight = Math.floor(bomberRight / WALL_SIZE);
+    const gridBottom = Math.floor(bomberBottom / WALL_SIZE);
+
+    // Check all tiles that the bomber overlaps
+    for (let gridY = gridTop; gridY <= gridBottom; gridY++) {
+      for (let gridX = gridLeft; gridX <= gridRight; gridX++) {
+        if (gridY < 0 || gridX < 0 || gridY >= map.length || gridX >= map[0].length) {
+          return false; // Out of bounds
+        }
+        const v = map[gridY][gridX];
+        // If any overlapping tile is not walkable, position is not walkable
+        if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
 
 function heuristic(a, b) {
@@ -40,13 +70,15 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
   const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
   const goal = isGrid ? toGridCoord(target, WALL_SIZE) : { x: target.x, y: target.y };
 
-  console.log('start', start);
-  console.log('goal', goal);
+  // console.log('start', start);
+  // console.log('goal', goal);
 
   const visited = new Set();
   const cameFrom = new Map();
 
   const open = [{ ...start, h: heuristic(start, goal) }];
+
+  // console.log('open', open);
 
   while (open.length > 0) {
     open.sort((a, b) => a.h - b.h);
@@ -68,11 +100,7 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
     for (const dir of DIRS) {
       const nx = current.x + dir.dx;
       const ny = current.y + dir.dy;
-      if (isGrid) {
-        if (!isWalkable(map, nx, ny) && !(nx === goal.x && ny === goal.y)) continue;
-      } else {
-        if (!isWalkable(map, Math.round(nx / WALL_SIZE), Math.round(ny / WALL_SIZE)) && !(nx === goal.x && ny === goal.y)) continue;
-      }
+      if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
       if (visited.has(`${nx},${ny}`)) continue;
       if (!open.find(n => n.x === nx && n.y === ny)) {
         cameFrom.set(`${nx},${ny}`, current);
@@ -169,8 +197,28 @@ function findNearestItem(myBomber, items) {
 function isInDanger(myBomber, DANGER_ZONE) {
   if (!myBomber) return false;
 
-  const bomberGrid = toGridCoord(myBomber);
-  return DANGER_ZONE.some(zone => zone.x === bomberGrid.x && zone.y === bomberGrid.y);
+  // Bomber position {x, y} is top-left corner of 35x35 square
+  const bomberRight = myBomber.x + BOMBER_SIZE;
+  const bomberBottom = myBomber.y + BOMBER_SIZE;
+
+  // Check if bomber overlaps with any danger zone tile
+  for (const zone of DANGER_ZONE) {
+    // Danger zone tile occupies pixels [zone.x * WALL_SIZE, (zone.x + 1) * WALL_SIZE)
+    const tileLeft = zone.x * WALL_SIZE;
+    const tileRight = (zone.x + 1) * WALL_SIZE;
+    const tileTop = zone.y * WALL_SIZE;
+    const tileBottom = (zone.y + 1) * WALL_SIZE;
+
+    // Check if rectangles overlap
+    const overlapX = myBomber.x < tileRight && bomberRight > tileLeft;
+    const overlapY = myBomber.y < tileBottom && bomberBottom > tileTop;
+
+    if (overlapX && overlapY) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function findNearestSafetyZone(myBomber, map, dangerArr) {

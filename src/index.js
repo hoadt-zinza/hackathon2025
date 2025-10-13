@@ -50,8 +50,6 @@ socket.on('new_bomb', (payload) => {
 });
 
 socket.on('item_collected', (payload) => {
-  console.log('item_collected', payload)
-
   if (payload.bomber && payload.bomber.name === process.env.BOMBER_NAME) {
     if (payload.item.type === 'SPEED') {
       SPEED += 1
@@ -69,9 +67,15 @@ socket.on('bomb_explode', (payload) => {
 });
 
 socket.on('map_update', (payload) => {
-  // console.log('Map updated', payload)
-  // CHESTS = payload.chests;
-  // ITEMS = payload.items;
+  const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
+  for (let i = CHESTS.length - 1; i >= 0; i--) {
+    if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
+      //update map (chest removed so set to null)
+      MAP[CHESTS[i].y / helpers.WALL_SIZE][CHESTS[i].x / helpers.WALL_SIZE] = null;
+      CHESTS.splice(i, 1);
+    }
+  }
+  ITEMS = payload.items;
 });
 
 function blindCodeMode() {
@@ -99,26 +103,18 @@ socket.on('connect', async () => {
   }
 
   while(true) {
-    if (BOMBS.length > 0) {
-      console.log('BOMBS', BOMBS)
-      console.log('DANGER', DANGER_ZONE)
-    }
-
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
     // Check if we're in danger and need to move to safety
-    while (isInDanger()) {
-      console.log('In danger! Moving to safety zone...');
+    if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
+      console.log('In danger! Moving to safety zone...', myBomber.x, myBomber.y, DANGER_ZONE.length);
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
         const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
-        console.log('path_to_safe', path);
         if (path && path.length > 1) {
           const step = nextStep(path);
           if (step) {
             move(step);
-            console.log('moving out danger zone', step);
-            console.log('bomber', myBomber.x, myBomber.y);
             // Skip the rest of the loop to give time to move out of danger
             await sleep(1000 / 60 / SPEED);
             continue;
@@ -127,28 +123,32 @@ socket.on('connect', async () => {
       }
     }
 
-    const chest = findNearestChest();
-    const item = findNearestItem();
-    const path_to_item = item ? findPathToTarget(item) : null;
+    const reachableItem = findReachableItem();
 
-    if (item && path_to_item && path_to_item.length > 1) {
-      console.log('moving to nearest item', myBomber.x, myBomber.y);
-      move(nextStep(path_to_item));
+    if (reachableItem) {
+      console.log('moving to reachable item', myBomber.x, myBomber.y);
+      move(nextStep(reachableItem.path));
     } else {
+
+    const chest = findNearestChest();
     if (chest) {
+      // console.log('chét', chest);
       const path = findPathToTarget(chest);
-      console.log('path to chest', path)
+      // console.log('path to chest', path)
       if (path && path.length > 1) {
-        console.log('moving to nearest chest');
-        const step = nextStep(path);
-        if (step) move(step);
+        if (helpers.isInDanger(path[1], DANGER_ZONE)) {
+          console.log('path 1 in danger zone so dont move', );
+        } else {
+          const step = nextStep(path);
+          if (step) move(step);
+        }
       } else if (path && path.length === 1) {
         console.log('touch nearest chest', )
         placeBoom();
         console.log('placed boom', myBomber.x, myBomber.y)
       }
     }}
-    await (sleep(1000/60/SPEED));
+    await (sleep(1000 / 60 / SPEED));
   }
 });
 
@@ -184,10 +184,10 @@ function addDangerZonesForBomb(bomb) {
 }
 
 function removeDangerZonesForBomb(bombId) {
-  // delegate to helper which returns a filtered array
-  const filtered = helpers.removeDangerZonesForBomb(DANGER_ZONE, bombId);
+  // Remove all danger zones associated with this bomb
+  const filtered = DANGER_ZONE.filter(z => z.bombId !== bombId);
   DANGER_ZONE.length = 0;
-  for (const z of filtered) DANGER_ZONE.push(z);
+  DANGER_ZONE.push(...filtered);
 }
 
 function upsertBomber(payload) {
@@ -240,30 +240,37 @@ function findNearestChest() {
   return nearest;
 }
 
-function findNearestItem() {
+function findReachableItem() {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   if (!myBomber || !Array.isArray(ITEMS) || ITEMS.length === 0) return null;
 
-  let nearest = null;
-  let bestDist2 = Infinity;
+  // Filter items within Manhattan distance <= 6
+  const nearbyItems = ITEMS.filter(item => {
+    if (!item) return false;
 
-  for (const item of ITEMS) {
-    if (!item) continue;
-    const dx = (item.x) - (myBomber.x);
-    const dy = (item.y) - (myBomber.y);
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist2) {
-      bestDist2 = d2;
-      nearest = item;
+    const distance = Math.abs(item.x - myBomber.x) + Math.abs(item.y - myBomber.y);
+    return distance <= (6 * helpers.WALL_SIZE);
+  });
+
+  // Find all valid paths to nearby items
+  const validPaths = [];
+  for (const item of nearbyItems) {
+    const path = findPathToTarget(item, false);
+    if (path && path.length > 1) {
+      validPaths.push({ item, path });
     }
   }
 
-  return nearest;
+  // Sort by path length (shortest first) and return the closest one
+  if (validPaths.length > 0) {
+    validPaths.sort((a, b) => a.path.length - b.path.length);
+    return validPaths[0];
+  }
+
+  return null;
 }
 
 function nextStep(path) {
-  // Expect path as an array of grid nodes from current -> ... -> target.
-  // If there's no next step (path shorter than 2), return null.
   if (!path || path.length < 2) return null;
   const current = path[0];
   const next = path[1];
@@ -274,15 +281,6 @@ function nextStep(path) {
   if (next.y < current.y) return 'UP';
 
   return null;
-}
-
-// Check if current position is in danger zone
-function isInDanger() {
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  if (!myBomber) return false;
-
-  // Use bombs/bombers to determine if current bomber is inside any bomb cross area
-  return helpers.isInDanger(myBomber, DANGER_ZONE);
 }
 
 // Wrapper to compute path using helpers with correct inputs
