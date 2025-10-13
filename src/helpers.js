@@ -20,7 +20,7 @@ function isWalkable(map, x, y, isGrid = true) {
     // Grid coordinate check - simple tile lookup
     const v = map[y][x];
     // Only walls ('W') are non-walkable
-    return v !== 'W';
+    return v === null || v === 'B' || v === 'R' || v === 'S';
   } else {
     // Real coordinate check - check if bomber's bounding box overlaps with walls
     // Position {x, y} is top-left corner of bomber (35x35 square)
@@ -38,7 +38,7 @@ function isWalkable(map, x, y, isGrid = true) {
       for (let gridX = gridLeft; gridX <= gridRight; gridX++) {
         const v = map[gridY][gridX];
         // If any overlapping tile is a wall ('W'), position is not walkable
-        if (v === 'W') {
+        if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
           return false;
         }
       }
