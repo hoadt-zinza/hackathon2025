@@ -19,8 +19,8 @@ function isWalkable(map, x, y, isGrid = true) {
   if (isGrid) {
     // Grid coordinate check - simple tile lookup
     const v = map[y][x];
-    // Walls and chest are NOT walkable before destroyed
-    return v === null || v === 'B' || v === 'R' || v === 'S';
+    // Only walls ('W') are non-walkable
+    return v !== 'W';
   } else {
     // Real coordinate check - check if bomber's bounding box overlaps with walls
     // Position {x, y} is top-left corner of bomber (35x35 square)
@@ -30,18 +30,15 @@ function isWalkable(map, x, y, isGrid = true) {
     // Calculate which grid tiles the bomber overlaps
     const gridLeft = Math.floor(x / WALL_SIZE);
     const gridTop = Math.floor(y / WALL_SIZE);
-    const gridRight = Math.floor(bomberRight / WALL_SIZE);
-    const gridBottom = Math.floor(bomberBottom / WALL_SIZE);
+    const gridRight = Math.floor(bomberRight / WALL_SIZE) - 0.5;
+    const gridBottom = Math.floor(bomberBottom / WALL_SIZE) - 0.5;
 
     // Check all tiles that the bomber overlaps
     for (let gridY = gridTop; gridY <= gridBottom; gridY++) {
       for (let gridX = gridLeft; gridX <= gridRight; gridX++) {
-        if (gridY < 0 || gridX < 0 || gridY >= map.length || gridX >= map[0].length) {
-          return false; // Out of bounds
-        }
         const v = map[gridY][gridX];
-        // If any overlapping tile is not walkable, position is not walkable
-        if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
+        // If any overlapping tile is a wall ('W'), position is not walkable
+        if (v === 'W') {
           return false;
         }
       }
@@ -69,9 +66,6 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 
   const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
   const goal = isGrid ? toGridCoord(target, WALL_SIZE) : { x: target.x, y: target.y };
-
-  // console.log('start', start);
-  // console.log('goal', goal);
 
   const visited = new Set();
   const cameFrom = new Map();
