@@ -1,3 +1,7 @@
 AFTER PLACE BOOM => MARK CHEST ISDESTROYED
 FIND BEST PLACE TO PLACE BOOM TO DESTROY MANY CHESTS
 test lai case bomb block duong` chay ra safezone`
+
+BUGS
+- 2 items dan den viec findReachableItem co the bi sai
+- BUG path_to_chest clgt null

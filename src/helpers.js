@@ -2,10 +2,24 @@
 import { MinHeap } from './MinHeap.js';
 
 const DIRS = [
-  {dx: 0, dy: -1},
-  {dx: 1, dy: 0},
-  {dx: 0, dy: 1},
-  {dx: -1, dy: 0}
+  [
+    {dx: 0, dy: -1},
+    {dx: 1, dy: 0},
+    {dx: 0, dy: 1},
+    {dx: -1, dy: 0}
+  ],
+  [
+    {dx: 0, dy: -2},
+    {dx: 2, dy: 0},
+    {dx: 0, dy: 2},
+    {dx: -2, dy: 0}
+  ],
+  [
+    {dx: 0, dy: -3},
+    {dx: 3, dy: 0},
+    {dx: 0, dy: 3},
+    {dx: -3, dy: 0}
+  ]
 ];
 
 // Constants
@@ -89,7 +103,7 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 
     visited.add(`${current.x},${current.y}`);
 
-    for (const dir of DIRS) {
+    for (const dir of DIRS[myBomber.speed - 1]) {
       const nx = current.x + dir.dx;
       const ny = current.y + dir.dy;
       if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
@@ -113,7 +127,7 @@ function createDangerZonesForBomb(bomb, placingBomber, map) {
   const zones = [];
   zones.push({ bombId: bomb.id, x: x, y: y });
 
-  for (const dir of DIRS) {
+  for (const dir of DIRS[0]) {
     for (let i = 1; i <= explosionRange; i++) {
       const nx = x + dir.dx * i;
       const ny = y + dir.dy * i;
@@ -216,7 +230,7 @@ function isInDanger(myBomber, DANGER_ZONE) {
 function findNearestSafetyZone(myBomber, map, dangerArr) {
   const currentGridPos = toGridCoord(myBomber, WALL_SIZE);
 
-  if (!Array.isArray(dangerArr) || dangerArr.length === 0) return currentGridPos;
+  if (dangerArr.length === 0) return { x: myBomber.x, y: myBomber.y };
 
   const dangerSet = new Set(dangerArr.map(z => `${z.x},${z.y}`));
   const openSet = new MinHeap((a, b) => a.f - b.f); // hàng đợi ưu tiên theo f = g + h
@@ -242,7 +256,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
       return { x: node.x, y: node.y };
     }
 
-    for (const dir of DIRS) {
+    for (const dir of DIRS[myBomber.speed - 1]) {
       const nx = node.x + dir.dx;
       const ny = node.y + dir.dy;
       const nextKey = `${nx},${ny}`;
@@ -263,7 +277,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
     }
   }
 
-  return currentGridPos; // không tìm được safe zone reachable
+  return { x: myBomber.x, y: myBomber.y }; // không tìm được safe zone reachable
 }
 
 // Return array of grid coords that form the cross-shaped danger area for a bomb.
@@ -339,7 +353,7 @@ function getWalkableNeighbors(map, position) {
     visited.add(key(row, col));
     result.push({ x: col, y: row });
 
-    for (const { dx, dy } of DIRS) {
+    for (const { dx, dy } of DIRS[0]) {
       queue.push({ row: row + dy, col: col + dx });
     }
   }

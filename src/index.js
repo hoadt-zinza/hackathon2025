@@ -103,72 +103,90 @@ socket.on('connect', async () => {
     await sleep(100)
   }
 
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  myBomber.x = 45
+  myBomber.y = 159
+
+  ITEMS = [
+    { x: 40, y: 240, type: 'SPEED' },
+    { x: 80, y: 160, type: 'EXPLOSION_RANGE' }
+  ]
+
+  console.log('ss', findReachableItem());
+  console.log('next', nextStep([{ x: 45, y: 159 }, { x: 45, y: 160 }]));
+
   while(true) {
-    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-    console.log('myboy', myBomber.x, myBomber.y)
+    // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+    // console.log('myboy', myBomber.x, myBomber.y)
 
-    if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      console.log('In danger! Moving to safety zone...');
-      const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
-      if (safetyZone) {
-        const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
-        if (path && path.length > 1) {
-          const step = nextStep(path);
-          if (step) {
-            move(step);
-            await sleep(1000 / 60 / SPEED);
-            continue;
-          }
-        }
-      } else {
-        console.log('no safety zone', )
-      }
-    }
+    // if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
+    //   console.log('DANGER_ZONE', DANGER_ZONE)
+    //   const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+    //   console.log('In danger! Moving to safety zone...', safetyZone);
+    //   if (safetyZone) {
+    //     const path = findPathToTarget(helpers.toMapCoord(safetyZone), false);
+    //     console.log('path_to_safe', safetyZone)
+    //     if (path && path.length > 1) {
+    //       const step = nextStep(path);
+    //       if (step) {
+    //         move(step);
+    //         await sleep(1000 / 60 / SPEED);
+    //         continue;
+    //       }
+    //     }
+    //   } else {
+    //     console.log('no safety zone', )
+    //   }
+    // }
 
-    const reachableItem = findReachableItem();
+    // const reachableItem = findReachableItem();
 
-    if (reachableItem) {
-      // console.log('moving to reachable item', myBomber.x, myBomber.y);
-      move(nextStep(reachableItem.path));
-    } else {
-      const chest = findNearestChest();
-      if (chest) {
-        const path_to_chest = findPathToTarget(chest);
-        if (path_to_chest && path_to_chest.length > 1) {
-          if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
-            console.log('path 1 in danger zone so dont move', path_to_chest[1], DANGER_ZONE);
-          } else {
-            const path_to_perfect_point = findPathToTarget(helpers.getMidPoint(path_to_chest), false);
+    // if (reachableItem) {
+    //   console.log('moving to reachable item', myBomber.x, myBomber.y, reachableItem.path);
+    //   move(nextStep(reachableItem.path));
+    // } else {
+    //   const chest = findNearestChest();
+    //   if (chest) {
+    //     const path_to_chest = findPathToTarget(chest);
 
-            if (path_to_perfect_point) {
-              if (path_to_perfect_point.length === 1) {
-                console.log('touch path_to_perfect_point', )
-                const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
-                if (safeZones)
-                  placeBoom(myBomber);
-              } else {
-                const step = nextStep(path_to_perfect_point);
-                if (step) {
-                  move(step);
-                } else {
-                  console.log('no step', );
-                }
-              }
-            } else {
-              console.log('no path to perfect point', );
-            }
-          }
-        } else if (path_to_chest && path_to_chest.length === 1) {
-          console.log('touch nearest chest', )
-          const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
-          if (safeZones) {
-            placeBoom(myBomber);
-          }
-        }
-      } else {
-        console.log('no chest', );
-      }
-    }
+    //     if (path_to_chest && path_to_chest.length > 1) {
+    //       if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
+    //         console.log('path 1 in danger zone so dont move', path_to_chest[1], DANGER_ZONE);
+    //       } else {
+    //         const path_to_perfect_point = findPathToTarget(helpers.getMidPoint(path_to_chest), false);
+
+    //         if (path_to_perfect_point) {
+    //           if (path_to_perfect_point.length === 1) {
+    //             console.log('touch path_to_perfect_point', )
+    //             const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
+    //             if (safeZones)
+    //               placeBoom(myBomber);
+    //           } else {
+    //             const step = nextStep(path_to_perfect_point);
+    //             if (step) {
+    //               move(step);
+    //             } else {
+    //               console.log('no step', );
+    //             }
+    //           }
+    //         } else {
+    //           console.log('no path to perfect point', );
+    //         }
+    //       }
+    //     } else if (path_to_chest && path_to_chest.length === 1) {
+    //       console.log('touch nearest chest', )
+    //       const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
+    //       if (safeZones) {
+    //         placeBoom(myBomber);
+    //       }
+    //     } else {
+    //       console.log('chest', chest)
+    //       console.log('clgt', path_to_chest);
+    //     }
+    //   } else {
+    //     console.log('no chest', );
+    //   }
+    // }
     await (sleep(1000 / 60 / SPEED));
   }
 });
@@ -265,9 +283,9 @@ function findNearestChest() {
 
 function findReachableItem() {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  if (!myBomber || !Array.isArray(ITEMS) || ITEMS.length === 0) return null;
+  if (ITEMS.length === 0) return null;
 
-  // Filter items within Manhattan distance <= 6
+  // Filter items within Manhattan distance <= 6 grid cells
   const nearbyItems = ITEMS.filter(item => {
     if (!item) return false;
 
