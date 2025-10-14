@@ -321,6 +321,65 @@ function getMidPoint(path) {
   }
 }
 
+//flood fill BFS to find walkable neighbors in real coordinates
+function getWalkableNeighbors(map, position) {
+  const { x: startCol, y: startRow } = toGridCoord(position);
+
+  const visited = new Set();
+  const queue = [{ row: startRow, col: startCol }];
+  const result = [];
+
+  const key = (r, c) => `${r},${c}`;
+
+  while (queue.length > 0) {
+    const { row, col } = queue.shift();
+    if (visited.has(key(row, col))) continue;
+    if (map[row][col] !== null) continue;
+
+    visited.add(key(row, col));
+    result.push({ x: col, y: row });
+
+    for (const { dx, dy } of DIRS) {
+      queue.push({ row: row + dy, col: col + dx });
+    }
+  }
+
+  return result;
+}
+
+function countSafeZonesAfterPlaceBoom(myBomber, dangerArr, map) {
+  if (!myBomber || !Array.isArray(dangerArr) || !map) return null;
+
+  const walkableNeighbors = getWalkableNeighbors(map, {x: myBomber.x, y: myBomber.y});
+  if (walkableNeighbors.length === 0) return null;
+
+  let updatedDangerZone = [...dangerArr];
+  const bombPos = { x: myBomber.x, y: myBomber.y };
+  updatedDangerZone = createDangerZonesForBomb(bombPos, myBomber, map).concat(updatedDangerZone)
+
+  const dangerSet = new Set();
+  const pushToSet = (p) => {
+    if (!p || typeof p.x !== 'number' || typeof p.y !== 'number') return;
+    const key = `${Math.trunc(p.x)},${Math.trunc(p.y)}`;
+    dangerSet.add(key);
+  };
+  for (let i = 0; i < dangerArr.length; i++) {
+    pushToSet(dangerArr[i]);
+  }
+  for (let i = 0; i < updatedDangerZone.length; i++) {
+    pushToSet(updatedDangerZone[i]);
+  }
+
+  let safeCount = 0;
+  for (const w of walkableNeighbors) {
+    if (!w || typeof w.x !== 'number' || typeof w.y !== 'number') continue;
+    const key = `${Math.trunc(w.x)},${Math.trunc(w.y)}`;
+    if (!dangerSet.has(key)) safeCount++;
+  }
+
+  return safeCount;
+}
+
 export {
   DIRS,
   isWalkable,
@@ -343,4 +402,6 @@ export {
   isBomberInBombCross,
   toMapCoord,
   getMidPoint,
+  getWalkableNeighbors,
+  countSafeZonesAfterPlaceBoom,
 };

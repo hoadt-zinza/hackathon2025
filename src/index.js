@@ -105,10 +105,8 @@ socket.on('connect', async () => {
 
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-
     console.log('myboy', myBomber.x, myBomber.y)
 
-    // Check if we're in danger and need to move to safety
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       console.log('In danger! Moving to safety zone...');
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
@@ -145,27 +143,30 @@ socket.on('connect', async () => {
             if (path_to_perfect_point) {
               if (path_to_perfect_point.length === 1) {
                 console.log('touch path_to_perfect_point', )
-                placeBoom();
-                console.log('placed boom', myBomber.x, myBomber.y)
+                const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
+                if (safeZones)
+                  placeBoom(myBomber);
               } else {
                 const step = nextStep(path_to_perfect_point);
                 if (step) {
                   move(step);
                 } else {
-                  // console.log('no step', );
+                  console.log('no step', );
                 }
               }
             } else {
-              // console.log('no path to perfect point', );
+              console.log('no path to perfect point', );
             }
           }
         } else if (path_to_chest && path_to_chest.length === 1) {
           console.log('touch nearest chest', )
-          placeBoom();
-          console.log('placed boom', myBomber.x, myBomber.y)
+          const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
+          if (safeZones) {
+            placeBoom(myBomber);
+          }
         }
       } else {
-        // console.log('no chest', );
+        console.log('no chest', );
       }
     }
     await (sleep(1000 / 60 / SPEED));
@@ -190,7 +191,8 @@ const move = (orient) => {
   // if (orient === 'RIGHT') myBomber.x += 2
 }
 
-const placeBoom = () => {
+const placeBoom = (myBomber = null) => {
+  console.log('placed boom at ', myBomber.x, myBomber.y)
   socket.emit('place_bomb', {})
 }
 
