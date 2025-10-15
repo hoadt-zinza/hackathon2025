@@ -20,7 +20,7 @@ let ITEMS=[]
 let GAME_START = false
 const FROZEN_BOTS = []
 const DANGER_ZONE = []
-let SPEED = 1
+let SPEED = 2
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -28,6 +28,8 @@ socket.on('user', (data) => {
   BOMBS = data.bombs;
   CHESTS = data.chests;
   ITEMS = data.items;
+  if (process.env.ENV == 'local')
+    GAME_START = true
 });
 
 socket.on('start', () => {
@@ -96,20 +98,18 @@ function blindCodeMode() {
       }
     }
   }
+  GAME_START = true
 }
 
 socket.on('connect', async () => {
   console.log('Connected to server');
-  socket.emit('join', {});
+  // socket.emit('join', {});
+  blindCodeMode()
   console.log('Sent join event');
-  if (process.env.ENV == 'local')
-    GAME_START = true
 
   while(!GAME_START) {
     await sleep(100)
   }
-
-  // blindCodeMode()
 
   while(BOMBERS.length === 0) {
     await sleep(100)
@@ -148,14 +148,13 @@ socket.on('connect', async () => {
       helpers.findBestBombPlacementNear(myBomber, MAP)
       const chest = helpers.findNearestChest(myBomber, CHESTS);
 
-      console.log('cest', helpers.findBestBombPlacementNear(myBomber, MAP));
-
       if (chest) {
         const path_to_chest = findPathToTarget(chest);
+        console.log('chest', chest);
 
         if (path_to_chest && path_to_chest.length > 1) {
           if (helpers.isInDanger(helpers.toMapCoord(path_to_chest[1]), DANGER_ZONE)) {
-            console.log('path 1 in danger zone so dont move', path_to_chest[1], DANGER_ZONE);
+            console.log('path 1 in danger zone so dont move');
           } else {
             const path_to_perfect_point = findPathToTarget(helpers.getMidPoint(path_to_chest), false);
 
@@ -177,15 +176,20 @@ socket.on('connect', async () => {
               console.log('no path to perfect point', );
             }
           }
-        } else if (path_to_chest && path_to_chest.length === 1) {
+        } else if (path_to_chest && path_to_chest.length < 2) {
           console.log('touch nearest chest', path_to_chest)
           const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
           if (safeZones) {
             placeBoom(myBomber);
           }
+          if (path_to_chest.length === 0) {
+            throw new Error('path to chest length 0')
+          }
         } else {
           console.log('chest', chest)
-          console.log('clgt', path_to_chest);
+          console.log('path_to_chest', path_to_chest);
+          console.log('map', MAP);
+          throw new Error('clgt')
         }
       } else {
         console.log('no chest', );
@@ -204,19 +208,27 @@ const move = (orient) => {
     orient: orient
   })
 
-  //blind code mode
-  // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  // if (!myBomber) return;
+  //blindcodemode
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  if (!myBomber) return;
 
-  // if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
+  if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
+  if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
+  if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
+  if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
 }
 
 const placeBoom = (myBomber = null) => {
   console.log('placed boom at ', myBomber.x, myBomber.y)
   socket.emit('place_bomb', {})
+
+  //blindcodemode
+  addDangerZonesForBomb({
+    id: `random-${Date.now()}`,
+    x: myBomber.x,
+    y: myBomber.y,
+    uid: myBomber.uid,
+  })
 }
 
 // Add danger zones for a specific bomb using bomber.explosionRange

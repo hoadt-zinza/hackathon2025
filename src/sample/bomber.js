@@ -1,5 +1,5 @@
 export default {
-  x: 40,
+  x: 565,
   y: 40,
   speed: 1,
   type: 1,
@@ -13,5 +13,5 @@ export default {
   color: 1,
   explosionRange: 2,
   bombCount: 1,
-  speedCount: 1
+  speedCount: 0
 };
