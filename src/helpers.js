@@ -84,11 +84,16 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
   const visited = new Set();
   const cameFrom = new Map();
 
-  const open = [{ ...start, h: heuristic(start, goal) }];
+  // Dùng heap thay vì mảng
+  const open = new MinHeap((a, b) => a.h - b.h);
+  open.push({ ...start, h: heuristic(start, goal) });
 
-  while (open.length > 0) {
-    open.sort((a, b) => a.h - b.h);
-    const current = open.shift();
+  // Để tránh .find() (O(n)), ta có thể thêm một map theo key "x,y"
+  const openSet = new Set([`${start.x},${start.y}`]);
+
+  while (!open.isEmpty()) {
+    const current = open.pop();
+    openSet.delete(`${current.x},${current.y}`);
 
     const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
     if (dist <= myBomber.speedCount) {
@@ -108,9 +113,12 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
       const ny = current.y + dir.dy;
       if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
       if (visited.has(`${nx},${ny}`)) continue;
-      if (!open.find(n => n.x === nx && n.y === ny)) {
-        cameFrom.set(`${nx},${ny}`, current);
+
+      const key = `${nx},${ny}`;
+      if (!openSet.has(key)) {
+        cameFrom.set(key, current);
         open.push({ x: nx, y: ny, h: heuristic({ x: nx, y: ny }, goal) });
+        openSet.add(key);
       }
     }
   }
