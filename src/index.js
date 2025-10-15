@@ -41,7 +41,6 @@ socket.on('new_enemy', (data) => {
 });
 
 socket.on('player_move', (payload) => {
-  console.log('p', payload);
   upsertBomber(payload);
 });
 
@@ -131,7 +130,7 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      console.log('moving to reachable item', myBomber.x, myBomber.y, reachableItem.path);
+      console.log('moving to reachable item', reachableItem.path);
       move(nextStep(reachableItem.path));
     } else {
       const chest = findNearestChest();
@@ -192,10 +191,11 @@ const move = (orient) => {
   //blind code mode
   // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   // if (!myBomber) return;
-  // if (orient === 'UP') myBomber.y -= 2
-  // if (orient === 'DOWN') myBomber.y += 2
-  // if (orient === 'LEFT') myBomber.x -= 2
-  // if (orient === 'RIGHT') myBomber.x += 2
+
+  // if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
 }
 
 const placeBoom = (myBomber = null) => {
