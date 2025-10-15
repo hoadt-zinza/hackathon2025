@@ -1,6 +1,6 @@
 export default {
-  x: 120,
-  y: 160,
+  x: 400,
+  y: 400,
   type: 'RANGE',
   size: 1,
   isCollected: false

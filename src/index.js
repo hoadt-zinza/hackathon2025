@@ -36,12 +36,12 @@ socket.on('start', () => {
 
 socket.on('new_enemy', (data) => {
   for (const bomber of data.bombers) {
-    upsertBomber(bomber);
+    helpers.upsertBomber(BOMBERS, bomber);
   }
 });
 
 socket.on('player_move', (payload) => {
-  upsertBomber(payload);
+  helpers.upsertBomber(BOMBERS, payload);
 });
 
 socket.on('new_bomb', (payload) => {
@@ -81,9 +81,21 @@ socket.on('map_update', (payload) => {
 
 function blindCodeMode() {
   BOMBERS.push({ ...sampleBomber });
-  CHESTS.push({ ...sampleChest });
   MAP = sampleMap;
   ITEMS.push({ ...sampleItem });
+  for (let y = 0; y < MAP.length; y++) {
+    for (let x = 0; x < MAP[y].length; x++) {
+      if (MAP[y][x] === 'C') {
+        CHESTS.push({
+          x: x * helpers.WALL_SIZE,
+          y: y * helpers.WALL_SIZE,
+          size: helpers.WALL_SIZE,
+          type: 'C',
+          isDestroyed: false
+        });
+      }
+    }
+  }
 }
 
 socket.on('connect', async () => {
@@ -130,10 +142,14 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      console.log('moving to reachable item', reachableItem.path);
+      console.log('moving to reachable item', reachableItem.path[0]);
       move(nextStep(reachableItem.path));
     } else {
-      const chest = findNearestChest();
+      helpers.findBestBombPlacementNear(myBomber, MAP)
+      const chest = helpers.findNearestChest(myBomber, CHESTS);
+
+      console.log('cest', helpers.findBestBombPlacementNear(myBomber, MAP));
+
       if (chest) {
         const path_to_chest = findPathToTarget(chest);
 
@@ -162,7 +178,7 @@ socket.on('connect', async () => {
             }
           }
         } else if (path_to_chest && path_to_chest.length === 1) {
-          console.log('touch nearest chest', )
+          console.log('touch nearest chest', path_to_chest)
           const safeZones = helpers.countSafeZonesAfterPlaceBoom(myBomber, DANGER_ZONE, MAP);
           if (safeZones) {
             placeBoom(myBomber);
@@ -220,22 +236,6 @@ function removeDangerZonesForBomb(bombId) {
   // console.log('DANGER ZONE AFTER REMOVE', DANGER_ZONE);
 }
 
-function upsertBomber(payload) {
-  const uid = payload.uid;
-  if (!uid) return;
-
-  // Tìm vị trí bomber có cùng uid
-  const idx = BOMBERS.findIndex(b => b && (b.uid === uid));
-
-  if (idx !== -1) {
-    // Cập nhật bomber hiện có
-    BOMBERS[idx] = { ...BOMBERS[idx], ...payload };
-  } else {
-    // Thêm bomber mới
-    BOMBERS.push(payload);
-  }
-}
-
 function upsertBomb(payload) {
   const id = payload.id;
   if (!id) return;
@@ -247,27 +247,6 @@ function upsertBomb(payload) {
   } else {
     BOMBS.push(payload);
   }
-}
-
-function findNearestChest() {
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  if (!myBomber || !Array.isArray(CHESTS) || CHESTS.length === 0) return null;
-
-  let nearest = null;
-  let bestDist2 = Infinity;
-
-  for (const chest of CHESTS) {
-    if (!chest || chest.isDestroyed) continue;
-    const dx = (chest.x) - (myBomber.x);
-    const dy = (chest.y) - (myBomber.y);
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist2) {
-      bestDist2 = d2;
-      nearest = chest;
-    }
-  }
-
-  return nearest;
 }
 
 function findReachableItem() {

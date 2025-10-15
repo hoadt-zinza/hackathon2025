@@ -155,6 +155,7 @@ function removeDangerZonesForBomb(dangerArr, bombId) {
 function upsertBomber(bombersArr, payload) {
   const uid = payload && payload.uid;
   if (!uid) return;
+
   const idx = bombersArr.findIndex(b => b && b.uid === uid);
   if (idx !== -1) {
     bombersArr[idx] = { ...bombersArr[idx], ...payload };
@@ -162,6 +163,7 @@ function upsertBomber(bombersArr, payload) {
     bombersArr.push(payload);
   }
 }
+
 
 function upsertBomb(bombsArr, payload) {
   const id = payload && payload.id;
@@ -176,6 +178,7 @@ function upsertBomb(bombsArr, payload) {
 
 function findNearestChest(myBomber, chests) {
   if (!myBomber || !Array.isArray(chests) || chests.length === 0) return null;
+
   let nearest = null;
   let bestDist2 = Infinity;
   for (const chest of chests) {
@@ -186,23 +189,6 @@ function findNearestChest(myBomber, chests) {
     if (d2 < bestDist2) {
       bestDist2 = d2;
       nearest = chest;
-    }
-  }
-  return nearest;
-}
-
-function findNearestItem(myBomber, items) {
-  if (!myBomber || !Array.isArray(items) || items.length === 0) return null;
-  let nearest = null;
-  let bestDist2 = Infinity;
-  for (const item of items) {
-    if (!item) continue;
-    const dx = (item.x) - (myBomber.x);
-    const dy = (item.y) - (myBomber.y);
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist2) {
-      bestDist2 = d2;
-      nearest = item;
     }
   }
   return nearest;
@@ -343,6 +329,57 @@ function getMidPoint(path) {
   }
 }
 
+// Count how many chests would be destroyed by a bomb placed at grid (x,y)
+// Explosion travels in 4 directions up to `range`, stops at walls ('W') and also
+// stops after destroying a chest ('C'). Walkable tiles are null | 'B' | 'R' | 'S'.
+function countChestsDestroyedAt(map, x, y, range = 2) {
+  if (!map || y < 0 || x < 0 || y >= map.length || x >= map[0].length) return 0;
+
+  let destroyed = 0;
+  for (const dir of DIRS[0]) {
+    for (let step = 1; step <= range; step++) {
+      const nx = x + dir.dx * step;
+      const ny = y + dir.dy * step;
+      if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) break;
+      const tile = map[ny][nx];
+      if (tile === 'W') break; // blocked by wall
+      if (tile === 'C') { destroyed += 1; break; } // destroy chest and stop
+      // else walkable/null or item; continue propagation
+    }
+  }
+
+  return destroyed;
+}
+
+// Find best bomb placement near a bomber that maximizes chests destroyed.
+// Returns a grid position { x, y, score } or null if none.
+// Tie-breakers: higher score first, then smaller Manhattan distance to bomber.
+function findBestBombPlacementNear(myBomber, map) {
+  if (!myBomber || !map) return null;
+  const start = toGridCoord(myBomber);
+  const range = myBomber.explosionRange;
+
+  // Only consider reachable tiles from current position
+  const reachable = getWalkableNeighbors(map, { x: myBomber.x, y: myBomber.y });
+  if (!Array.isArray(reachable) || reachable.length === 0) return null;
+
+  let best = null;
+  for (const pos of reachable) {
+    const x = pos.x;
+    const y = pos.y;
+    const score = countChestsDestroyedAt(map, x, y, range);
+    if (score <= 0) continue;
+
+    const dist = Math.abs(x - start.x) + Math.abs(y - start.y);
+    if (!best || score > best.score || (score === best.score && dist < best.dist)) {
+      best = { x, y, score, dist };
+    }
+  }
+
+  if (!best) return null;
+  return { x: best.x, y: best.y, score: best.score };
+}
+
 //flood fill BFS to find walkable neighbors in real coordinates
 function getWalkableNeighbors(map, position) {
   const { x: startCol, y: startRow } = toGridCoord(position);
@@ -371,7 +408,6 @@ function getWalkableNeighbors(map, position) {
 
 function countSafeZonesAfterPlaceBoom(myBomber, dangerArr, map) {
   const walkableNeighbors = getWalkableNeighbors(map, {x: myBomber.x, y: myBomber.y});
-  console.log('walkableNeighbors', walkableNeighbors);
   if (walkableNeighbors.length === 0) return null;
 
   let updatedDangerZone = [...dangerArr];
@@ -412,7 +448,6 @@ export {
   upsertBomber,
   upsertBomb,
   findNearestChest,
-  findNearestItem,
   isInDanger,
   findNearestSafetyZone,
   MAP_SIZE,
@@ -425,4 +460,6 @@ export {
   getMidPoint,
   getWalkableNeighbors,
   countSafeZonesAfterPlaceBoom,
+  countChestsDestroyedAt,
+  findBestBombPlacementNear,
 };
