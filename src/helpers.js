@@ -362,9 +362,8 @@ function getWalkableNeighbors(map, position) {
 }
 
 function countSafeZonesAfterPlaceBoom(myBomber, dangerArr, map) {
-  if (!myBomber || !Array.isArray(dangerArr) || !map) return null;
-
   const walkableNeighbors = getWalkableNeighbors(map, {x: myBomber.x, y: myBomber.y});
+  console.log('walkableNeighbors', walkableNeighbors);
   if (walkableNeighbors.length === 0) return null;
 
   let updatedDangerZone = [...dangerArr];
