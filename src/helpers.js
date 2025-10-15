@@ -90,20 +90,20 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
     open.sort((a, b) => a.h - b.h);
     const current = open.shift();
 
-    if (current.x === goal.x && current.y === goal.y) {
+    const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
+    if (dist <= myBomber.speedCount) {
       const path = [];
       let step = current;
       while (step) {
         path.push({ x: step.x, y: step.y });
         step = cameFrom.get(`${step.x},${step.y}`);
       }
-      if (target.type === 'C') return path.reverse().slice(0, -1);
-      return path.reverse();
+      return target.type === 'C' ? path.reverse().slice(0, -1) : path.reverse();
     }
 
     visited.add(`${current.x},${current.y}`);
 
-    for (const dir of DIRS[myBomber.speed - 1]) {
+    for (const dir of DIRS[myBomber.speedCount]) {
       const nx = current.x + dir.dx;
       const ny = current.y + dir.dy;
       if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;

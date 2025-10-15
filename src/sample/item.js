@@ -1,5 +1,5 @@
 export default {
-  x: 80,
+  x: 120,
   y: 160,
   type: 'RANGE',
   size: 1,
