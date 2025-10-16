@@ -126,10 +126,9 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
   return null;
 }
 
-function createDangerZonesForBomb(bomb, placingBomber, map) {
+function createDangerZonesForBomb(bomb, explosionRange, map) {
   if (!bomb) return [];
 
-  const explosionRange = placingBomber.explosionRange;
   const { x, y } = toGridCoord(bomb);
 
   const zones = [];
@@ -250,7 +249,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
       return { x: node.x, y: node.y };
     }
 
-    for (const dir of DIRS[myBomber.speed - 1]) {
+    for (const dir of DIRS[myBomber.speedCount]) {
       const nx = node.x + dir.dx;
       const ny = node.y + dir.dy;
       const nextKey = `${nx},${ny}`;
@@ -307,6 +306,7 @@ function isBomberInBombCross(myBomber, bomb, range = 2) {
   return isPointInBombCross(grid, bomb, range);
 }
 
+// path: array of REAL coordinates [{x, y}, ...]
 function getMidPoint(path) {
   const a = path[path.length - 2];
   const b = path[path.length - 1];
@@ -351,36 +351,36 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
   return destroyed;
 }
 
-// Find best bomb placement near a bomber that maximizes chests destroyed.
-// Returns a grid position { x, y, score } or null if none.
-// Tie-breakers: higher score first, then smaller Manhattan distance to bomber.
-function findBestBombPlacementNear(myBomber, map) {
+// Find all possible bomb placements near a bomber from reachable tiles.
+// Returns array of { x, y, score, dist } sorted by score (highest first). XY are grid coords.
+// score = number of chests destroyed, dist = Manhattan distance from bomber.
+/*
+  [
+    { x: 14, y: 4, score: 2, dist: 3 },
+    { x: 14, y: 1, score: 1, dist: 0 },
+    { x: 13, y: 1, score: 1, dist: 1 },
+    { x: 14, y: 3, score: 1, dist: 2 },
+    { x: 14, y: 2, score: 0, dist: 1 }
+  ]
+*/
+function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = []) {
   if (!myBomber || !map) return null;
   const start = toGridCoord(myBomber);
   const range = myBomber.explosionRange;
 
   // Only consider reachable tiles from current position
-  const reachable = getWalkableNeighbors(map, { x: myBomber.x, y: myBomber.y });
-  if (!Array.isArray(reachable) || reachable.length === 0) return null;
+  if (!walkableNeighbors) walkableNeighbors = getWalkableNeighbors(map, { x: myBomber.x, y: myBomber.y });
+  if (walkableNeighbors.length === 0) return null;
 
-  let best = null;
-  for (const pos of reachable) {
-    const x = pos.x;
-    const y = pos.y;
-    const score = countChestsDestroyedAt(map, x, y, range);
-    if (score <= 0) continue;
-
-    const dist = Math.abs(x - start.x) + Math.abs(y - start.y);
-    if (!best || score > best.score || (score === best.score && dist < best.dist)) {
-      best = { x, y, score, dist };
-    }
-  }
-
-  if (!best) return null;
-  return { x: best.x, y: best.y, score: best.score };
+  return walkableNeighbors.map(p => {
+    return { x: p.x, y: p.y, score: countChestsDestroyedAt(map, p.x, p.y, range), dist: Math.abs(p.x - start.x) + Math.abs(p.y - start.y) };
+  }).sort((a, b) => {
+    return b.score - a.score; // higher score first
+  })
 }
 
-//flood fill BFS to find walkable neighbors in real coordinates
+// Find all walkable neighbors from a position using flood fill BFS.
+// Returns array of { x, y } grid coordinates that are reachable from the starting position.
 function getWalkableNeighbors(map, position) {
   const { x: startCol, y: startRow } = toGridCoord(position);
 
@@ -406,23 +406,19 @@ function getWalkableNeighbors(map, position) {
   return result;
 }
 
-function countSafeZonesAfterPlaceBoom(myBomber, dangerArr, map) {
-  const walkableNeighbors = getWalkableNeighbors(map, {x: myBomber.x, y: myBomber.y});
+// position are grid coords
+function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, walkableNeighbors = []) {
+  if (!walkableNeighbors) walkableNeighbors = getWalkableNeighbors(map, {x: position.x, y: position.y});
   if (walkableNeighbors.length === 0) return null;
 
   let updatedDangerZone = [...dangerArr];
-  const bombPos = { x: myBomber.x, y: myBomber.y };
-  updatedDangerZone = createDangerZonesForBomb(bombPos, myBomber, map).concat(updatedDangerZone)
+  updatedDangerZone = createDangerZonesForBomb(position, explosionRange, map).concat(updatedDangerZone)
 
   const dangerSet = new Set();
   const pushToSet = (p) => {
-    if (!p || typeof p.x !== 'number' || typeof p.y !== 'number') return;
     const key = `${Math.trunc(p.x)},${Math.trunc(p.y)}`;
     dangerSet.add(key);
   };
-  for (let i = 0; i < dangerArr.length; i++) {
-    pushToSet(dangerArr[i]);
-  }
   for (let i = 0; i < updatedDangerZone.length; i++) {
     pushToSet(updatedDangerZone[i]);
   }
@@ -461,5 +457,5 @@ export {
   getWalkableNeighbors,
   countSafeZonesAfterPlaceBoom,
   countChestsDestroyedAt,
-  findBestBombPlacementNear,
+  findAllPossiblePlaceBoom,
 };
