@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import * as helpers from './helpers.js';
 import { io } from 'socket.io-client';
 import sampleBomber from './sample/bomber.js';
-import sampleChest from './sample/chest.js';
 import sampleMap from './sample/map.js';
 import sampleItem from './sample/item.js';
 
@@ -22,64 +21,68 @@ const FROZEN_BOTS = []
 const DANGER_ZONE = []
 let SPEED = 2
 
-socket.on('user', (data) => {
-  MAP = data.map;
-  BOMBERS = data.bombers;
-  BOMBS = data.bombs;
-  CHESTS = data.chests;
-  ITEMS = data.items;
-  if (process.env.ENV == 'local')
-    GAME_START = true
-});
+// socket.on('user', (data) => {
+//   MAP = data.map;
+//   BOMBERS = data.bombers;
+//   BOMBS = data.bombs;
+//   CHESTS = data.chests;
+//   ITEMS = data.items;
+//   if (process.env.ENV == 'local')
+//     GAME_START = true
+// });
 
-socket.on('start', () => {
-  GAME_START = true
-})
+// socket.on('start', () => {
+//   GAME_START = true
+// })
 
-socket.on('new_enemy', (data) => {
-  for (const bomber of data.bombers) {
-    helpers.upsertBomber(BOMBERS, bomber);
-  }
-});
+// socket.on('new_enemy', (data) => {
+//   for (const bomber of data.bombers) {
+//     helpers.upsertBomber(BOMBERS, bomber);
+//   }
+// });
 
-socket.on('player_move', (payload) => {
-  helpers.upsertBomber(BOMBERS, payload);
-});
+// socket.on('player_move', (payload) => {
+//   helpers.upsertBomber(BOMBERS, payload);
+// });
 
-socket.on('new_bomb', (payload) => {
-  upsertBomb(payload);
-  // Add danger zone tiles for this bomb based on explosion range
-  addDangerZonesForBomb(payload);
-});
+// socket.on('new_bomb', (payload) => {
+//   upsertBomb(payload);
+//   // Add danger zone tiles for this bomb based on explosion range
+//   addDangerZonesForBomb(payload);
+// });
 
-socket.on('item_collected', (payload) => {
-  if (payload.bomber && payload.bomber.name === process.env.BOMBER_NAME) {
-    if (payload.item.type === 'SPEED') {
-      SPEED += 1
-    }
-  }
-  // remove collected item from ITEMS (match both x and y)
-  ITEMS = ITEMS.filter(i => !(i && i.x === payload.item.x && i.y === payload.item.y));
-});
+// socket.on('item_collected', (payload) => {
+//   if (payload.bomber && payload.bomber.name === process.env.BOMBER_NAME) {
+//     if (payload.item.type === 'SPEED') {
+//       SPEED += 1
+//     }
+//   }
+//   // remove collected item from ITEMS (match both x and y)
+//   ITEMS = ITEMS.filter(i => !(i && i.x === payload.item.x && i.y === payload.item.y));
+// });
 
-socket.on('bomb_explode', (payload) => {
-  //remove bomb from BOMBS
-  BOMBS = BOMBS.filter(b => b.id !== payload.id);
-  // Remove danger zones associated with this bomb
-  removeDangerZonesForBomb(payload.id);
-});
+// socket.on('bomb_explode', (payload) => {
+//   console.log('bomb explode', payload.uid);
+//   //remove bomb from BOMBS
+//   BOMBS = BOMBS.filter(b => b.id !== payload.id);
+//   // Remove danger zones associated with this bomb
+//   removeDangerZonesForBomb(payload.id);
+// });
 
-socket.on('map_update', (payload) => {
-  const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
-  for (let i = CHESTS.length - 1; i >= 0; i--) {
-    if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
-      //update map (chest removed so set to null)
-      MAP[CHESTS[i].y / helpers.WALL_SIZE][CHESTS[i].x / helpers.WALL_SIZE] = null;
-      CHESTS.splice(i, 1);
-    }
-  }
-  ITEMS = payload.items;
-});
+// socket.on('map_update', (payload) => {
+//   console.log('map update', );
+//   const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
+//   for (let i = CHESTS.length - 1; i >= 0; i--) {
+//     if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
+//       //update map (chest removed so set to null)
+//       MAP[CHESTS[i].y / helpers.WALL_SIZE][CHESTS[i].x / helpers.WALL_SIZE] = null;
+//       console.log('y', CHESTS[i].y / helpers.WALL_SIZE);
+//       console.log('x', CHESTS[i].x / helpers.WALL_SIZE);
+//       CHESTS.splice(i, 1);
+//     }
+//   }
+//   ITEMS = payload.items;
+// });
 
 function blindCodeMode() {
   BOMBERS.push({ ...sampleBomber });
@@ -98,14 +101,13 @@ function blindCodeMode() {
       }
     }
   }
-  console.log('chest', CHESTS)
   GAME_START = true
 }
 
 socket.on('connect', async () => {
   console.log('Connected to server');
-  socket.emit('join', {});
-  // blindCodeMode()
+  // socket.emit('join', {});
+  blindCodeMode()
   console.log('Sent join event');
 
   while(!GAME_START) {
@@ -141,13 +143,15 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      console.log('moving to reachable item', reachableItem.path[0]);
+      console.log('moving to reachable item', reachableItem.path.length);
       move(nextStep(reachableItem.path));
     } else {
+      console.log('dont have reachable item', );
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
 
       if (allPlaces && allPlaces.length > 0) {
+
         for (const place of allPlaces) {
           // console.log('place', place)
           const safeZones = helpers.countSafeZonesAfterPlaceBoom(helpers.toMapCoord(place), myBomber.explosionRange, DANGER_ZONE, MAP, walkableNeighbors);
@@ -157,6 +161,9 @@ socket.on('connect', async () => {
             if (gridPath && gridPath.length > 1) {
               if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
                 console.log('path 1 in danger zone so dont move');
+                console.log('place', place);
+                const last = gridPath[gridPath.length - 1];
+                console.log('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
               } else {
                 const middlePoint = helpers.getMidPoint(gridPath);
                 const pathToMidPoint = findPathToTarget(middlePoint, false)
@@ -172,24 +179,29 @@ socket.on('connect', async () => {
                   } else {
                     console.log('touch pathToMidPoint', )
                     placeBoom(myBomber);
+                    getDestroyedChests(myBomber);
                     //Calculate which chest is going to be destroyed and mark it as wall
-                    console.log('hehe', getDestroyedChests(myBomber))
+                    // console.log('hehe', getDestroyedChests(myBomber))
                   }
                 }
               }
             } else if (gridPath && gridPath.length < 2) {
               console.log('touch nearest chest', gridPath)
               placeBoom(myBomber);
+              getDestroyedChests(myBomber);
               //remove chest and update map
-              console.log('hehe', getDestroyedChests(myBomber))
+              // console.log('hehe', getDestroyedChests(myBomber))
             }
             break;
           } else {
-            console.log('no safe zone', )
+            console.log('no safe zone', place)
           }
         }
       } else {
         console.log('allPlaces', allPlaces)
+        console.log('MAP', MAP);
+        console.log('walkableNeighbors', walkableNeighbors);
+        console.log('myBomber', myBomber);
         throw new Error(`no all places`)
       }
     }
@@ -207,13 +219,13 @@ const move = (orient) => {
   })
 
   //blindcodemode
-  // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  // if (!myBomber) return;
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  if (!myBomber) return;
 
-  // if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
+  if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
+  if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
+  if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
+  if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
 }
 
 const placeBoom = (myBomber = null) => {
@@ -221,12 +233,32 @@ const placeBoom = (myBomber = null) => {
   socket.emit('place_bomb', {})
 
   //blindcodemode
-  // addDangerZonesForBomb({
-  //   id: `random-${Date.now()}`,
-  //   x: myBomber.x,
-  //   y: myBomber.y,
-  //   uid: myBomber.uid,
-  // })
+  const bomID = `random-${Date.now()}`
+  addDangerZonesForBomb({
+    id: bomID,
+    x: myBomber.x,
+    y: myBomber.y,
+    uid: myBomber.uid,
+  })
+  setTimeout(() => {
+    console.log('bomb explode', );
+    console.log('bomb explode', );
+    console.log('bomb explode', );
+    console.log('bomb explode', );
+    console.log('bomb explode', );
+    removeDangerZonesForBomb(bomID);
+    console.log('destroyed Chest', );
+    console.log('chest before', CHESTS.length);
+    CHESTS.filter(x => x.isDestroyed).map(c => {
+      MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
+      console.log('y', c.y / helpers.WALL_SIZE);
+      console.log('x', c.x / helpers.WALL_SIZE);
+    })
+    CHESTS = CHESTS.filter(x => !x.isDestroyed)
+    console.log('chest after', CHESTS.length);
+    if (CHESTS.length == 82)
+      console.log('-------------------------------------------------------------------------------------------------------------', );
+  }, 5000)
 }
 
 // Add danger zones for a specific bomb using bomber.explosionRange
@@ -243,7 +275,7 @@ function removeDangerZonesForBomb(bombId) {
   const filtered = DANGER_ZONE.filter(z => z.bombId !== bombId);
   DANGER_ZONE.length = 0;
   DANGER_ZONE.push(...filtered);
-  // console.log('DANGER ZONE AFTER REMOVE', DANGER_ZONE);
+  console.log('DANGER ZONE AFTER REMOVE', DANGER_ZONE);
 }
 
 function upsertBomb(payload) {
@@ -332,6 +364,8 @@ function getDestroyedChests(bomber) {
         const chest = CHESTS.find(ch => ch.x === chestX && ch.y === chestY && !ch.isDestroyed);
         if (chest) {
           MAP[r][c] = 'W'; // ✅ cập nhật MAP
+          console.log('update map to w when place boom', r, c);
+          chest.isDestroyed = true
         }
         break; // nổ dừng tại chest
       }

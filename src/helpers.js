@@ -333,14 +333,11 @@ function getMidPoint(path) {
 // Explosion travels in 4 directions up to `range`, stops at walls ('W') and also
 // stops after destroying a chest ('C'). Walkable tiles are null | 'B' | 'R' | 'S'.
 function countChestsDestroyedAt(map, x, y, range = 2) {
-  if (!map || y < 0 || x < 0 || y >= map.length || x >= map[0].length) return 0;
-
   let destroyed = 0;
   for (const dir of DIRS[0]) {
     for (let step = 1; step <= range; step++) {
       const nx = x + dir.dx * step;
       const ny = y + dir.dy * step;
-      if (ny < 0 || ny >= map.length || nx < 0 || nx >= map[0].length) break;
       const tile = map[ny][nx];
       if (tile === 'W') break; // blocked by wall
       if (tile === 'C') { destroyed += 1; break; } // destroy chest and stop
@@ -376,6 +373,8 @@ function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = []) {
     return { x: p.x, y: p.y, score: countChestsDestroyedAt(map, p.x, p.y, range), dist: Math.abs(p.x - start.x) + Math.abs(p.y - start.y) };
   }).sort((a, b) => {
     return b.score - a.score; // higher score first
+  }).filter(w => {
+    return w.score != 0;
   })
 }
 
