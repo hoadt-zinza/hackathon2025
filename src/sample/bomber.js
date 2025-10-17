@@ -1,6 +1,6 @@
 export default {
   x: 40,
-  y: 565,
+  y: 40,
   speed: 1,
   type: 1,
   uid: '1sEo7KS7efpHtJViAAAB',
