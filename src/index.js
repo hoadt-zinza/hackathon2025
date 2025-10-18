@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import sampleBomber from './sample/bomber.js';
 import sampleMap from './sample/map.js';
 import sampleItem from './sample/item.js';
-import fs from 'fs';
+import fs, { write } from 'fs';
 
 dotenv.config();
 const auth = { token: process.env.TOKEN };
@@ -63,7 +63,7 @@ socket.on('item_collected', (payload) => {
 });
 
 socket.on('bomb_explode', (payload) => {
-  console.log('bomb explode', payload.uid);
+  writeLog('bomb explode', payload.uid);
   //remove bomb from BOMBS
   BOMBS = BOMBS.filter(b => b.id !== payload.id);
   // Remove danger zones associated with this bomb
@@ -71,14 +71,14 @@ socket.on('bomb_explode', (payload) => {
 });
 
 socket.on('map_update', (payload) => {
-  console.log('map update', );
+  writeLog('map update', );
   const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
   for (let i = CHESTS.length - 1; i >= 0; i--) {
     if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
       //update map (chest removed so set to null)
       MAP[CHESTS[i].y / helpers.WALL_SIZE][CHESTS[i].x / helpers.WALL_SIZE] = null;
-      console.log('y', CHESTS[i].y / helpers.WALL_SIZE);
-      console.log('x', CHESTS[i].x / helpers.WALL_SIZE);
+      writeLog('y', CHESTS[i].y / helpers.WALL_SIZE);
+      writeLog('x', CHESTS[i].x / helpers.WALL_SIZE);
       CHESTS.splice(i, 1);
     }
   }
@@ -108,8 +108,8 @@ function blindCodeMode() {
 
 socket.on('connect', async () => {
   console.log('Connected to server');
-  // socket.emit('join', {});
-  blindCodeMode()
+  socket.emit('join', {});
+  // blindCodeMode()
   console.log('Sent join event');
 
   while(!GAME_START) {
@@ -221,13 +221,13 @@ const move = (orient) => {
   })
 
   //blindcodemode
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  if (!myBomber) return;
+  // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  // if (!myBomber) return;
 
-  if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
-  if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
-  if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
-  if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
 }
 
 const placeBoom = (myBomber = null) => {
@@ -235,24 +235,24 @@ const placeBoom = (myBomber = null) => {
   socket.emit('place_bomb', {})
 
   //blindcodemode
-  const bomID = `random-${Date.now()}`
-  addDangerZonesForBomb({
-    id: bomID,
-    x: myBomber.x,
-    y: myBomber.y,
-    uid: myBomber.uid,
-  })
-  setTimeout(() => {
-    writeLog('BOMB EXPLODE', );
-    removeDangerZonesForBomb(bomID);
-    writeLog('chest before', CHESTS.length);
-    CHESTS.filter(x => x.isDestroyed).map(c => {
-      MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
-      writeLog('x y', c.x / helpers.WALL_SIZE, c.y / helpers.WALL_SIZE);
-    })
-    CHESTS = CHESTS.filter(x => !x.isDestroyed)
-    writeLog('chest after', CHESTS.length);
-  }, 5000)
+  // const bomID = `random-${Date.now()}`
+  // addDangerZonesForBomb({
+  //   id: bomID,
+  //   x: myBomber.x,
+  //   y: myBomber.y,
+  //   uid: myBomber.uid,
+  // })
+  // setTimeout(() => {
+  //   writeLog('BOMB EXPLODE', );
+  //   removeDangerZonesForBomb(bomID);
+  //   writeLog('chest before', CHESTS.length);
+  //   CHESTS.filter(x => x.isDestroyed).map(c => {
+  //     MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
+  //     writeLog('x y', c.x / helpers.WALL_SIZE, c.y / helpers.WALL_SIZE);
+  //   })
+  //   CHESTS = CHESTS.filter(x => !x.isDestroyed)
+  //   writeLog('chest after', CHESTS.length);
+  // }, 3000)
 }
 
 // Add danger zones for a specific bomb using bomber.explosionRange
@@ -269,7 +269,7 @@ function removeDangerZonesForBomb(bombId) {
   const filtered = DANGER_ZONE.filter(z => z.bombId !== bombId);
   DANGER_ZONE.length = 0;
   DANGER_ZONE.push(...filtered);
-  console.log('DANGER ZONE AFTER REMOVE', DANGER_ZONE);
+  writeLog('DANGER ZONE AFTER REMOVE', DANGER_ZONE);
 }
 
 function upsertBomb(payload) {
@@ -358,7 +358,7 @@ function getDestroyedChests(bomber) {
         const chest = CHESTS.find(ch => ch.x === chestX && ch.y === chestY && !ch.isDestroyed);
         if (chest) {
           MAP[r][c] = 'W'; // ✅ cập nhật MAP
-          console.log('update map to w when place boom', r, c);
+          writeLog('update map to w when place boom', r, c);
           chest.isDestroyed = true
         }
         break; // nổ dừng tại chest
