@@ -28,7 +28,11 @@ const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
 function isWalkable(map, x, y, isGrid = true) {
-  if (!map || y < 0 || x < 0) return false;
+  if (!map || y < 0 || x < 0) {
+    console.log('map', map);
+    console.log('x y', x, y);
+    throw new Error('something wrong')
+  }
 
   if (isGrid) {
     // Grid coordinate check - simple tile lookup
@@ -42,14 +46,12 @@ function isWalkable(map, x, y, isGrid = true) {
     const bomberBottom = y + BOMBER_SIZE;
 
     // Calculate which grid tiles the bomber overlaps
-    const gridLeft = Math.floor(x / WALL_SIZE);
-    const gridTop = Math.floor(y / WALL_SIZE);
     const gridRight = Math.floor((bomberRight - 0.5) / WALL_SIZE);
     const gridBottom = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
 
     // Check all tiles that the bomber overlaps
-    for (let gridY = gridTop; gridY <= gridBottom; gridY++) {
-      for (let gridX = gridLeft; gridX <= gridRight; gridX++) {
+    for (let gridY = Math.floor(y / WALL_SIZE); gridY <= gridBottom; gridY++) {
+      for (let gridX = Math.floor(x / WALL_SIZE); gridX <= gridRight; gridX++) {
         const v = map[gridY][gridX];
         // If any overlapping tile is a wall ('W'), position is not walkable
         if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
@@ -90,25 +92,26 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 
   // Để tránh .find() (O(n)), ta có thể thêm một map theo key "x,y"
   const openSet = new Set([`${start.x},${start.y}`]);
+  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speedCount]
 
   while (!open.isEmpty()) {
     const current = open.pop();
     openSet.delete(`${current.x},${current.y}`);
 
     const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
-    if (dist <= myBomber.speedCount) {
+    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= myBomber.speedCount) {
       const path = [];
       let step = current;
       while (step) {
         path.push({ x: step.x, y: step.y });
         step = cameFrom.get(`${step.x},${step.y}`);
       }
-      return target.type === 'C' ? path.reverse().slice(0, -1) : path.reverse();
+      return path.reverse();
     }
 
     visited.add(`${current.x},${current.y}`);
 
-    for (const dir of DIRS[myBomber.speedCount]) {
+    for (const dir of dirs) {
       const nx = current.x + dir.dx;
       const ny = current.y + dir.dy;
       if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
@@ -125,6 +128,81 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 
   return null;
 }
+
+// A* Search (improved version of findPathToTarget)
+function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
+  if (!myBomber || !target || !map) return null;
+
+  const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
+  const goal = isGrid ? toGridCoord(target, WALL_SIZE) : { x: target.x, y: target.y };
+
+  const visited = new Set();
+  const cameFrom = new Map();
+
+  // Priority queue sorted by f = g + h
+  const open = new MinHeap((a, b) => a.f - b.f);
+  const openSet = new Set([`${start.x},${start.y}`]);
+
+  const startNode = {
+    x: start.x,
+    y: start.y,
+    g: 0,
+    h: heuristic(start, goal),
+    f: heuristic(start, goal)
+  };
+  open.push(startNode);
+  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speedCount]
+
+  while (!open.isEmpty()) {
+    const current = open.pop();
+    openSet.delete(`${current.x},${current.y}`);
+
+    const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
+    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= myBomber.speedCount) {
+      // reconstruct path
+      const path = [];
+      let step = current;
+      while (step) {
+        path.push({ x: step.x, y: step.y });
+        step = cameFrom.get(`${step.x},${step.y}`);
+      }
+      return path.reverse();
+    }
+
+    visited.add(`${current.x},${current.y}`);
+
+    for (const dir of dirs) {
+      const nx = current.x + dir.dx;
+      const ny = current.y + dir.dy;
+      const key = `${nx},${ny}`;
+
+      if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
+      if (visited.has(key)) continue;
+
+      const g = current.g + 1;
+      const h = heuristic({ x: nx, y: ny }, goal);
+      const f = g + h;
+
+      if (!openSet.has(key)) {
+        cameFrom.set(key, current);
+        open.push({ x: nx, y: ny, g, h, f });
+        openSet.add(key);
+      } else {
+        // nếu node đã nằm trong openSet mà có đường tốt hơn => cập nhật
+        const existing = open.data.find(n => n.x === nx && n.y === ny);
+        if (existing && g < existing.g) {
+          existing.g = g;
+          existing.f = g + existing.h;
+          cameFrom.set(key, current);
+          open._bubbleUp(); // đảm bảo heap sắp lại đúng
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
 
 function createDangerZonesForBomb(bomb, explosionRange, map) {
   if (!bomb) return [];
@@ -163,7 +241,6 @@ function upsertBomber(bombersArr, payload) {
   }
 }
 
-
 function upsertBomb(bombsArr, payload) {
   const id = payload && payload.id;
   if (!id) return;
@@ -175,26 +252,8 @@ function upsertBomb(bombsArr, payload) {
   }
 }
 
-function findNearestChest(myBomber, chests) {
-  if (!myBomber || !Array.isArray(chests) || chests.length === 0) return null;
-
-  let nearest = null;
-  let bestDist2 = Infinity;
-  for (const chest of chests) {
-    if (!chest || chest.isDestroyed) continue;
-    const dx = (chest.x) - (myBomber.x);
-    const dy = (chest.y) - (myBomber.y);
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist2) {
-      bestDist2 = d2;
-      nearest = chest;
-    }
-  }
-  return nearest;
-}
-
 function isInDanger(myBomber, DANGER_ZONE) {
-  if (!myBomber) return false;
+  if (!myBomber || DANGER_ZONE.length == 0) return false;
 
   // Bomber position {x, y} is top-left corner of 35x35 square
   const bomberRight = myBomber.x + BOMBER_SIZE;
@@ -221,7 +280,7 @@ function isInDanger(myBomber, DANGER_ZONE) {
 }
 
 function findNearestSafetyZone(myBomber, map, dangerArr) {
-  const currentGridPos = toGridCoord(myBomber, WALL_SIZE);
+  const currentGridPos = toGridCoord(myBomber);
 
   if (dangerArr.length === 0) return { x: myBomber.x, y: myBomber.y };
 
@@ -249,7 +308,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
       return { x: node.x, y: node.y };
     }
 
-    for (const dir of DIRS[myBomber.speedCount]) {
+    for (const dir of DIRS[0]) {
       const nx = node.x + dir.dx;
       const ny = node.y + dir.dy;
       const nextKey = `${nx},${ny}`;
@@ -307,10 +366,9 @@ function isBomberInBombCross(myBomber, bomb, range = 2) {
 }
 
 // path: array of REAL coordinates [{x, y}, ...]
-function getMidPoint(path) {
+function getMidPoint(path, bias = 1) {
   const a = path[path.length - 2];
   const b = path[path.length - 1];
-  const bias = 1; // lệch 1px về phía b
 
   if (a.x === b.x) {
     // di chuyển theo trục Y
@@ -392,7 +450,7 @@ function getWalkableNeighbors(map, position) {
   while (queue.length > 0) {
     const { row, col } = queue.shift();
     if (visited.has(key(row, col))) continue;
-    if (map[row][col] !== null) continue;
+    if (map[row][col] === 'W' || map[row][col] === 'C') continue;
 
     visited.add(key(row, col));
     result.push({ x: col, y: row });
@@ -432,17 +490,43 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
   return safeCount;
 }
 
+function markOwnBombOnMap(myBomber, bombs, MAP) {
+  if (!myBomber || !bombs || !MAP) return;
+
+  for (const bomb of bombs) {
+    // chỉ xét bomb của mình
+    if (bomb.ownerName !== myBomber.name) continue;
+    if (MAP[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] == 'W') continue;
+
+    // Tính bounding box
+    const bomberRight = myBomber.x + BOMBER_SIZE;
+    const bomberBottom = myBomber.y + BOMBER_SIZE;
+    const bombRight = bomb.x + WALL_SIZE;
+    const bombBottom = bomb.y + WALL_SIZE;
+
+    // Kiểm tra overlap
+    const overlapX = myBomber.x < bombRight && bomberRight > bomb.x;
+    const overlapY = myBomber.y < bombBottom && bomberBottom > bomb.y;
+
+    if (!(overlapX && overlapY)) {
+      MAP[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] = 'W'
+      console.log('UPDATED BOOM IN THE MAP TO W', bomb.x / WALL_SIZE, bomb.y / WALL_SIZE);
+      return true;
+    }
+  }
+}
+
 export {
   DIRS,
   isWalkable,
   heuristic,
   toGridCoord,
   findPathToTarget,
+  findPathToTargetAStar,
   createDangerZonesForBomb,
   removeDangerZonesForBomb,
   upsertBomber,
   upsertBomb,
-  findNearestChest,
   isInDanger,
   findNearestSafetyZone,
   MAP_SIZE,
@@ -457,4 +541,5 @@ export {
   countSafeZonesAfterPlaceBoom,
   countChestsDestroyedAt,
   findAllPossiblePlaceBoom,
+  markOwnBombOnMap,
 };
