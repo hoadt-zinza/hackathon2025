@@ -510,7 +510,6 @@ function markOwnBombOnMap(myBomber, bombs, MAP) {
 
     if (!(overlapX && overlapY)) {
       MAP[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] = 'W'
-      console.log('UPDATED BOOM IN THE MAP TO W', bomb.x / WALL_SIZE, bomb.y / WALL_SIZE);
       return true;
     }
   }

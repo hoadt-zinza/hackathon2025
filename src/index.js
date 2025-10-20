@@ -3,7 +3,7 @@ import * as helpers from './helpers.js';
 import { io } from 'socket.io-client';
 import sampleBomber from './sample/bomber.js';
 import sampleMap from './sample/map.js';
-import fs, { write } from 'fs';
+import fs from 'fs';
 
 dotenv.config();
 const auth = { token: process.env.TOKEN };
@@ -80,6 +80,12 @@ socket.on('map_update', (payload) => {
   ITEMS = payload.items;
 });
 
+socket.on('user_die_update', (payload) => {
+  if (payload.killed.name === process.env.BOMBER_NAME) {
+    writeLog('user die update', payload)
+  }
+})
+
 function blindCodeMode() {
   BOMBERS.push({ ...sampleBomber });
   MAP = sampleMap;
@@ -118,7 +124,7 @@ socket.on('connect', async () => {
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
     writeLog('myboy', myBomber.x, myBomber.y)
-    writeLog('update bom to w', helpers.markOwnBombOnMap(myBomber, BOMBS, MAP))
+    helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       writeLog('In danger! Moving to safety zone...', safetyZone);
@@ -205,12 +211,6 @@ socket.on('connect', async () => {
             writeLog('no safe zone', place)
           }
         }
-      } else {
-        writeLog('allPlaces', allPlaces)
-        writeLog('MAP', MAP);
-        writeLog('walkableNeighbors', walkableNeighbors);
-        writeLog('myBomber', myBomber);
-        throw new Error(`no all places`)
       }
     }
     await (sleep(1000 / 60 / SPEED));
@@ -237,6 +237,17 @@ const move = (orient) => {
 }
 
 const placeBoom = (myBomber = null) => {
+  // Count active bombs owned by this bomber (tracked by uid)
+  const ownedActiveBombs = BOMBS.filter(b => b && b.uid === myBomber.uid).length;
+
+  if (ownedActiveBombs >= myBomber.bombCount) {
+    writeLog('Skip placing bomb: limit reached', {
+      ownedActiveBombs,
+      bombCount: myBomber.bombCount
+    });
+    return;
+  }
+
   writeLog('PLACED BOOM at ', myBomber.x, myBomber.y)
   socket.emit('place_bomb', {})
 
