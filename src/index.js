@@ -81,6 +81,10 @@ socket.on('map_update', (payload) => {
 });
 
 socket.on('user_die_update', (payload) => {
+  if (process.env.ENV != 'local') {
+    BOMBERS = BOMBERS.filter(b => b.uid === payload.uid)
+  }
+
   if (payload.killed.name === process.env.BOMBER_NAME) {
     writeLog('user die update', payload)
   }
@@ -121,10 +125,13 @@ socket.on('connect', async () => {
     await sleep(100)
   }
 
+  // writeLog('yyy', helpers.findChestBreakScoresToFrozen(myBomber2, frozenBots, MAP))
+
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
     writeLog('myboy', myBomber.x, myBomber.y)
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
+
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       writeLog('In danger! Moving to safety zone...', safetyZone);
@@ -140,6 +147,9 @@ socket.on('connect', async () => {
             move(step);
             await sleep(1000 / 60 / SPEED);
             continue;
+          } else {
+            writeLog('no step', step)
+            writeLog('path to safety', path)
           }
         } else {
           writeLog('no path to safety', path);
@@ -163,7 +173,10 @@ socket.on('connect', async () => {
         move(nextStep(reachableItem.path));
       }
     } else {
-      writeLog('dont have reachable item', );
+      writeLog('dont have reachable item', ITEMS);
+      //skip in case no bom available
+      if (!checkBomAvailables(myBomber)) continue;
+
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
 
@@ -226,6 +239,8 @@ const move = (orient) => {
     orient: orient
   })
 
+  writeLog('moved ', orient)
+
   //blindcodemode
   // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   // if (!myBomber) return;
@@ -237,19 +252,12 @@ const move = (orient) => {
 }
 
 const placeBoom = (myBomber = null) => {
-  // Count active bombs owned by this bomber (tracked by uid)
-  const ownedActiveBombs = BOMBS.filter(b => b && b.uid === myBomber.uid).length;
-
-  if (ownedActiveBombs >= myBomber.bombCount) {
-    writeLog('Skip placing bomb: limit reached', {
-      ownedActiveBombs,
-      bombCount: myBomber.bombCount
-    });
-    return;
+  if (checkBomAvailables(myBomber)) {
+    writeLog('PLACED BOOM at ', myBomber.x, myBomber.y)
+    socket.emit('place_bomb', {})
+  } else {
+    writeLog('BOOM REACH MAX ', myBomber, BOMBS)
   }
-
-  writeLog('PLACED BOOM at ', myBomber.x, myBomber.y)
-  socket.emit('place_bomb', {})
 
   //blindcodemode
   // const bomID = `random-${Date.now()}`
@@ -374,7 +382,7 @@ function updateMapWhenPlaceBoom(bomber) {
 setTimeout(() => {
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
-}, 30000); // 30 giây
+}, 15000);
 
 function writeLog(...args) {
   console.log(...args)
@@ -386,4 +394,11 @@ function writeLog(...args) {
 
   const log = `[${new Date().toISOString()}] ${message}\n`;
   fs.appendFileSync('log.txt', log);
+}
+
+function checkBomAvailables(myBomber) {
+  // Count active bombs owned by this bomber (tracked by uid)
+  const ownedActiveBombs = BOMBS.filter(b => b && b.uid === myBomber.uid).length;
+
+  return ownedActiveBombs < myBomber.bombCount
 }

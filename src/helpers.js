@@ -490,13 +490,13 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
   return safeCount;
 }
 
-function markOwnBombOnMap(myBomber, bombs, MAP) {
-  if (!myBomber || !bombs || !MAP) return;
+function markOwnBombOnMap(myBomber, bombs, map) {
+  if (!myBomber || !bombs || !map) return;
 
   for (const bomb of bombs) {
     // chỉ xét bomb của mình
     if (bomb.ownerName !== myBomber.name) continue;
-    if (MAP[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] == 'W') continue;
+    if (map[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] == 'W') continue;
 
     // Tính bounding box
     const bomberRight = myBomber.x + BOMBER_SIZE;
@@ -509,10 +509,67 @@ function markOwnBombOnMap(myBomber, bombs, MAP) {
     const overlapY = myBomber.y < bombBottom && bomberBottom > bomb.y;
 
     if (!(overlapX && overlapY)) {
-      MAP[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] = 'W'
+      map[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] = 'W'
       return true;
     }
   }
+}
+
+// Compute, for each frozen bot, the minimum number of chests that must be destroyed
+// for myBomber to reach that bot. Uses 0-1 BFS where entering a chest tile ('C') costs 1
+// and entering walkable tiles (null | 'B' | 'R' | 'S') costs 0. Walls ('W') are impassable.
+// Returns an array of objects: [{ id: <bot uid>, score: <min chest breaks> }]
+function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
+  if (!myBomber || !Array.isArray(frozenBots) || !map || map.length === 0) return [];
+
+  const start = toGridCoord(myBomber);
+  const rows = map.length;
+  const cols = map[0].length;
+
+  const INF = Number.POSITIVE_INFINITY;
+  const dist = Array.from({ length: rows }, () => Array(cols).fill(INF));
+  // Deque implemented with array ops; for small grids this is fine
+  const deque = [];
+  const pushFront = (v) => deque.unshift(v);
+  const pushBack = (v) => deque.push(v);
+  const popFront = () => deque.shift();
+
+  dist[start.y][start.x] = 0;
+  pushFront({ x: start.x, y: start.y });
+
+  while (deque.length > 0) {
+    const cur = popFront();
+    const base = dist[cur.y][cur.x];
+
+    for (const { dx, dy } of DIRS[0]) {
+      const nx = cur.x + dx;
+      const ny = cur.y + dy;
+
+      if (ny < 0 || ny >= rows || nx < 0 || nx >= cols) continue;
+
+      const tile = map[ny][nx];
+      if (tile === 'W') continue; // walls block
+
+      const costAdd = tile === 'C' ? 1 : 0;
+      const nextCost = base + costAdd;
+      if (nextCost < dist[ny][nx]) {
+        dist[ny][nx] = nextCost;
+        if (costAdd === 0) pushFront({ x: nx, y: ny }); else pushBack({ x: nx, y: ny });
+      }
+    }
+  }
+
+  const results = [];
+  for (const bot of frozenBots) {
+    if (!bot) continue;
+    const gp = toGridCoord(bot);
+    const d = dist[gp.y] && dist[gp.y][gp.x];
+    if (typeof d === 'number' && isFinite(d)) {
+      results.push({ id: bot.uid || bot.id, score: d });
+    }
+  }
+
+  return results;
 }
 
 export {
@@ -541,4 +598,5 @@ export {
   countChestsDestroyedAt,
   findAllPossiblePlaceBoom,
   markOwnBombOnMap,
+  findChestBreakScoresToFrozen,
 };

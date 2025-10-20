@@ -1,0 +1,1045 @@
+Dang cho` bom no? thi chet. hoa' ra in danger nhung co ve do speed 3 nen khong move dc den diem safety
+
+[2025-10-20T12:27:18.074Z] dont have reachable item
+[2025-10-20T12:27:18.074Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.075Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.075Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.075Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.082Z] myboy 161 159
+[2025-10-20T12:27:18.083Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.083Z] dont have reachable item
+[2025-10-20T12:27:18.083Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.083Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.083Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.083Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.092Z] myboy 161 159
+[2025-10-20T12:27:18.092Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.092Z] dont have reachable item
+[2025-10-20T12:27:18.093Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.093Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.093Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.093Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.101Z] myboy 161 159
+[2025-10-20T12:27:18.102Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.102Z] dont have reachable item
+[2025-10-20T12:27:18.102Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.103Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.103Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.103Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.111Z] myboy 161 159
+[2025-10-20T12:27:18.111Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.111Z] dont have reachable item
+[2025-10-20T12:27:18.112Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.112Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.112Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.112Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.121Z] myboy 161 159
+[2025-10-20T12:27:18.121Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.121Z] dont have reachable item
+[2025-10-20T12:27:18.122Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.122Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.122Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.122Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.130Z] myboy 161 159
+[2025-10-20T12:27:18.131Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.131Z] dont have reachable item
+[2025-10-20T12:27:18.131Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.132Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.132Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.132Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.140Z] myboy 161 159
+[2025-10-20T12:27:18.140Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.141Z] dont have reachable item
+[2025-10-20T12:27:18.141Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.141Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.142Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.142Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.150Z] myboy 161 159
+[2025-10-20T12:27:18.150Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.150Z] dont have reachable item
+[2025-10-20T12:27:18.151Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.151Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.151Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.151Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.160Z] myboy 161 159
+[2025-10-20T12:27:18.160Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.160Z] dont have reachable item
+[2025-10-20T12:27:18.161Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.161Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.161Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.161Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.169Z] myboy 161 159
+[2025-10-20T12:27:18.170Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.170Z] dont have reachable item
+[2025-10-20T12:27:18.170Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.170Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.171Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.171Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.179Z] myboy 161 159
+[2025-10-20T12:27:18.179Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.179Z] dont have reachable item
+[2025-10-20T12:27:18.180Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.180Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.180Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.180Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.189Z] myboy 161 159
+[2025-10-20T12:27:18.189Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.189Z] dont have reachable item
+[2025-10-20T12:27:18.190Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.190Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.190Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.190Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.199Z] myboy 161 159
+[2025-10-20T12:27:18.199Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.199Z] dont have reachable item
+[2025-10-20T12:27:18.200Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.200Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.200Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.200Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.209Z] myboy 161 159
+[2025-10-20T12:27:18.209Z] In danger! Moving to safety zone... {"x":4,"y":4}
+[2025-10-20T12:27:18.209Z] dont have reachable item
+[2025-10-20T12:27:18.210Z] allPlaces [{"x":6,"y":4,"score":2,"dist":2},{"x":6,"y":1,"score":2,"dist":5},{"x":4,"y":4,"score":1,"dist":0},{"x":5,"y":4,"score":1,"dist":1},{"x":3,"y":4,"score":1,"dist":1},{"x":6,"y":3,"score":1,"dist":3},{"x":3,"y":1,"score":1,"dist":4},{"x":4,"y":1,"score":1,"dist":3},{"x":5,"y":1,"score":1,"dist":4},{"x":1,"y":1,"score":1,"dist":6},{"x":1,"y":2,"score":1,"dist":5}]
+[2025-10-20T12:27:18.210Z] path 1 in danger zone so dont move
+[2025-10-20T12:27:18.210Z] place {"x":6,"y":4,"score":2,"dist":2}
+[2025-10-20T12:27:18.210Z] MAP[last.y][last.x] 4 6 null
+[2025-10-20T12:27:18.214Z] bomb explode {"id":457,"x":200,"y":120,"uid":"WpPbU9MKAspWd-5rAAPQ","explosionArea":[{"x":200,"y":120,"dir":"CENTER","step":0},{"x":200,"y":160,"dir":"DOWN","step":1},{"x":200,"y":200,"dir":"DOWN","step":2},{"x":200,"y":240,"dir":"DOWN","step":3},{"x":160,"y":120,"dir":"LEFT","step":1},{"x":120,"y":120,"dir":"LEFT","step":2},{"x":240,"y":120,"dir":"RIGHT","step":1},{"x":280,"y":120,"dir":"RIGHT","step":2}]}
+[2025-10-20T12:27:18.214Z] DANGER ZONE AFTER REMOVE []
+[2025-10-20T12:27:18.215Z] user die update {"killer":{"x":161,"y":159,"speed":1,"type":1,"uid":"WpPbU9MKAspWd-5rAAPQ","orient":"LEFT","isAlive":false,"size":35,"name":"bobao","movable":true,"protectCooldown":0,"score":80,"color":1,"explosionRange":4,"bombCount":5,"speedCount":2},"killed":{"x":161,"y":159,"speed":1,"type":1,"uid":"WpPbU9MKAspWd-5rAAPQ","orient":"LEFT","isAlive":false,"size":35,"name":"bobao","movable":true,"protectCooldown":0,"score":80,"color":1,"explosionRange":4,"bombCount":5,"speedCount":2},"bomb":{"x":200,"y":120,"uid":"WpPbU9MKAspWd-5rAAPQ","ownerName":"bobao","id":457,"lifeTime":5000,"createdAt":1760963186597,"explosionRange":4,"isExploded":true},"bombers":[{"x":565,"y":565,"speed":1,"type":1,"uid":"Cu_4wjpWJZuHRE1YAAAB","orient":"DOWN","isAlive":false,"size":35,"name":"zarenabot","movable":true,"protectCooldown":0,"score":0,"color":0,"explosionRange":2,"bombCount":1,"speedCount":0},{"x":161,"y":159,"speed":1,"type":1,"uid":"WpPbU9MKAspWd-5rAAPQ","orient":"LEFT","isAlive":false,"size":35,"name":"bobao","movable":true,"protectCooldown":0,"score":80,"color":1,"explosionRange":4,"bombCount":5,"speedCount":2}]}
+[2025-10-20T12:27:18.216Z] map update
+[2025-10-20T12:27:18.216Z] x y 7 3
+[2025-10-20T12:27:18.216Z] x y 5 6
+[2025-10-20T12:27:18.219Z] myboy 161 159
+[2025-10-20T12:27:18.219Z] moving to reachable item 41
+[2025-10-20T12:27:18.228Z] myboy 565 565
+[2025-10-20T12:27:18.228Z] dont have reachable item
+[2025-10-20T12:27:18.229Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.229Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.238Z] myboy 565 562
+[2025-10-20T12:27:18.238Z] dont have reachable item
+[2025-10-20T12:27:18.239Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.239Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.248Z] myboy 565 562
+[2025-10-20T12:27:18.248Z] dont have reachable item
+[2025-10-20T12:27:18.249Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.249Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.258Z] myboy 562 562
+[2025-10-20T12:27:18.258Z] dont have reachable item
+[2025-10-20T12:27:18.259Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.259Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.267Z] myboy 559 562
+[2025-10-20T12:27:18.267Z] dont have reachable item
+[2025-10-20T12:27:18.268Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.268Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.277Z] myboy 559 562
+[2025-10-20T12:27:18.277Z] dont have reachable item
+[2025-10-20T12:27:18.277Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.277Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.285Z] myboy 556 562
+[2025-10-20T12:27:18.286Z] dont have reachable item
+[2025-10-20T12:27:18.286Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.286Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.295Z] myboy 556 562
+[2025-10-20T12:27:18.295Z] dont have reachable item
+[2025-10-20T12:27:18.295Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.296Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.305Z] myboy 553 562
+[2025-10-20T12:27:18.305Z] dont have reachable item
+[2025-10-20T12:27:18.305Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.306Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.315Z] myboy 553 562
+[2025-10-20T12:27:18.315Z] dont have reachable item
+[2025-10-20T12:27:18.315Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.315Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.324Z] myboy 550 562
+[2025-10-20T12:27:18.324Z] dont have reachable item
+[2025-10-20T12:27:18.324Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.325Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.334Z] myboy 550 562
+[2025-10-20T12:27:18.334Z] dont have reachable item
+[2025-10-20T12:27:18.334Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.334Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.343Z] myboy 547 562
+[2025-10-20T12:27:18.343Z] dont have reachable item
+[2025-10-20T12:27:18.344Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.344Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.353Z] myboy 544 562
+[2025-10-20T12:27:18.353Z] dont have reachable item
+[2025-10-20T12:27:18.353Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.353Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.362Z] myboy 544 562
+[2025-10-20T12:27:18.362Z] dont have reachable item
+[2025-10-20T12:27:18.362Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.363Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.372Z] myboy 541 562
+[2025-10-20T12:27:18.372Z] dont have reachable item
+[2025-10-20T12:27:18.372Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.372Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.381Z] myboy 541 562
+[2025-10-20T12:27:18.381Z] dont have reachable item
+[2025-10-20T12:27:18.381Z] allPlaces [{"x":14,"y":14,"score":2,"dist":0},{"x":12,"y":14,"score":2,"dist":2},{"x":14,"y":13,"score":1,"dist":1},{"x":13,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:18.382Z] no safe zone {"x":14,"y":14,"score":2,"dist":0}
+[2025-10-20T12:27:18.391Z] myboy 538 562
+[2025-10-20T12:27:18.391Z] dont have reachable item
+[2025-10-20T12:27:18.392Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.392Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.401Z] myboy 538 562
+[2025-10-20T12:27:18.401Z] dont have reachable item
+[2025-10-20T12:27:18.402Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.402Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.411Z] myboy 535 562
+[2025-10-20T12:27:18.411Z] dont have reachable item
+[2025-10-20T12:27:18.412Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.412Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.421Z] myboy 532 562
+[2025-10-20T12:27:18.421Z] dont have reachable item
+[2025-10-20T12:27:18.422Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.422Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.431Z] myboy 532 562
+[2025-10-20T12:27:18.431Z] dont have reachable item
+[2025-10-20T12:27:18.432Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.432Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.441Z] myboy 529 562
+[2025-10-20T12:27:18.441Z] dont have reachable item
+[2025-10-20T12:27:18.441Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.442Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.449Z] myboy 529 562
+[2025-10-20T12:27:18.450Z] dont have reachable item
+[2025-10-20T12:27:18.450Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.450Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.459Z] myboy 526 562
+[2025-10-20T12:27:18.459Z] dont have reachable item
+[2025-10-20T12:27:18.459Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.460Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.468Z] myboy 526 562
+[2025-10-20T12:27:18.469Z] dont have reachable item
+[2025-10-20T12:27:18.469Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.469Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.478Z] myboy 523 562
+[2025-10-20T12:27:18.478Z] dont have reachable item
+[2025-10-20T12:27:18.478Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.479Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.487Z] myboy 523 562
+[2025-10-20T12:27:18.488Z] dont have reachable item
+[2025-10-20T12:27:18.488Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.488Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.498Z] myboy 520 562
+[2025-10-20T12:27:18.498Z] dont have reachable item
+[2025-10-20T12:27:18.498Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.498Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.506Z] myboy 517 562
+[2025-10-20T12:27:18.507Z] dont have reachable item
+[2025-10-20T12:27:18.507Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.507Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.516Z] myboy 517 562
+[2025-10-20T12:27:18.516Z] dont have reachable item
+[2025-10-20T12:27:18.517Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.517Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.526Z] myboy 514 562
+[2025-10-20T12:27:18.526Z] dont have reachable item
+[2025-10-20T12:27:18.526Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.526Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.535Z] myboy 514 562
+[2025-10-20T12:27:18.535Z] dont have reachable item
+[2025-10-20T12:27:18.535Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.536Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.544Z] myboy 511 562
+[2025-10-20T12:27:18.544Z] dont have reachable item
+[2025-10-20T12:27:18.545Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.545Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.552Z] myboy 511 562
+[2025-10-20T12:27:18.553Z] dont have reachable item
+[2025-10-20T12:27:18.553Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.553Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.562Z] myboy 508 562
+[2025-10-20T12:27:18.562Z] dont have reachable item
+[2025-10-20T12:27:18.563Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.563Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.572Z] myboy 508 562
+[2025-10-20T12:27:18.572Z] dont have reachable item
+[2025-10-20T12:27:18.572Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.573Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.582Z] myboy 505 562
+[2025-10-20T12:27:18.582Z] dont have reachable item
+[2025-10-20T12:27:18.582Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.582Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.591Z] myboy 502 562
+[2025-10-20T12:27:18.591Z] dont have reachable item
+[2025-10-20T12:27:18.591Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.591Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.600Z] myboy 502 562
+[2025-10-20T12:27:18.600Z] dont have reachable item
+[2025-10-20T12:27:18.601Z] allPlaces [{"x":14,"y":14,"score":2,"dist":1},{"x":12,"y":14,"score":2,"dist":1},{"x":13,"y":14,"score":1,"dist":0},{"x":14,"y":13,"score":1,"dist":2}]
+[2025-10-20T12:27:18.601Z] no safe zone {"x":14,"y":14,"score":2,"dist":1}
+[2025-10-20T12:27:18.609Z] myboy 499 562
+[2025-10-20T12:27:18.609Z] dont have reachable item
+[2025-10-20T12:27:18.609Z] allPlaces [{"x":12,"y":14,"score":2,"dist":0},{"x":14,"y":14,"score":2,"dist":2},{"x":13,"y":14,"score":1,"dist":1},{"x":14,"y":13,"score":1,"dist":3}]
+[2025-10-20T12:27:18.610Z] touch nearest chest [{"x":12,"y":14}]
+[2025-10-20T12:27:18.610Z] places [{"x":12,"y":14,"score":2,"dist":0},{"x":14,"y":14,"score":2,"dist":2},{"x":13,"y":14,"score":1,"dist":1},{"x":14,"y":13,"score":1,"dist":3}]
+[2025-10-20T12:27:18.610Z] PLACED BOOM at  499 562
+[2025-10-20T12:27:18.610Z] update map to w when place boom 12 13
+[2025-10-20T12:27:18.610Z] update map to w when place boom 11 14
+[2025-10-20T12:27:18.615Z] bombs [{"x":480,"y":560,"uid":"WpPbU9MKAspWd-5rAAPQ","ownerName":"bobao","id":458,"lifeTime":5000,"createdAt":1760963192027,"explosionRange":4,"isExploded":false}]
+[2025-10-20T12:27:18.619Z] myboy 499 562
+[2025-10-20T12:27:18.619Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.628Z] myboy 502 562
+[2025-10-20T12:27:18.628Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.637Z] myboy 502 562
+[2025-10-20T12:27:18.637Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.646Z] myboy 505 562
+[2025-10-20T12:27:18.646Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.655Z] myboy 505 562
+[2025-10-20T12:27:18.655Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.664Z] myboy 508 562
+[2025-10-20T12:27:18.664Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.673Z] myboy 508 562
+[2025-10-20T12:27:18.673Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.682Z] myboy 511 562
+[2025-10-20T12:27:18.682Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.691Z] myboy 511 562
+[2025-10-20T12:27:18.691Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.700Z] myboy 514 562
+[2025-10-20T12:27:18.700Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.709Z] myboy 514 562
+[2025-10-20T12:27:18.709Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.718Z] myboy 517 562
+[2025-10-20T12:27:18.718Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.727Z] myboy 520 562
+[2025-10-20T12:27:18.727Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.736Z] myboy 520 562
+[2025-10-20T12:27:18.736Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.745Z] myboy 523 562
+[2025-10-20T12:27:18.745Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.754Z] myboy 523 562
+[2025-10-20T12:27:18.754Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.763Z] myboy 526 562
+[2025-10-20T12:27:18.764Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.772Z] myboy 526 562
+[2025-10-20T12:27:18.772Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.781Z] myboy 529 562
+[2025-10-20T12:27:18.781Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.788Z] myboy 529 562
+[2025-10-20T12:27:18.789Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.797Z] myboy 532 562
+[2025-10-20T12:27:18.798Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.806Z] myboy 532 562
+[2025-10-20T12:27:18.807Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.816Z] myboy 535 562
+[2025-10-20T12:27:18.817Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.825Z] myboy 535 562
+[2025-10-20T12:27:18.826Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.835Z] myboy 538 562
+[2025-10-20T12:27:18.836Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.845Z] myboy 538 562
+[2025-10-20T12:27:18.845Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.854Z] myboy 541 562
+[2025-10-20T12:27:18.854Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.863Z] myboy 544 562
+[2025-10-20T12:27:18.863Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.873Z] myboy 544 562
+[2025-10-20T12:27:18.873Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.884Z] myboy 547 562
+[2025-10-20T12:27:18.884Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.897Z] myboy 547 562
+[2025-10-20T12:27:18.898Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.908Z] myboy 550 562
+[2025-10-20T12:27:18.910Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.919Z] myboy 553 562
+[2025-10-20T12:27:18.920Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.944Z] myboy 553 562
+[2025-10-20T12:27:18.945Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.955Z] myboy 553 562
+[2025-10-20T12:27:18.956Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.965Z] myboy 553 562
+[2025-10-20T12:27:18.966Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.977Z] myboy 553 562
+[2025-10-20T12:27:18.980Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:18.991Z] myboy 553 562
+[2025-10-20T12:27:18.991Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.001Z] myboy 553 562
+[2025-10-20T12:27:19.001Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.010Z] myboy 553 562
+[2025-10-20T12:27:19.011Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.019Z] myboy 556 562
+[2025-10-20T12:27:19.019Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.028Z] myboy 556 562
+[2025-10-20T12:27:19.028Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.037Z] myboy 559 562
+[2025-10-20T12:27:19.037Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.047Z] myboy 559 562
+[2025-10-20T12:27:19.047Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.057Z] myboy 562 562
+[2025-10-20T12:27:19.057Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.066Z] myboy 562 562
+[2025-10-20T12:27:19.066Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.075Z] myboy 562 559
+[2025-10-20T12:27:19.076Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.085Z] myboy 562 559
+[2025-10-20T12:27:19.085Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.096Z] myboy 562 556
+[2025-10-20T12:27:19.097Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.105Z] myboy 562 553
+[2025-10-20T12:27:19.106Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.115Z] myboy 562 553
+[2025-10-20T12:27:19.115Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.124Z] myboy 562 550
+[2025-10-20T12:27:19.125Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.133Z] myboy 562 550
+[2025-10-20T12:27:19.134Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.142Z] myboy 562 547
+[2025-10-20T12:27:19.142Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.151Z] myboy 562 547
+[2025-10-20T12:27:19.151Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.160Z] myboy 562 544
+[2025-10-20T12:27:19.160Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.169Z] myboy 562 544
+[2025-10-20T12:27:19.169Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.178Z] myboy 562 541
+[2025-10-20T12:27:19.179Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.187Z] myboy 562 541
+[2025-10-20T12:27:19.187Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.196Z] myboy 562 538
+[2025-10-20T12:27:19.196Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.204Z] myboy 562 538
+[2025-10-20T12:27:19.205Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.214Z] myboy 562 535
+[2025-10-20T12:27:19.214Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.223Z] myboy 562 535
+[2025-10-20T12:27:19.223Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.232Z] myboy 562 532
+[2025-10-20T12:27:19.232Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.241Z] myboy 562 532
+[2025-10-20T12:27:19.241Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.250Z] myboy 562 529
+[2025-10-20T12:27:19.250Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.259Z] myboy 562 529
+[2025-10-20T12:27:19.259Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.267Z] myboy 562 526
+[2025-10-20T12:27:19.267Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.276Z] myboy 562 526
+[2025-10-20T12:27:19.276Z] In danger! Moving to safety zone... {"x":14,"y":13}
+[2025-10-20T12:27:19.284Z] myboy 562 523
+[2025-10-20T12:27:19.285Z] dont have reachable item
+[2025-10-20T12:27:19.285Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.285Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.285Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.293Z] myboy 562 523
+[2025-10-20T12:27:19.293Z] dont have reachable item
+[2025-10-20T12:27:19.294Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.294Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.294Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.302Z] myboy 562 523
+[2025-10-20T12:27:19.302Z] dont have reachable item
+[2025-10-20T12:27:19.303Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.303Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.303Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.311Z] myboy 562 523
+[2025-10-20T12:27:19.311Z] dont have reachable item
+[2025-10-20T12:27:19.311Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.312Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.312Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.320Z] myboy 562 523
+[2025-10-20T12:27:19.321Z] dont have reachable item
+[2025-10-20T12:27:19.321Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.322Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.322Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.330Z] myboy 562 523
+[2025-10-20T12:27:19.330Z] dont have reachable item
+[2025-10-20T12:27:19.331Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.331Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.331Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.339Z] myboy 562 523
+[2025-10-20T12:27:19.339Z] dont have reachable item
+[2025-10-20T12:27:19.339Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.340Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.340Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.348Z] myboy 562 523
+[2025-10-20T12:27:19.348Z] dont have reachable item
+[2025-10-20T12:27:19.348Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.348Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.348Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.357Z] myboy 562 523
+[2025-10-20T12:27:19.357Z] dont have reachable item
+[2025-10-20T12:27:19.357Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.358Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.358Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.366Z] myboy 562 523
+[2025-10-20T12:27:19.366Z] dont have reachable item
+[2025-10-20T12:27:19.366Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.366Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.366Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.389Z] myboy 562 523
+[2025-10-20T12:27:19.389Z] dont have reachable item
+[2025-10-20T12:27:19.389Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.389Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.389Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.398Z] myboy 562 523
+[2025-10-20T12:27:19.398Z] dont have reachable item
+[2025-10-20T12:27:19.398Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.398Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.398Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.407Z] myboy 562 523
+[2025-10-20T12:27:19.407Z] dont have reachable item
+[2025-10-20T12:27:19.407Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.407Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.408Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.416Z] myboy 562 523
+[2025-10-20T12:27:19.416Z] dont have reachable item
+[2025-10-20T12:27:19.416Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.416Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.416Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.425Z] myboy 562 523
+[2025-10-20T12:27:19.425Z] dont have reachable item
+[2025-10-20T12:27:19.425Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.425Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.425Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.434Z] myboy 562 523
+[2025-10-20T12:27:19.434Z] dont have reachable item
+[2025-10-20T12:27:19.434Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.434Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.434Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.442Z] myboy 562 523
+[2025-10-20T12:27:19.442Z] dont have reachable item
+[2025-10-20T12:27:19.443Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.443Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.443Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.451Z] myboy 562 523
+[2025-10-20T12:27:19.451Z] dont have reachable item
+[2025-10-20T12:27:19.451Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.451Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.451Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.460Z] myboy 562 523
+[2025-10-20T12:27:19.460Z] dont have reachable item
+[2025-10-20T12:27:19.460Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.460Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.460Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.467Z] myboy 562 523
+[2025-10-20T12:27:19.468Z] dont have reachable item
+[2025-10-20T12:27:19.468Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.468Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.468Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.476Z] myboy 562 523
+[2025-10-20T12:27:19.476Z] dont have reachable item
+[2025-10-20T12:27:19.477Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.477Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.477Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.485Z] myboy 562 523
+[2025-10-20T12:27:19.485Z] dont have reachable item
+[2025-10-20T12:27:19.485Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.485Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.485Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.494Z] myboy 562 523
+[2025-10-20T12:27:19.494Z] dont have reachable item
+[2025-10-20T12:27:19.494Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.494Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.494Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.502Z] myboy 562 523
+[2025-10-20T12:27:19.503Z] dont have reachable item
+[2025-10-20T12:27:19.503Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.503Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.503Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.511Z] myboy 562 523
+[2025-10-20T12:27:19.512Z] dont have reachable item
+[2025-10-20T12:27:19.512Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.512Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.512Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.519Z] myboy 562 523
+[2025-10-20T12:27:19.519Z] dont have reachable item
+[2025-10-20T12:27:19.520Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.520Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.520Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.528Z] myboy 562 523
+[2025-10-20T12:27:19.528Z] dont have reachable item
+[2025-10-20T12:27:19.529Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.529Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.529Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.537Z] myboy 562 523
+[2025-10-20T12:27:19.537Z] dont have reachable item
+[2025-10-20T12:27:19.537Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.537Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.537Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.546Z] myboy 562 523
+[2025-10-20T12:27:19.546Z] dont have reachable item
+[2025-10-20T12:27:19.546Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.546Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.546Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.554Z] myboy 562 523
+[2025-10-20T12:27:19.554Z] dont have reachable item
+[2025-10-20T12:27:19.555Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.555Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.555Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.563Z] myboy 562 523
+[2025-10-20T12:27:19.563Z] dont have reachable item
+[2025-10-20T12:27:19.564Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.564Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.564Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.572Z] myboy 562 523
+[2025-10-20T12:27:19.572Z] dont have reachable item
+[2025-10-20T12:27:19.572Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.573Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.573Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.581Z] myboy 562 523
+[2025-10-20T12:27:19.581Z] dont have reachable item
+[2025-10-20T12:27:19.581Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.581Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.581Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.590Z] myboy 562 523
+[2025-10-20T12:27:19.590Z] dont have reachable item
+[2025-10-20T12:27:19.590Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.590Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.591Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.599Z] myboy 562 523
+[2025-10-20T12:27:19.599Z] dont have reachable item
+[2025-10-20T12:27:19.599Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.599Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.599Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.608Z] myboy 562 523
+[2025-10-20T12:27:19.608Z] dont have reachable item
+[2025-10-20T12:27:19.608Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.609Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.609Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.617Z] myboy 562 523
+[2025-10-20T12:27:19.617Z] dont have reachable item
+[2025-10-20T12:27:19.617Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.618Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.618Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.626Z] myboy 562 523
+[2025-10-20T12:27:19.626Z] dont have reachable item
+[2025-10-20T12:27:19.627Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.627Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.627Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.635Z] myboy 562 523
+[2025-10-20T12:27:19.635Z] dont have reachable item
+[2025-10-20T12:27:19.635Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.636Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.636Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.644Z] myboy 562 523
+[2025-10-20T12:27:19.644Z] dont have reachable item
+[2025-10-20T12:27:19.644Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.644Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.645Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.653Z] myboy 562 523
+[2025-10-20T12:27:19.653Z] dont have reachable item
+[2025-10-20T12:27:19.653Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.653Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.653Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.662Z] myboy 562 523
+[2025-10-20T12:27:19.662Z] dont have reachable item
+[2025-10-20T12:27:19.662Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.662Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.662Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.671Z] myboy 562 523
+[2025-10-20T12:27:19.671Z] dont have reachable item
+[2025-10-20T12:27:19.671Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.671Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.671Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.679Z] myboy 562 523
+[2025-10-20T12:27:19.679Z] dont have reachable item
+[2025-10-20T12:27:19.680Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.680Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.680Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.688Z] myboy 562 523
+[2025-10-20T12:27:19.688Z] dont have reachable item
+[2025-10-20T12:27:19.689Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.689Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.689Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.697Z] myboy 562 523
+[2025-10-20T12:27:19.697Z] dont have reachable item
+[2025-10-20T12:27:19.697Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.698Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.698Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.706Z] myboy 562 523
+[2025-10-20T12:27:19.706Z] dont have reachable item
+[2025-10-20T12:27:19.706Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.707Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.707Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.715Z] myboy 562 523
+[2025-10-20T12:27:19.715Z] dont have reachable item
+[2025-10-20T12:27:19.715Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.715Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.715Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.724Z] myboy 562 523
+[2025-10-20T12:27:19.724Z] dont have reachable item
+[2025-10-20T12:27:19.724Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.724Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.725Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.733Z] myboy 562 523
+[2025-10-20T12:27:19.733Z] dont have reachable item
+[2025-10-20T12:27:19.733Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.733Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.733Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.741Z] myboy 562 523
+[2025-10-20T12:27:19.742Z] dont have reachable item
+[2025-10-20T12:27:19.742Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.742Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.742Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.750Z] myboy 562 523
+[2025-10-20T12:27:19.750Z] dont have reachable item
+[2025-10-20T12:27:19.750Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.750Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.751Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.759Z] myboy 562 523
+[2025-10-20T12:27:19.759Z] dont have reachable item
+[2025-10-20T12:27:19.759Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.759Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.759Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.768Z] myboy 562 523
+[2025-10-20T12:27:19.768Z] dont have reachable item
+[2025-10-20T12:27:19.768Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.768Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.768Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.776Z] myboy 562 523
+[2025-10-20T12:27:19.776Z] dont have reachable item
+[2025-10-20T12:27:19.776Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.776Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.777Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.785Z] myboy 562 523
+[2025-10-20T12:27:19.785Z] dont have reachable item
+[2025-10-20T12:27:19.785Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.785Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.785Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.793Z] myboy 562 523
+[2025-10-20T12:27:19.793Z] dont have reachable item
+[2025-10-20T12:27:19.794Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.794Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.794Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.802Z] myboy 562 523
+[2025-10-20T12:27:19.802Z] dont have reachable item
+[2025-10-20T12:27:19.802Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.803Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.803Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.811Z] myboy 562 523
+[2025-10-20T12:27:19.811Z] dont have reachable item
+[2025-10-20T12:27:19.811Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.812Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.812Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.820Z] myboy 562 523
+[2025-10-20T12:27:19.820Z] dont have reachable item
+[2025-10-20T12:27:19.820Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.821Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.821Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.829Z] myboy 562 523
+[2025-10-20T12:27:19.829Z] dont have reachable item
+[2025-10-20T12:27:19.830Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.830Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.830Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.838Z] myboy 562 523
+[2025-10-20T12:27:19.839Z] dont have reachable item
+[2025-10-20T12:27:19.839Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.839Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.839Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.848Z] myboy 562 523
+[2025-10-20T12:27:19.848Z] dont have reachable item
+[2025-10-20T12:27:19.848Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.849Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.849Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.857Z] myboy 562 523
+[2025-10-20T12:27:19.857Z] dont have reachable item
+[2025-10-20T12:27:19.858Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.858Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.858Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.866Z] myboy 562 523
+[2025-10-20T12:27:19.866Z] dont have reachable item
+[2025-10-20T12:27:19.866Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.867Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.867Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.875Z] myboy 562 523
+[2025-10-20T12:27:19.875Z] dont have reachable item
+[2025-10-20T12:27:19.875Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.875Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.876Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.884Z] myboy 562 523
+[2025-10-20T12:27:19.884Z] dont have reachable item
+[2025-10-20T12:27:19.884Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.884Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.884Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.893Z] myboy 562 523
+[2025-10-20T12:27:19.893Z] dont have reachable item
+[2025-10-20T12:27:19.893Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.893Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.893Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.901Z] myboy 562 523
+[2025-10-20T12:27:19.902Z] dont have reachable item
+[2025-10-20T12:27:19.902Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.902Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.902Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.910Z] myboy 562 523
+[2025-10-20T12:27:19.910Z] dont have reachable item
+[2025-10-20T12:27:19.911Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.911Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.911Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.919Z] myboy 562 523
+[2025-10-20T12:27:19.919Z] dont have reachable item
+[2025-10-20T12:27:19.920Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.920Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.920Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.928Z] myboy 562 523
+[2025-10-20T12:27:19.928Z] dont have reachable item
+[2025-10-20T12:27:19.929Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.929Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.929Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.938Z] myboy 562 523
+[2025-10-20T12:27:19.938Z] dont have reachable item
+[2025-10-20T12:27:19.938Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.938Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.938Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.946Z] myboy 562 523
+[2025-10-20T12:27:19.946Z] dont have reachable item
+[2025-10-20T12:27:19.947Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.947Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.947Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.955Z] myboy 562 523
+[2025-10-20T12:27:19.955Z] dont have reachable item
+[2025-10-20T12:27:19.955Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.956Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.956Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.964Z] myboy 562 523
+[2025-10-20T12:27:19.964Z] dont have reachable item
+[2025-10-20T12:27:19.964Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.965Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.965Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.973Z] myboy 562 523
+[2025-10-20T12:27:19.973Z] dont have reachable item
+[2025-10-20T12:27:19.973Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.973Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.974Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.982Z] myboy 562 523
+[2025-10-20T12:27:19.982Z] dont have reachable item
+[2025-10-20T12:27:19.982Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.982Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.982Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:19.991Z] myboy 562 523
+[2025-10-20T12:27:19.991Z] dont have reachable item
+[2025-10-20T12:27:19.991Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:19.991Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:19.992Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.000Z] myboy 562 523
+[2025-10-20T12:27:20.000Z] dont have reachable item
+[2025-10-20T12:27:20.000Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.001Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.001Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.009Z] myboy 562 523
+[2025-10-20T12:27:20.009Z] dont have reachable item
+[2025-10-20T12:27:20.010Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.010Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.010Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.018Z] myboy 562 523
+[2025-10-20T12:27:20.019Z] dont have reachable item
+[2025-10-20T12:27:20.019Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.019Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.019Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.028Z] myboy 562 523
+[2025-10-20T12:27:20.028Z] dont have reachable item
+[2025-10-20T12:27:20.028Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.028Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.028Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.036Z] myboy 562 523
+[2025-10-20T12:27:20.036Z] dont have reachable item
+[2025-10-20T12:27:20.036Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.037Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.037Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.045Z] myboy 562 523
+[2025-10-20T12:27:20.045Z] dont have reachable item
+[2025-10-20T12:27:20.045Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.045Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.045Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.054Z] myboy 562 523
+[2025-10-20T12:27:20.054Z] dont have reachable item
+[2025-10-20T12:27:20.054Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.054Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.054Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.062Z] myboy 562 523
+[2025-10-20T12:27:20.062Z] dont have reachable item
+[2025-10-20T12:27:20.062Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.062Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.063Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.071Z] myboy 562 523
+[2025-10-20T12:27:20.071Z] dont have reachable item
+[2025-10-20T12:27:20.071Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.071Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.071Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.080Z] myboy 562 523
+[2025-10-20T12:27:20.080Z] dont have reachable item
+[2025-10-20T12:27:20.080Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.080Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.080Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.089Z] myboy 562 523
+[2025-10-20T12:27:20.089Z] dont have reachable item
+[2025-10-20T12:27:20.089Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.090Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.090Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.099Z] myboy 562 523
+[2025-10-20T12:27:20.099Z] dont have reachable item
+[2025-10-20T12:27:20.099Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.099Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.099Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.108Z] myboy 562 523
+[2025-10-20T12:27:20.108Z] dont have reachable item
+[2025-10-20T12:27:20.109Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.109Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.109Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.117Z] myboy 562 523
+[2025-10-20T12:27:20.117Z] dont have reachable item
+[2025-10-20T12:27:20.118Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.118Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.118Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.126Z] myboy 562 523
+[2025-10-20T12:27:20.126Z] dont have reachable item
+[2025-10-20T12:27:20.127Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.127Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.127Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.135Z] myboy 562 523
+[2025-10-20T12:27:20.136Z] dont have reachable item
+[2025-10-20T12:27:20.136Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.136Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.136Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.144Z] myboy 562 523
+[2025-10-20T12:27:20.145Z] dont have reachable item
+[2025-10-20T12:27:20.145Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.145Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.145Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.154Z] myboy 562 523
+[2025-10-20T12:27:20.154Z] dont have reachable item
+[2025-10-20T12:27:20.154Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.155Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.155Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.163Z] myboy 562 523
+[2025-10-20T12:27:20.164Z] dont have reachable item
+[2025-10-20T12:27:20.164Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.164Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.165Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.173Z] myboy 562 523
+[2025-10-20T12:27:20.173Z] dont have reachable item
+[2025-10-20T12:27:20.173Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.174Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.174Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.182Z] myboy 562 523
+[2025-10-20T12:27:20.182Z] dont have reachable item
+[2025-10-20T12:27:20.182Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.183Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.183Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.191Z] myboy 562 523
+[2025-10-20T12:27:20.191Z] dont have reachable item
+[2025-10-20T12:27:20.191Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.191Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.191Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.200Z] myboy 562 523
+[2025-10-20T12:27:20.200Z] dont have reachable item
+[2025-10-20T12:27:20.200Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.200Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.200Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.208Z] myboy 562 523
+[2025-10-20T12:27:20.208Z] dont have reachable item
+[2025-10-20T12:27:20.209Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.209Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.209Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.217Z] myboy 562 523
+[2025-10-20T12:27:20.218Z] dont have reachable item
+[2025-10-20T12:27:20.218Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.218Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.218Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.227Z] myboy 562 523
+[2025-10-20T12:27:20.227Z] dont have reachable item
+[2025-10-20T12:27:20.227Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.227Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.227Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.235Z] myboy 562 523
+[2025-10-20T12:27:20.236Z] dont have reachable item
+[2025-10-20T12:27:20.236Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.236Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.236Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.244Z] myboy 562 523
+[2025-10-20T12:27:20.244Z] dont have reachable item
+[2025-10-20T12:27:20.245Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.245Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.245Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.253Z] myboy 562 523
+[2025-10-20T12:27:20.253Z] dont have reachable item
+[2025-10-20T12:27:20.254Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.254Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.254Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.262Z] myboy 562 523
+[2025-10-20T12:27:20.262Z] dont have reachable item
+[2025-10-20T12:27:20.263Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.263Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.263Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.271Z] myboy 562 523
+[2025-10-20T12:27:20.271Z] dont have reachable item
+[2025-10-20T12:27:20.272Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.272Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.272Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.280Z] myboy 562 523
+[2025-10-20T12:27:20.281Z] dont have reachable item
+[2025-10-20T12:27:20.281Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.281Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.281Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.290Z] myboy 562 523
+[2025-10-20T12:27:20.290Z] dont have reachable item
+[2025-10-20T12:27:20.290Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.290Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.290Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.298Z] myboy 562 523
+[2025-10-20T12:27:20.298Z] dont have reachable item
+[2025-10-20T12:27:20.299Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.299Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.299Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.307Z] myboy 562 523
+[2025-10-20T12:27:20.308Z] dont have reachable item
+[2025-10-20T12:27:20.308Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.308Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.308Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.316Z] myboy 562 523
+[2025-10-20T12:27:20.316Z] dont have reachable item
+[2025-10-20T12:27:20.316Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.317Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.317Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.325Z] myboy 562 523
+[2025-10-20T12:27:20.325Z] dont have reachable item
+[2025-10-20T12:27:20.325Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.326Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.326Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.334Z] myboy 562 523
+[2025-10-20T12:27:20.334Z] dont have reachable item
+[2025-10-20T12:27:20.334Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.334Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.334Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.343Z] myboy 562 523
+[2025-10-20T12:27:20.343Z] dont have reachable item
+[2025-10-20T12:27:20.343Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.343Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.343Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.351Z] myboy 562 523
+[2025-10-20T12:27:20.351Z] dont have reachable item
+[2025-10-20T12:27:20.351Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.351Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.352Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.360Z] myboy 562 523
+[2025-10-20T12:27:20.360Z] dont have reachable item
+[2025-10-20T12:27:20.360Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.360Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.360Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.368Z] myboy 562 523
+[2025-10-20T12:27:20.369Z] dont have reachable item
+[2025-10-20T12:27:20.369Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.369Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.369Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.377Z] myboy 562 523
+[2025-10-20T12:27:20.377Z] dont have reachable item
+[2025-10-20T12:27:20.377Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.377Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.377Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.386Z] myboy 562 523
+[2025-10-20T12:27:20.386Z] dont have reachable item
+[2025-10-20T12:27:20.386Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.386Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.386Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.395Z] myboy 562 523
+[2025-10-20T12:27:20.395Z] dont have reachable item
+[2025-10-20T12:27:20.395Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.395Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.395Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
+[2025-10-20T12:27:20.403Z] myboy 562 523
+[2025-10-20T12:27:20.404Z] dont have reachable item
+[2025-10-20T12:27:20.404Z] allPlaces [{"x":14,"y":13,"score":1,"dist":0},{"x":14,"y":14,"score":1,"dist":1}]
+[2025-10-20T12:27:20.404Z] no safe zone {"x":14,"y":13,"score":1,"dist":0}
+[2025-10-20T12:27:20.404Z] no safe zone {"x":14,"y":14,"score":1,"dist":1}
