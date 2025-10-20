@@ -59,7 +59,11 @@ socket.on('item_collected', (payload) => {
 
 socket.on('bomb_explode', (payload) => {
   writeLog('bomb explode', payload);
-  MAP[payload.y / helpers.WALL_SIZE][payload.x / helpers.WALL_SIZE] = null;
+  for (const area of payload.explosionArea) {
+    writeLog(area)
+    MAP[area.y / helpers.WALL_SIZE][payload.x / helpers.WALL_SIZE] = null;
+    writeLog("update map to null x y", area.x, area.y)
+  }
 
   //remove bomb from BOMBS
   BOMBS = BOMBS.filter(b => b.id !== payload.id);
@@ -69,14 +73,13 @@ socket.on('bomb_explode', (payload) => {
 
 socket.on('map_update', (payload) => {
   writeLog('map update', );
-  const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
-  for (let i = CHESTS.length - 1; i >= 0; i--) {
-    if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
-      MAP[CHESTS[i].y / helpers.WALL_SIZE][CHESTS[i].x / helpers.WALL_SIZE] = null;
-      writeLog('x y', CHESTS[i].x / helpers.WALL_SIZE, CHESTS[i].y / helpers.WALL_SIZE);
-      CHESTS.splice(i, 1);
-    }
-  }
+  // const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
+  // for (let i = CHESTS.length - 1; i >= 0; i--) {
+  //   if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
+  //     writeLog('x y', CHESTS[i].x / helpers.WALL_SIZE, CHESTS[i].y / helpers.WALL_SIZE);
+  //     CHESTS.splice(i, 1);
+  //   }
+  // }
   ITEMS = payload.items;
 });
 
@@ -125,6 +128,12 @@ socket.on('connect', async () => {
     await sleep(100)
   }
 
+  // let bomber = sampleBomber;
+  // let safetyZone = { x: 2, y: 14 }
+  // let MAP = sampleMap;
+  // const path = helpers.findPathToTargetAStar(bomber, helpers.toMapCoord(safetyZone), MAP, false);
+  // writeLog('pathhhh', path)
+
   // writeLog('yyy', helpers.findChestBreakScoresToFrozen(myBomber2, frozenBots, MAP))
 
   while(true) {
@@ -138,6 +147,11 @@ socket.on('connect', async () => {
       if (safetyZone) {
         const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
+          if (path.length == 1) {
+            writeLog("path length 1 case new")
+            writeLog("path 0 + bomber x y", path[0], myBomber)
+          }
+
           if (path.length == 1 && (path[0].x != myBomber.x || path[0].y != myBomber.y)) {
             path.unshift({x: myBomber.x, y: myBomber.y})
             writeLog("path length 1 case")
@@ -174,8 +188,9 @@ socket.on('connect', async () => {
       }
     } else {
       writeLog('dont have reachable item', ITEMS);
+      writeLog('MAP', MAP)
       //skip in case no bom available
-      if (!checkBomAvailables(myBomber)) continue;
+      // if (!checkBomAvailables(myBomber)) continue;
 
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
@@ -309,6 +324,8 @@ function findReachableItem() {
     return distance <= (6 * helpers.WALL_SIZE);
   });
 
+  writeLog("nearByItem", nearbyItems)
+
   // Find all valid paths to nearby items
   const validPaths = [];
   for (const item of nearbyItems) {
@@ -351,7 +368,7 @@ function updateMapWhenPlaceBoom(bomber) {
   const { x: startCol, y: startRow } = helpers.toGridCoord(bomber);
 
   // Tính cả vị trí bom
-  const inBounds = (r, c) => r >= 0 && c >= 0 && r < MAP.length && c < MAP[0].length;
+  const inBounds = (r, c) => r >= 0 && c >= 0 && r < 16 && c < 16;
 
   for (const { dx, dy } of helpers.DIRS[0]) {
     for (let step = 1; step <= bomber.explosionRange; step++) {
