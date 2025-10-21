@@ -60,9 +60,9 @@ socket.on('item_collected', (payload) => {
 socket.on('bomb_explode', (payload) => {
   writeLog('bomb explode', payload);
   for (const area of payload.explosionArea) {
-    writeLog(area)
-    MAP[area.y / helpers.WALL_SIZE][payload.x / helpers.WALL_SIZE] = null;
-    writeLog("update map to null x y", area.x, area.y)
+    if (MAP[area.y / helpers.WALL_SIZE][area.x / helpers.WALL_SIZE] == null) continue;
+
+    MAP[area.y / helpers.WALL_SIZE][area.x / helpers.WALL_SIZE] = null;
   }
 
   //remove bomb from BOMBS
@@ -72,14 +72,6 @@ socket.on('bomb_explode', (payload) => {
 });
 
 socket.on('map_update', (payload) => {
-  writeLog('map update', );
-  // const chestCoords = new Set(payload.chests.map(c => `${c.x},${c.y}`));
-  // for (let i = CHESTS.length - 1; i >= 0; i--) {
-  //   if (!chestCoords.has(`${CHESTS[i].x},${CHESTS[i].y}`)) {
-  //     writeLog('x y', CHESTS[i].x / helpers.WALL_SIZE, CHESTS[i].y / helpers.WALL_SIZE);
-  //     CHESTS.splice(i, 1);
-  //   }
-  // }
   ITEMS = payload.items;
 });
 
