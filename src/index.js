@@ -202,7 +202,7 @@ socket.on('connect', async () => {
                 const last = gridPath[gridPath.length - 1];
                 writeLog('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
               } else {
-                const middlePoint = helpers.getMidPoint(gridPath, myBomber.speedCount + 1);
+                const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
                 const pathToMidPoint = findPathToTarget(middlePoint, false)
 
                 if (pathToMidPoint) {
@@ -252,10 +252,10 @@ const move = (orient) => {
   // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   // if (!myBomber) return;
 
-  // if (orient === 'UP') myBomber.y -= (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'DOWN') myBomber.y += (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed + myBomber.speedCount)
-  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed + myBomber.speedCount)
+  // if (orient === 'UP') myBomber.y -= (myBomber.speed)
+  // if (orient === 'DOWN') myBomber.y += (myBomber.speed)
+  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed)
+  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed)
 }
 
 const placeBoom = (myBomber = null) => {

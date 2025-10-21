@@ -92,14 +92,14 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 
   // Để tránh .find() (O(n)), ta có thể thêm một map theo key "x,y"
   const openSet = new Set([`${start.x},${start.y}`]);
-  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speedCount]
+  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speed - 1]
 
   while (!open.isEmpty()) {
     const current = open.pop();
     openSet.delete(`${current.x},${current.y}`);
 
     const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
-    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= myBomber.speedCount) {
+    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= (myBomber.speed - 1)) {
       const path = [];
       let step = current;
       while (step) {
@@ -151,14 +151,14 @@ function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
     f: heuristic(start, goal)
   };
   open.push(startNode);
-  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speedCount]
+  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speed - 1]
 
   while (!open.isEmpty()) {
     const current = open.pop();
     openSet.delete(`${current.x},${current.y}`);
 
     const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
-    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= myBomber.speedCount) {
+    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= (myBomber.speed - 1)) {
       // reconstruct path
       const path = [];
       let step = current;
