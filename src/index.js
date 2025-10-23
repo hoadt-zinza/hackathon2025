@@ -199,11 +199,15 @@ socket.on('connect', async () => {
 
                 if (pathToMidPoint) {
                   if (pathToMidPoint.length > 1) {
-                    const step = nextStep(pathToMidPoint);
-                    if (step) {
-                      move(step);
+                    if (helpers.isInDanger(pathToMidPoint[1], DANGER_ZONE)) {
+                      writeLog('path 1 pathToMidPoint in danger zone so dont move');
                     } else {
-                      writeLog('no step');
+                      const step = nextStep(pathToMidPoint);
+                      if (step) {
+                        move(step);
+                      } else {
+                        writeLog('no step');
+                      }
                     }
                   } else {
                     writeLog('touch pathToMidPoint', pathToMidPoint)
