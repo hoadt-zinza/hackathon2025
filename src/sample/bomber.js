@@ -1,6 +1,6 @@
 export default {
-  x: 79,
-  y: 561,
+  x: 40,
+  y: 40,
   speed: 1,
   type: 1,
   uid: '1sEo7KS7efpHtJViAAAB',
@@ -9,7 +9,7 @@ export default {
   size: 35,
   name: 'bobao',
   movable: true,
-  score: 0,
+  score: 10,
   color: 1,
   explosionRange: 2,
   bombCount: 1,

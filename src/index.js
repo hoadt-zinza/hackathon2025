@@ -108,8 +108,8 @@ function blindCodeMode() {
 
 socket.on('connect', async () => {
   console.log('Connected to server');
-  socket.emit('join', {});
-  // blindCodeMode()
+  // socket.emit('join', {});
+  blindCodeMode()
   fs.writeFileSync('log.txt', '');
   console.log('Sent join event');
 
@@ -132,104 +132,111 @@ socket.on('connect', async () => {
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
     writeLog('myboy', myBomber.x, myBomber.y)
-    helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
+    // helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
 
-    if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
-      writeLog('In danger! Moving to safety zone...', safetyZone);
-      if (safetyZone) {
-        const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
-        if (path && path.length >= 1) {
-          if (path.length == 1) {
-            path.push(helpers.toMapCoord(safetyZone))
-            writeLog("path length 1 case")
-          }
-          const step = nextStep(path);
-          if (step) {
-            move(step);
-            await sleep(1000 / 60 / SPEED);
-            continue;
-          } else {
-            writeLog('no step', step)
-            writeLog('path to safety', path)
-          }
-        } else {
-          writeLog('no path to safety', path);
-          writeLog('myBomber', myBomber);
-          writeLog('DANGER_ZONE', DANGER_ZONE);
-          writeLog('MAP', MAP)
-          writeLog('safetyZone', safetyZone);
-        }
-      } else {
-        writeLog('no safety zone', )
+    if (FROZEN_BOTS.length > 0) {
+      // no bomb is placing
+      if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
+        writeLog(helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP))
       }
     }
 
-    const reachableItem = findReachableItem();
+    // if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
+    //   const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+    //   writeLog('In danger! Moving to safety zone...', safetyZone);
+    //   if (safetyZone) {
+    //     const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
+    //     if (path && path.length >= 1) {
+    //       if (path.length == 1) {
+    //         path.push(helpers.toMapCoord(safetyZone))
+    //         writeLog("path length 1 case")
+    //       }
+    //       const step = nextStep(path);
+    //       if (step) {
+    //         move(step);
+    //         await sleep(1000 / 60 / SPEED);
+    //         continue;
+    //       } else {
+    //         writeLog('no step', step)
+    //         writeLog('path to safety', path)
+    //       }
+    //     } else {
+    //       writeLog('no path to safety', path);
+    //       writeLog('myBomber', myBomber);
+    //       writeLog('DANGER_ZONE', DANGER_ZONE);
+    //       writeLog('MAP', MAP)
+    //       writeLog('safetyZone', safetyZone);
+    //     }
+    //   } else {
+    //     writeLog('no safety zone', )
+    //   }
+    // }
 
-    if (reachableItem) {
-      writeLog('moving to reachable item', reachableItem.path.length);
-      if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE)) {
-        writeLog('path 1 in danger zone so dont move');
-      } else {
-        move(nextStep(reachableItem.path));
-      }
-    } else {
-      writeLog('dont have reachable item', ITEMS);
-      writeLog('MAP', MAP)
-      //skip in case no bom available
-      // if (!checkBomAvailables(myBomber)) continue;
+    // const reachableItem = findReachableItem();
 
-      const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
-      const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
+    // if (reachableItem) {
+    //   writeLog('moving to reachable item', reachableItem.path.length);
+    //   if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE)) {
+    //     writeLog('path 1 in danger zone so dont move');
+    //   } else {
+    //     move(nextStep(reachableItem.path));
+    //   }
+    // } else {
+    //   writeLog('dont have reachable item', ITEMS);
+    //   writeLog('MAP', MAP)
+    //   //skip in case no bom available
+    //   // if (!checkBomAvailables(myBomber)) continue;
 
-      if (allPlaces && allPlaces.length > 0) {
-        writeLog('allPlaces', allPlaces)
-        for (const place of allPlaces) {
-          // writeLog('place', place)
-          const safeZones = helpers.countSafeZonesAfterPlaceBoom(helpers.toMapCoord(place), myBomber.explosionRange, DANGER_ZONE, MAP, walkableNeighbors);
-          if (safeZones) {
-            const gridPath = findPathToTarget(helpers.toMapCoord(place))
-            // writeLog('gridPath', gridPath)
-            if (gridPath && gridPath.length > 1) {
-              if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
-                writeLog('path 1 in danger zone so dont move');
-                writeLog('place', place);
-                const last = gridPath[gridPath.length - 1];
-                writeLog('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
-              } else {
-                const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
-                const pathToMidPoint = findPathToTarget(middlePoint, false)
+    //   const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
+    //   const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
 
-                if (pathToMidPoint) {
-                  if (pathToMidPoint.length > 1) {
-                    const step = nextStep(pathToMidPoint);
-                    if (step) {
-                      move(step);
-                    } else {
-                      writeLog('no step');
-                    }
-                  } else {
-                    writeLog('touch pathToMidPoint', pathToMidPoint)
-                    placeBoom(myBomber);
-                    updateMapWhenPlaceBoom(myBomber);
-                  }
-                }
-              }
-            } else if (gridPath && gridPath.length < 2) {
-              writeLog('touch nearest chest', gridPath)
-              writeLog('places', allPlaces)
-              placeBoom(myBomber);
-              updateMapWhenPlaceBoom(myBomber);
-            }
-            break;
-          } else {
-            writeLog('no safe zone', place)
-          }
-        }
-      }
-    }
-    await (sleep(1000 / 60 / SPEED));
+    //   if (allPlaces && allPlaces.length > 0) {
+    //     writeLog('allPlaces', allPlaces)
+    //     for (const place of allPlaces) {
+    //       // writeLog('place', place)
+    //       const safeZones = helpers.countSafeZonesAfterPlaceBoom(helpers.toMapCoord(place), myBomber.explosionRange, DANGER_ZONE, MAP, walkableNeighbors);
+    //       if (safeZones) {
+    //         const gridPath = findPathToTarget(helpers.toMapCoord(place))
+    //         // writeLog('gridPath', gridPath)
+    //         if (gridPath && gridPath.length > 1) {
+    //           if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
+    //             writeLog('path 1 in danger zone so dont move');
+    //             writeLog('place', place);
+    //             const last = gridPath[gridPath.length - 1];
+    //             writeLog('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
+    //           } else {
+    //             const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
+    //             const pathToMidPoint = findPathToTarget(middlePoint, false)
+
+    //             if (pathToMidPoint) {
+    //               if (pathToMidPoint.length > 1) {
+    //                 const step = nextStep(pathToMidPoint);
+    //                 if (step) {
+    //                   move(step);
+    //                 } else {
+    //                   writeLog('no step');
+    //                 }
+    //               } else {
+    //                 writeLog('touch pathToMidPoint', pathToMidPoint)
+    //                 placeBoom(myBomber);
+    //                 updateMapWhenPlaceBoom(myBomber);
+    //               }
+    //             }
+    //           }
+    //         } else if (gridPath && gridPath.length < 2) {
+    //           writeLog('touch nearest chest', gridPath)
+    //           writeLog('places', allPlaces)
+    //           placeBoom(myBomber);
+    //           updateMapWhenPlaceBoom(myBomber);
+    //         }
+    //         break;
+    //       } else {
+    //         writeLog('no safe zone', place)
+    //       }
+    //     }
+    //   }
+    // }
+    await (sleep(1000));
   }
 });
 
@@ -372,7 +379,6 @@ function updateMapWhenPlaceBoom(bomber) {
         const chest = CHESTS.find(ch => ch.x === chestX && ch.y === chestY && !ch.isDestroyed);
         if (chest) {
           MAP[r][c] = 'W';
-          writeLog('update map to w when place boom', c, r);
         }
         break; // nổ dừng tại chest
       }
@@ -383,6 +389,13 @@ function updateMapWhenPlaceBoom(bomber) {
 }
 
 setTimeout(() => {
+  const fakeBomber1 = { ...sampleBomber, score: 0, x: 565, y: 565 };
+  const fakeBomber2 = { ...sampleBomber, score: 0, x: 40, y: 565 };
+  const fakeBomber3 = { ...sampleBomber, score: 0, x: 565, y: 40 };
+  BOMBERS.push(fakeBomber3)
+  BOMBERS.push(fakeBomber1)
+  BOMBERS.push(fakeBomber2)
+
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
 }, 15000);
