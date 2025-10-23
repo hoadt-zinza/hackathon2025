@@ -3,6 +3,7 @@ import * as helpers from './helpers.js';
 import { io } from 'socket.io-client';
 import sampleBomber from './sample/bomber.js';
 import sampleMap from './sample/map.js';
+import blankMap from './sample/blankMap.js'
 import fs from 'fs';
 
 dotenv.config();
@@ -140,12 +141,7 @@ socket.on('connect', async () => {
         const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
           if (path.length == 1) {
-            writeLog("path length 1 case new")
-            writeLog("path 0 + bomber x y", path[0], myBomber)
-          }
-
-          if (path.length == 1 && (path[0].x != myBomber.x || path[0].y != myBomber.y)) {
-            path.unshift({x: myBomber.x, y: myBomber.y})
+            path.push(helpers.toMapCoord(safetyZone))
             writeLog("path length 1 case")
           }
           const step = nextStep(path);
@@ -315,8 +311,6 @@ function findReachableItem() {
     const distance = Math.abs(item.x - myBomber.x) + Math.abs(item.y - myBomber.y);
     return distance <= (6 * helpers.WALL_SIZE);
   });
-
-  writeLog("nearByItem", nearbyItems)
 
   // Find all valid paths to nearby items
   const validPaths = [];
