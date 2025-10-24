@@ -670,6 +670,61 @@ function hasChestLeft(map) {
   return map.some(row => row.includes('C'));
 }
 
+/**
+ * Trả về các ô (tile coords) có thể đặt bom để phá chest ở chestTile.
+ *
+ * chestTile: { x: number, y: number }  // tile coordinates
+ * map: 2D array map[y][x], 'W' là wall
+ * options:
+ *   - range (default 1)         // explosion range in tiles
+ *   - includeChestTile (true)   // có cho phép đặt bom ngay trên chest không
+ *   - returnInPixels (false)    // nếu true trả {x:pixel, y:pixel, tileX, tileY}
+ *   - tileSize (default 40)     // dùng khi returnInPixels = true
+ *
+ * Trả về mảng các đối tượng: { x, y } (tile coords) hoặc { x, y, tileX, tileY } (pixels + tile)
+ */
+function bombPositionsForChest(myBomber, chestTile, map) {
+  const { x, y } = chestTile;
+  const resultsSet = new Set();
+
+  for (const { dx, dy } of DIRS[0]) {
+    for (let step = 1; step <= myBomber.explosionRange; step++) {
+      const tx = x + dx * step;
+      const ty = y + dy * step;
+      // nếu ra ngoài hoặc chạm tường thì dừng quét hướng này (tường chặn vụ nổ)
+      if (!isWalkable(map,tx, ty)) break;
+      resultsSet.add(`${tx},${ty}`);
+    }
+  }
+
+  // chuyển set -> array, có thể trả pixel center nếu cần
+  const out = Array.from(resultsSet, k => {
+    const [tx, ty] = k.split(',').map(Number);
+    return {
+      tileX: tx,
+      tileY: ty,
+      x: tx * WALL_SIZE + Math.floor(WALL_SIZE / 2),
+      y: ty * WALL_SIZE + Math.floor(WALL_SIZE / 2)
+    };
+  }).sort((a, b) => {
+    heuristic({
+      x: Math.floor(myBomber.x / WALL_SIZE),
+      y: Math.floor(myBomber.y / WALL_SIZE)
+    }, {
+      x: b.tileX,
+      y: b.tileY
+    }) - heuristic({
+      x: Math.floor(myBomber.x / WALL_SIZE),
+      y: Math.floor(myBomber.y / WALL_SIZE)
+    }, {
+      x: a.tileX,
+      y: a.tileY
+    })
+  });
+
+  return out;
+}
+
 export {
   DIRS,
   isWalkable,
@@ -700,4 +755,5 @@ export {
   coveredTiles,
   findBombPositionsForEnemyArea,
   hasChestLeft,
+  bombPositionsForChest,
 };

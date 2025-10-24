@@ -228,12 +228,13 @@ socket.on('connect', async () => {
       // if (!checkBomAvailables(myBomber)) continue;
 
       if (PRIORITY_CHESTS.length > 0) {
-        const gridPath = findPathToTarget(PRIORITY_CHESTS[0])
-        writeLog('gridPath', gridPath)
+        const allPlaces = helpers.bombPositionsForChest(myBomber, PRIORITY_CHESTS[0], MAP)
+        console.log('allPlaces', allPlaces)
+        if (allPlaces && allPlaces.length > 0) {
 
-
-        sleep(10)
-        continue;
+          sleep(10)
+          continue;
+        }
       }
 
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
@@ -413,7 +414,7 @@ function updateMapWhenPlaceBoom(bomber) {
 setTimeout(() => {
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
-}, 15000);
+}, 30000);
 
 function writeLog(...args) {
   console.log(...args)
