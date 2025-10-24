@@ -406,18 +406,6 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
   return destroyed;
 }
 
-// Find all possible bomb placements near a bomber from reachable tiles.
-// Returns array of { x, y, score, dist } sorted by score (highest first). XY are grid coords.
-// score = number of chests destroyed, dist = Manhattan distance from bomber.
-/*
-  [
-    { x: 14, y: 4, score: 2, dist: 3 },
-    { x: 14, y: 1, score: 1, dist: 0 },
-    { x: 13, y: 1, score: 1, dist: 1 },
-    { x: 14, y: 3, score: 1, dist: 2 },
-    { x: 14, y: 2, score: 0, dist: 1 }
-  ]
-*/
 function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = []) {
   if (!myBomber || !map) return null;
   const start = toGridCoord(myBomber);
@@ -572,6 +560,93 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
   return results;
 }
 
+function coveredTiles(bomber, MAP) {
+  if (!bomber || !MAP) return []
+
+  const { x, y } = bomber;
+
+  // Tọa độ pixel của khung bao quanh bomber
+  const bomberRight  = x + BOMBER_SIZE;
+  const bomberBottom = y + BOMBER_SIZE;
+
+  // Tính các chỉ số ô (tile) mà bomber đang chiếm
+  const tx0 = Math.floor(bomber.x / WALL_SIZE);
+  const ty0 = Math.floor(bomber.y  / WALL_SIZE);
+  const tx1 = Math.floor((bomberRight  - 0.5) / WALL_SIZE);
+  const ty1 = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
+
+  const tiles = [];
+  for (let y = ty0; y <= ty1; y++) {
+    for (let x = tx0; x <= tx1; x++) {
+      if (MAP[y][x] === 'W') continue; // bỏ qua tường
+      tiles.push({ x, y });
+    }
+  }
+
+  return tiles;
+}
+
+/**
+ * Tìm ô đặt bom có thể tiêu địch khi enemy có kích thước >1 ô.
+ *
+ * bot: { x, y, explosionRange }  // x,y pixel or tile depending coordsAreTiles
+ * enemy: { x, y, width, height } // x,y = center pixel (or tile if coordsAreTiles)
+ * map: 2D array map[y][x], 'W' là wall
+ * options:
+ *  - tileSize (default 40)
+ *  - coordsAreTiles (default false) // nếu true, inputs đã là tile coords (và enemy.width/height đo theo tiles)
+ *  - requireReachable (default false)
+ *  - returnInPixels (default false) // trả center pixel of tile
+ */
+function findBombPositionsForEnemyArea(myBomber, enemy, map) {
+  // tìm tất cả tile mà enemy phủ
+  const tiles = coveredTiles(enemy, map)
+  if (tiles.length === 0) return [];
+
+  const dirs = DIRS[0]
+
+  const resultsSet = new Set();
+
+  console.log('tiles', tiles)
+
+  // từ mỗi tile địch quét 4 hướng
+  for (const tile of tiles) {
+    for (const {dx, dy} of dirs) {
+      for (let step = 1; step <= myBomber.explosionRange; step++) {
+        const tx = tile.x + dx * step;
+        const ty = tile.y + dy * step;
+        if (map[ty][tx] === 'W') break; // wall chặn vụ nổ -> dừng quét hướng này
+        resultsSet.add(`${tx},${ty}`);
+      }
+    }
+  }
+
+  console.log('resultSet', resultsSet)
+
+  // chuyển set -> array
+  const results = Array.from(resultsSet, k => {
+    const [x, y] = k.split(',').map(Number);
+    const pos = { x: x, y: y }
+    const h = heuristic({
+      x: Math.floor(myBomber.x / WALL_SIZE),
+      y: Math.floor(myBomber.y / WALL_SIZE)
+    }, pos);
+    const enemyH = heuristic({
+      x: Math.floor(enemy.x / WALL_SIZE),
+      y: Math.floor(enemy.y / WALL_SIZE)
+    }, pos);
+
+    return {
+      x: x,
+      y: y,
+      h: h,
+      enemyH: enemyH
+    };
+  });
+
+  return results.sort((a, b) => (a.h + a.enemyH) - (b.h + b.enemyH));
+}
+
 export {
   DIRS,
   isWalkable,
@@ -599,4 +674,6 @@ export {
   findAllPossiblePlaceBoom,
   markOwnBombOnMap,
   findChestBreakScoresToFrozen,
+  coveredTiles,
+  findBombPositionsForEnemyArea,
 };

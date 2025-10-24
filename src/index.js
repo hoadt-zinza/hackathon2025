@@ -20,6 +20,7 @@ let ITEMS=[]
 let GAME_START = false
 const FROZEN_BOTS = []
 const DANGER_ZONE = []
+const ATTACK_MODE = false
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -116,8 +117,8 @@ function blindCodeMode() {
 
 socket.on('connect', async () => {
   console.log('Connected to server');
-  // socket.emit('join', {});
-  blindCodeMode()
+  socket.emit('join', {});
+  // blindCodeMode()
   fs.writeFileSync('log.txt', '');
   console.log('Sent join event');
 
@@ -134,12 +135,12 @@ socket.on('connect', async () => {
     writeLog('myboy', myBomber.x, myBomber.y)
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
 
-    if (FROZEN_BOTS.length > 0) {
-      // no bomb is placing
-      if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
-        // writeLog(helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP))
-      }
-    }
+    // if (FROZEN_BOTS.length > 0) {
+    //   // no bomb is placing
+    //   if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
+    //     writeLog(helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP))
+    //   }
+    // }
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
@@ -154,7 +155,7 @@ socket.on('connect', async () => {
           const step = nextStep(path);
           if (step) {
             move(step);
-            await sleep(100);
+            await sleep(10);
             continue;
           } else {
             writeLog('no step', step)
@@ -170,6 +171,44 @@ socket.on('connect', async () => {
       } else {
         writeLog('no safety zone', )
       }
+    }
+
+    if (ITEMS.length === 0 && CHESTS.length == 0) {
+      ATTACK_MODE = true;
+      //move to nearest bot and place boom
+      const slowestNearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
+        .sort((a, b) => a.speed - b.speed)
+        .sort((a, b) => {
+          helpers.heuristic(myBomber, a) - helpers.heuristic(myBomber, b)
+        })[0]
+      writeLog('slowestNearestBot', slowestNearestBot)
+      writeLog('bomb postions', helpers.findBombPositionsForEnemyArea(myBomber, slowestNearestBot, MAP))
+      const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, slowestNearestBot, MAP)[0]
+
+      const pathToBot = helpers.findPathToTargetAStar(myBomber, {
+        x: bestPos.x * helpers.WALL_SIZE,
+        y: bestPos.y * helpers.WALL_SIZE
+      }, MAP, false);
+
+      if (pathToBot && pathToBot.length > 1) {
+        if (helpers.isInDanger(pathToBot, DANGER_ZONE)) {
+          writeLog('path 1 in danger zone so dont move ATTACK_MODE');
+        } else {
+          const step = nextStep(pathToBot);
+          move(step);
+        }
+      } else if (pathToBot && pathToBot.length <= 1) {
+        writeLog('touch bot position', pathToBot)
+        placeBoom(myBomber);
+        updateMapWhenPlaceBoom(myBomber);
+      } else {
+        writeLog('no path to bot', pathToBot)
+      }
+    }
+
+    if (ATTACK_MODE) {
+      await sleep(10);
+      continue;
     }
 
     const reachableItem = findReachableItem();
@@ -235,7 +274,7 @@ socket.on('connect', async () => {
         }
       }
     }
-    await (sleep(100));
+    await (sleep(10));
   }
 });
 
@@ -251,13 +290,13 @@ const move = (orient) => {
   writeLog('moved ', orient)
 
   //blindcodemode
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  if (!myBomber) return;
+  // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  // if (!myBomber) return;
 
-  if (orient === 'UP') myBomber.y -= (myBomber.speed)
-  if (orient === 'DOWN') myBomber.y += (myBomber.speed)
-  if (orient === 'LEFT') myBomber.x -= (myBomber.speed)
-  if (orient === 'RIGHT') myBomber.x += (myBomber.speed)
+  // if (orient === 'UP') myBomber.y -= (myBomber.speed)
+  // if (orient === 'DOWN') myBomber.y += (myBomber.speed)
+  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed)
+  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed)
 }
 
 const placeBoom = (myBomber = null) => {
@@ -269,24 +308,24 @@ const placeBoom = (myBomber = null) => {
   }
 
   //blindcodemode
-  const bomID = `random-${Date.now()}`
-  addDangerZonesForBomb({
-    id: bomID,
-    x: myBomber.x,
-    y: myBomber.y,
-    uid: myBomber.uid,
-  })
-  setTimeout(() => {
-    writeLog('BOMB EXPLODE', );
-    removeDangerZonesForBomb(bomID);
-    writeLog('update map to null', myBomber.x, myBomber.y)
-    writeLog('MAP', MAP[1])
-    MAP[Math.floor(myBomber.y / helpers.WALL_SIZE)][Math.floor(myBomber.x / helpers.WALL_SIZE)] = null;
-    CHESTS.filter(x => x.isDestroyed).map(c => {
-      MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
-      writeLog('x y', c.x / helpers.WALL_SIZE, c.y / helpers.WALL_SIZE);
-    })
-  }, 5000)
+  // const bomID = `random-${Date.now()}`
+  // addDangerZonesForBomb({
+  //   id: bomID,
+  //   x: myBomber.x,
+  //   y: myBomber.y,
+  //   uid: myBomber.uid,
+  // })
+  // setTimeout(() => {
+  //   writeLog('BOMB EXPLODE', );
+  //   removeDangerZonesForBomb(bomID);
+  //   writeLog('update map to null', myBomber.x, myBomber.y)
+  //   writeLog('MAP', MAP[1])
+  //   MAP[Math.floor(myBomber.y / helpers.WALL_SIZE)][Math.floor(myBomber.x / helpers.WALL_SIZE)] = null;
+  //   CHESTS.filter(x => x.isDestroyed).map(c => {
+  //     MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
+  //     writeLog('x y', c.x / helpers.WALL_SIZE, c.y / helpers.WALL_SIZE);
+  //   })
+  // }, 5000)
 }
 
 // Add danger zones for a specific bomb using bomber.explosionRange
