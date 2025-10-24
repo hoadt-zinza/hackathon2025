@@ -426,13 +426,6 @@ function updateMapWhenPlaceBoom(bomber) {
 }
 
 setTimeout(() => {
-  const fakeBomber1 = { ...sampleBomber, score: 0, x: 565, y: 565 };
-  const fakeBomber2 = { ...sampleBomber, score: 0, x: 40, y: 565 };
-  const fakeBomber3 = { ...sampleBomber, score: 0, x: 565, y: 40 };
-  BOMBERS.push(fakeBomber3)
-  BOMBERS.push(fakeBomber1)
-  BOMBERS.push(fakeBomber2)
-
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
 }, 15000);
