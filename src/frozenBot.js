@@ -11,11 +11,11 @@ const socket = io(process.env.SOCKET_SERVER, {
 
 socket.on('connect', async () => {
   console.log('Connected to server frozen BOT');
-  // socket.emit('join', {});
+  socket.emit('join', {});
 })
 
-console.log('xx', helpers.findBombPositionsForEnemyArea(
-  { x: 565, y: 565, explosionRange: 2 },
-  { x: 125, y: 79 },
-  sampleMap
-))
+socket.on('finish', (data) => {
+  socket.disconnect();
+  socket.connect();
+  socket.emit('join', {});
+})
