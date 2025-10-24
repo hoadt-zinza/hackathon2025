@@ -35,6 +35,12 @@ socket.on('start', () => {
   GAME_START = true
 })
 
+socket.on('finish', () => {
+  socket.disconnect();
+  socket.connect();
+  socket.emit('join', {});
+})
+
 socket.on('new_enemy', (data) => {
   for (const bomber of data.bombers) {
     helpers.upsertBomber(BOMBERS, bomber);
@@ -76,6 +82,8 @@ socket.on('map_update', (payload) => {
 });
 
 socket.on('user_die_update', (payload) => {
+  writeLog("user die update")
+
   if (process.env.ENV != 'local') {
     BOMBERS = BOMBERS.filter(b => b.uid === payload.uid)
     //remove from frozen bot too
