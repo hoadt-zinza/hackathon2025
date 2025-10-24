@@ -18,6 +18,7 @@ let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
 const FROZEN_BOTS = []
+const PRIORITY_CHESTS = []
 const DANGER_ZONE = []
 let ATTACK_MODE = false
 
@@ -137,7 +138,11 @@ socket.on('connect', async () => {
     // if (FROZEN_BOTS.length > 0) {
     //   // no bomb is placing
     //   if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
-    //     writeLog(helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP))
+    //     const chestToFrozenBots = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP).sort((a, b) => a.score - b.score)[0]
+    //     // PRIORITY_CHESTS.push(...chestToFrozenBots)
+
+    //     writeLog('PRIORITY_CHESTS', chestToFrozenBots.chests)
+    //     if (PRIORITY_CHESTS.length == 0) PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
     //   }
     // }
 
@@ -225,6 +230,15 @@ socket.on('connect', async () => {
       //skip in case no bom available
       // if (!checkBomAvailables(myBomber)) continue;
 
+      // if (PRIORITY_CHESTS.length > 0) {
+      //   const gridPath = findPathToTarget(PRIORITY_CHESTS[0])
+      //   writeLog('gridPath', gridPath)
+
+
+      //   sleep(1000)
+      //   continue;
+      // }
+
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
 
@@ -288,14 +302,7 @@ const move = (orient) => {
 
   writeLog('moved ', orient)
 
-  //blindcodemode
-  // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  // if (!myBomber) return;
 
-  // if (orient === 'UP') myBomber.y -= (myBomber.speed)
-  // if (orient === 'DOWN') myBomber.y += (myBomber.speed)
-  // if (orient === 'LEFT') myBomber.x -= (myBomber.speed)
-  // if (orient === 'RIGHT') myBomber.x += (myBomber.speed)
 }
 
 const placeBoom = (myBomber = null) => {
@@ -306,25 +313,6 @@ const placeBoom = (myBomber = null) => {
     writeLog('BOOM REACH MAX ', myBomber, BOMBS)
   }
 
-  //blindcodemode
-  // const bomID = `random-${Date.now()}`
-  // addDangerZonesForBomb({
-  //   id: bomID,
-  //   x: myBomber.x,
-  //   y: myBomber.y,
-  //   uid: myBomber.uid,
-  // })
-  // setTimeout(() => {
-  //   writeLog('BOMB EXPLODE', );
-  //   removeDangerZonesForBomb(bomID);
-  //   writeLog('update map to null', myBomber.x, myBomber.y)
-  //   writeLog('MAP', MAP[1])
-  //   MAP[Math.floor(myBomber.y / helpers.WALL_SIZE)][Math.floor(myBomber.x / helpers.WALL_SIZE)] = null;
-  //   CHESTS.filter(x => x.isDestroyed).map(c => {
-  //     MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
-  //     writeLog('x y', c.x / helpers.WALL_SIZE, c.y / helpers.WALL_SIZE);
-  //   })
-  // }, 5000)
 }
 
 // Add danger zones for a specific bomb using bomber.explosionRange
@@ -433,7 +421,6 @@ setTimeout(() => {
 function writeLog(...args) {
   console.log(...args)
 
-  //blindcodemode
   const message = args.map(a =>
     typeof a === 'object' ? JSON.stringify(a, null) : String(a)
   ).join(' ');
