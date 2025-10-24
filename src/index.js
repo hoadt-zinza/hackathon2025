@@ -135,16 +135,13 @@ socket.on('connect', async () => {
     writeLog('myboy', myBomber.x, myBomber.y)
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
 
-    // if (FROZEN_BOTS.length > 0) {
-    //   // no bomb is placing
-    //   if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
-    //     const chestToFrozenBots = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP).sort((a, b) => a.score - b.score)[0]
-    //     // PRIORITY_CHESTS.push(...chestToFrozenBots)
-
-    //     writeLog('PRIORITY_CHESTS', chestToFrozenBots.chests)
-    //     if (PRIORITY_CHESTS.length == 0) PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
-    //   }
-    // }
+    if (FROZEN_BOTS.length > 0) {
+      // no bomb is placing
+      if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
+        const chestToFrozenBots = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP).sort((a, b) => a.score - b.score)[0]
+        if (PRIORITY_CHESTS.length == 0) PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
+      }
+    }
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
@@ -230,14 +227,14 @@ socket.on('connect', async () => {
       //skip in case no bom available
       // if (!checkBomAvailables(myBomber)) continue;
 
-      // if (PRIORITY_CHESTS.length > 0) {
-      //   const gridPath = findPathToTarget(PRIORITY_CHESTS[0])
-      //   writeLog('gridPath', gridPath)
+      if (PRIORITY_CHESTS.length > 0) {
+        const gridPath = findPathToTarget(PRIORITY_CHESTS[0])
+        writeLog('gridPath', gridPath)
 
 
-      //   sleep(1000)
-      //   continue;
-      // }
+        sleep(10)
+        continue;
+      }
 
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)

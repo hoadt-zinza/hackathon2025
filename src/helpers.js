@@ -516,7 +516,8 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
 
   const INF = Number.POSITIVE_INFINITY;
   const dist = Array.from({ length: rows }, () => Array(cols).fill(INF));
-  // Deque implemented with array ops; for small grids this is fine
+  const parent = Array.from({ length: rows }, () => Array(cols).fill(null)); // lưu cha
+
   const deque = [];
   const pushFront = (v) => deque.unshift(v);
   const pushBack = (v) => deque.push(v);
@@ -540,20 +541,42 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
 
       const costAdd = tile === 'C' ? 1 : 0;
       const nextCost = base + costAdd;
+
       if (nextCost < dist[ny][nx]) {
         dist[ny][nx] = nextCost;
-        if (costAdd === 0) pushFront({ x: nx, y: ny }); else pushBack({ x: nx, y: ny });
+        parent[ny][nx] = { x: cur.x, y: cur.y }; // lưu đường đi
+        if (costAdd === 0) pushFront({ x: nx, y: ny });
+        else pushBack({ x: nx, y: ny });
       }
     }
   }
 
   const results = [];
+
   for (const bot of frozenBots) {
     if (!bot) continue;
     const gp = toGridCoord(bot);
     const d = dist[gp.y] && dist[gp.y][gp.x];
+
     if (typeof d === 'number' && isFinite(d)) {
-      results.push({ id: bot.uid || bot.id, score: d });
+      // Truy vết ngược đường đi
+      const path = [];
+      let cur = { x: gp.x, y: gp.y };
+      while (cur) {
+        path.push(cur);
+        cur = parent[cur.y]?.[cur.x] || null;
+      }
+
+      // Lọc ra những ô là chest
+      const chests = path
+        .filter(({ x, y }) => map[y][x] === 'C')
+        .reverse(); // reverse để đi từ bomber -> bot
+
+      results.push({
+        id: bot.uid || bot.id,
+        score: d,
+        chests,
+      });
     }
   }
 
