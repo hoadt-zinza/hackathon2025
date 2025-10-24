@@ -159,7 +159,7 @@ socket.on('connect', async () => {
           const step = nextStep(path);
           if (step) {
             move(step);
-            await sleep(10);
+            await sleep(15);
             continue;
           } else {
             writeLog('no step', step)
@@ -187,7 +187,7 @@ socket.on('connect', async () => {
       const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
       if (!bestPos) {
         writeLog('no best pos to attack bot', nearestBot)
-        await sleep(10);
+        await sleep(15);
         continue;
       }
 
@@ -213,7 +213,7 @@ socket.on('connect', async () => {
     }
 
     if (ATTACK_MODE) {
-      await sleep(10);
+      await sleep(15);
       continue;
     }
 
@@ -287,7 +287,7 @@ socket.on('connect', async () => {
         }
       }
     }
-    await (sleep(10));
+    await (sleep(15));
   }
 });
 
