@@ -3,7 +3,6 @@ import * as helpers from './helpers.js';
 import { io } from 'socket.io-client';
 import sampleBomber from './sample/bomber.js';
 import sampleMap from './sample/map.js';
-import blankMap from './sample/blankMap.js'
 import fs from 'fs';
 
 dotenv.config();
@@ -20,7 +19,7 @@ let ITEMS=[]
 let GAME_START = false
 const FROZEN_BOTS = []
 const DANGER_ZONE = []
-const ATTACK_MODE = false
+let ATTACK_MODE = false
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -173,17 +172,19 @@ socket.on('connect', async () => {
       }
     }
 
-    if (ITEMS.length === 0 && CHESTS.length == 0) {
+    if (!helpers.hasChestLeft(MAP)) {
       ATTACK_MODE = true;
       //move to nearest bot and place boom
-      const slowestNearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
-        .sort((a, b) => a.speed - b.speed)
+      const nearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
         .sort((a, b) => {
           helpers.heuristic(myBomber, a) - helpers.heuristic(myBomber, b)
         })[0]
-      writeLog('slowestNearestBot', slowestNearestBot)
-      writeLog('bomb postions', helpers.findBombPositionsForEnemyArea(myBomber, slowestNearestBot, MAP))
-      const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, slowestNearestBot, MAP)[0]
+      const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
+      if (!bestPos) {
+        writeLog('no best pos to attack bot', nearestBot)
+        await sleep(10);
+        continue;
+      }
 
       const pathToBot = helpers.findPathToTargetAStar(myBomber, {
         x: bestPos.x * helpers.WALL_SIZE,
@@ -214,7 +215,7 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      writeLog('moving to reachable item', reachableItem.path.length);
+      writeLog('moving to reachable item');
       if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE)) {
         writeLog('path 1 in danger zone so dont move');
       } else {
@@ -229,17 +230,15 @@ socket.on('connect', async () => {
 
       if (allPlaces && allPlaces.length > 0) {
         for (const place of allPlaces) {
-          // writeLog('place', place)
           const safeZones = helpers.countSafeZonesAfterPlaceBoom(helpers.toMapCoord(place), myBomber.explosionRange, DANGER_ZONE, MAP, walkableNeighbors);
           if (safeZones) {
             const gridPath = findPathToTarget(helpers.toMapCoord(place))
-            // writeLog('gridPath', gridPath)
             if (gridPath && gridPath.length > 1) {
               if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
                 writeLog('path 1 in danger zone so dont move');
                 writeLog('place', place);
                 const last = gridPath[gridPath.length - 1];
-                writeLog('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
+                // writeLog('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
               } else {
                 const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
                 const pathToMidPoint = findPathToTarget(middlePoint, false)

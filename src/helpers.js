@@ -607,8 +607,6 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
 
   const resultsSet = new Set();
 
-  console.log('tiles', tiles)
-
   // từ mỗi tile địch quét 4 hướng
   for (const tile of tiles) {
     for (const {dx, dy} of dirs) {
@@ -620,8 +618,6 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
       }
     }
   }
-
-  console.log('resultSet', resultsSet)
 
   // chuyển set -> array
   const results = Array.from(resultsSet, k => {
@@ -645,6 +641,10 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
   });
 
   return results.sort((a, b) => (a.h + a.enemyH) - (b.h + b.enemyH));
+}
+
+function hasChestLeft(map) {
+  return map.some(row => row.includes('C'));
 }
 
 export {
@@ -676,4 +676,5 @@ export {
   findChestBreakScoresToFrozen,
   coveredTiles,
   findBombPositionsForEnemyArea,
+  hasChestLeft,
 };
