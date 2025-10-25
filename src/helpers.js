@@ -503,81 +503,73 @@ function markOwnBombOnMap(myBomber, bombs, map) {
   }
 }
 
-// Compute, for each frozen bot, the minimum number of chests that must be destroyed
-// for myBomber to reach that bot. Uses 0-1 BFS where entering a chest tile ('C') costs 1
-// and entering walkable tiles (null | 'B' | 'R' | 'S') costs 0. Walls ('W') are impassable.
-// Returns an array of objects: [{ id: <bot uid>, score: <min chest breaks> }]
 function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
   if (!myBomber || !Array.isArray(frozenBots) || !map || map.length === 0) return [];
 
-  const start = toGridCoord(myBomber);
-  const rows = map.length;
-  const cols = map[0].length;
-
-  const INF = Number.POSITIVE_INFINITY;
-  const dist = Array.from({ length: rows }, () => Array(cols).fill(INF));
-  const parent = Array.from({ length: rows }, () => Array(cols).fill(null)); // lưu cha
-
-  const deque = [];
-  const pushFront = (v) => deque.unshift(v);
-  const pushBack = (v) => deque.push(v);
-  const popFront = () => deque.shift();
-
-  dist[start.y][start.x] = 0;
-  pushFront({ x: start.x, y: start.y });
-
-  while (deque.length > 0) {
-    const cur = popFront();
-    const base = dist[cur.y][cur.x];
-
-    for (const { dx, dy } of DIRS[0]) {
-      const nx = cur.x + dx;
-      const ny = cur.y + dy;
-
-      if (ny < 0 || ny >= rows || nx < 0 || nx >= cols) continue;
-
-      const tile = map[ny][nx];
-      if (tile === 'W') continue; // walls block
-
-      const costAdd = tile === 'C' ? 1 : 0;
-      const nextCost = base + costAdd;
-
-      if (nextCost < dist[ny][nx]) {
-        dist[ny][nx] = nextCost;
-        parent[ny][nx] = { x: cur.x, y: cur.y }; // lưu đường đi
-        if (costAdd === 0) pushFront({ x: nx, y: ny });
-        else pushBack({ x: nx, y: ny });
-      }
-    }
-  }
-
   const results = [];
+  const INF = 1e9;
+
+  const start = toGridCoord(myBomber);
 
   for (const bot of frozenBots) {
     if (!bot) continue;
-    const gp = toGridCoord(bot);
-    const d = dist[gp.y] && dist[gp.y][gp.x];
 
-    if (typeof d === 'number' && isFinite(d)) {
-      // Truy vết ngược đường đi
-      const path = [];
-      let cur = { x: gp.x, y: gp.y };
-      while (cur) {
-        path.push(cur);
-        cur = parent[cur.y]?.[cur.x] || null;
+    const target = toGridCoord(bot);
+
+    // 0-1 BFS
+    const g = Array.from({ length: 16 }, () => Array(16).fill(INF));
+    const parent = Array.from({ length: 16 }, () => Array(16).fill(null));
+    const deque = [];
+
+    g[start.y][start.x] = 0;
+    deque.push({ x: start.x, y: start.y });
+
+    while (deque.length > 0) {
+      const cur = deque.shift();
+      const { x, y } = cur;
+
+      if (x === target.x && y === target.y) break;
+
+      for (const { dx, dy } of DIRS[0]) {
+        const nx = x + dx;
+        const ny = y + dy;
+
+        const tile = map[ny][nx];
+        if (tile === 'W') continue;
+
+        const cost = tile === 'C' ? 1 : 0;
+        const tentative = g[y][x] + cost;
+
+        if (tentative < g[ny][nx]) {
+          g[ny][nx] = tentative;
+          parent[ny][nx] = { x, y };
+
+          if (cost === 0) deque.unshift({ x: nx, y: ny }); // ưu tiên ô trống
+          else deque.push({ x: nx, y: ny }); // chest -> đẩy ra sau
+        }
       }
-
-      // Lọc ra những ô là chest
-      const chests = path
-        .filter(({ x, y }) => map[y][x] === 'C')
-        .reverse(); // reverse để đi từ bomber -> bot
-
-      results.push({
-        id: bot.uid || bot.id,
-        score: d,
-        chests,
-      });
     }
+
+    const dist = g[target.y][target.x];
+    if (dist === INF) continue; // không đến được
+
+    // Truy ngược đường đi
+    const path = [];
+    let cur = { x: target.x, y: target.y };
+    while (cur) {
+      path.push(cur);
+      cur = parent[cur.y]?.[cur.x] || null;
+    }
+
+    // Lọc các ô chest trên đường
+    const chests = path.filter(({ x, y }) => map[y][x] === 'C').reverse();
+    chests.push({ x: target.x, y: target.y }); // thêm ô địch vào cuối
+
+    results.push({
+      id: bot.uid || bot.id,
+      score: dist,
+      chests,
+    });
   }
 
   return results;
@@ -670,19 +662,6 @@ function hasChestLeft(map) {
   return map.some(row => row.includes('C'));
 }
 
-/**
- * Trả về các ô (tile coords) có thể đặt bom để phá chest ở chestTile.
- *
- * chestTile: { x: number, y: number }  // tile coordinates
- * map: 2D array map[y][x], 'W' là wall
- * options:
- *   - range (default 1)         // explosion range in tiles
- *   - includeChestTile (true)   // có cho phép đặt bom ngay trên chest không
- *   - returnInPixels (false)    // nếu true trả {x:pixel, y:pixel, tileX, tileY}
- *   - tileSize (default 40)     // dùng khi returnInPixels = true
- *
- * Trả về mảng các đối tượng: { x, y } (tile coords) hoặc { x, y, tileX, tileY } (pixels + tile)
- */
 function bombPositionsForChest(myBomber, chestTile, map) {
   const { x, y } = chestTile;
   const resultsSet = new Set();
@@ -701,24 +680,22 @@ function bombPositionsForChest(myBomber, chestTile, map) {
   const out = Array.from(resultsSet, k => {
     const [tx, ty] = k.split(',').map(Number);
     return {
-      tileX: tx,
-      tileY: ty,
-      x: tx * WALL_SIZE + Math.floor(WALL_SIZE / 2),
-      y: ty * WALL_SIZE + Math.floor(WALL_SIZE / 2)
+      x: tx,
+      y: ty,
     };
   }).sort((a, b) => {
     heuristic({
       x: Math.floor(myBomber.x / WALL_SIZE),
       y: Math.floor(myBomber.y / WALL_SIZE)
     }, {
-      x: b.tileX,
-      y: b.tileY
+      x: b.x,
+      y: b.y
     }) - heuristic({
       x: Math.floor(myBomber.x / WALL_SIZE),
       y: Math.floor(myBomber.y / WALL_SIZE)
     }, {
-      x: a.tileX,
-      y: a.tileY
+      x: a.x,
+      y: a.y
     })
   });
 

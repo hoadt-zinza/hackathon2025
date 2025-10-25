@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 import * as helpers from './helpers.js';
 import { io } from 'socket.io-client';
-import sampleBomber from './sample/bomber.js';
-import sampleMap from './sample/map.js';
 import fs from 'fs';
 
 dotenv.config();
@@ -18,7 +16,7 @@ let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
 const FROZEN_BOTS = []
-const PRIORITY_CHESTS = []
+let PRIORITY_CHESTS = []
 const DANGER_ZONE = []
 let ATTACK_MODE = false
 
@@ -95,53 +93,44 @@ socket.on('user_die_update', (payload) => {
   }
 })
 
-function blindCodeMode() {
-  BOMBERS.push({ ...sampleBomber });
-  MAP = sampleMap;
-  // ITEMS.push({ ...sampleItem });
-  for (let y = 0; y < MAP.length; y++) {
-    for (let x = 0; x < MAP[y].length; x++) {
-      if (MAP[y][x] === 'C') {
-        CHESTS.push({
-          x: x * helpers.WALL_SIZE,
-          y: y * helpers.WALL_SIZE,
-          size: helpers.WALL_SIZE,
-          type: 'C',
-          isDestroyed: false
-        });
-      }
+socket.on('chest_destroyed', (payload) => {
+  writeLog('chest destroyed', payload);
+
+  if (PRIORITY_CHESTS.length > 0) {
+    writeLog('check and remove priority chest', PRIORITY_CHESTS)
+    PRIORITY_CHESTS = PRIORITY_CHESTS.filter(chest =>
+      !(chest.x === (payload.x / helpers.WALL_SIZE) && chest.y === (payload.y / helpers.WALL_SIZE))
+    );
+    writeLog('check and remove priority chest after', PRIORITY_CHESTS)
+  }
+
+  if (FROZEN_BOTS.length > 0 && PRIORITY_CHESTS.length == 0) {
+    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+
+    // no bomb is placing
+    if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
+      const findChest = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP)
+      const chestToFrozenBots = findChest.sort((a, b) => a.score - b.score)[0]
+      PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
+      writeLog('added priority chests', PRIORITY_CHESTS)
     }
   }
-  GAME_START = true
-}
+})
 
 socket.on('connect', async () => {
   console.log('Connected to server');
   socket.emit('join', {});
-  // blindCodeMode()
   fs.writeFileSync('log.txt', '');
   console.log('Sent join event');
 
   while(!GAME_START) {
-    await sleep(100)
-  }
-
-  while(BOMBERS.length === 0) {
-    await sleep(100)
+    await sleep(10)
   }
 
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
     writeLog('myboy', myBomber.x, myBomber.y)
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP)
-
-    if (FROZEN_BOTS.length > 0) {
-      // no bomb is placing
-      if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
-        const chestToFrozenBots = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP).sort((a, b) => a.score - b.score)[0]
-        if (PRIORITY_CHESTS.length == 0) PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
-      }
-    }
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
@@ -156,7 +145,7 @@ socket.on('connect', async () => {
           const step = nextStep(path);
           if (step) {
             move(step);
-            await sleep(15);
+            await sleep(10);
             continue;
           } else {
             writeLog('no step', step)
@@ -184,7 +173,7 @@ socket.on('connect', async () => {
       const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
       if (!bestPos) {
         writeLog('no best pos to attack bot', nearestBot)
-        await sleep(15);
+        await sleep(10);
         continue;
       }
 
@@ -210,7 +199,7 @@ socket.on('connect', async () => {
     }
 
     if (ATTACK_MODE) {
-      await sleep(15);
+      await sleep(10);
       continue;
     }
 
@@ -227,18 +216,13 @@ socket.on('connect', async () => {
       //skip in case no bom available
       // if (!checkBomAvailables(myBomber)) continue;
 
-      if (PRIORITY_CHESTS.length > 0) {
-        const allPlaces = helpers.bombPositionsForChest(myBomber, PRIORITY_CHESTS[0], MAP)
-        console.log('allPlaces', allPlaces)
-        if (allPlaces && allPlaces.length > 0) {
-
-          sleep(10)
-          continue;
-        }
-      }
-
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
-      const allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
+      let allPlaces = null;
+
+      if (PRIORITY_CHESTS.length > 0)
+        allPlaces = helpers.bombPositionsForChest(myBomber, PRIORITY_CHESTS[0], MAP)
+      else
+        allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
 
       if (allPlaces && allPlaces.length > 0) {
         for (const place of allPlaces) {
@@ -285,7 +269,7 @@ socket.on('connect', async () => {
         }
       }
     }
-    await (sleep(15));
+    await (sleep(10));
   }
 });
 
@@ -414,7 +398,7 @@ function updateMapWhenPlaceBoom(bomber) {
 setTimeout(() => {
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
-}, 30000);
+}, 15000);
 
 function writeLog(...args) {
   console.log(...args)
