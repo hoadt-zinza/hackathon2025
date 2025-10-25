@@ -683,20 +683,6 @@ function bombPositionsForChest(myBomber, chestTile, map) {
       x: tx,
       y: ty,
     };
-  }).sort((a, b) => {
-    heuristic({
-      x: Math.floor(myBomber.x / WALL_SIZE),
-      y: Math.floor(myBomber.y / WALL_SIZE)
-    }, {
-      x: b.x,
-      y: b.y
-    }) - heuristic({
-      x: Math.floor(myBomber.x / WALL_SIZE),
-      y: Math.floor(myBomber.y / WALL_SIZE)
-    }, {
-      x: a.x,
-      y: a.y
-    })
   });
 
   return out;

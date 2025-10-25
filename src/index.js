@@ -19,6 +19,7 @@ const FROZEN_BOTS = []
 let PRIORITY_CHESTS = []
 const DANGER_ZONE = []
 let ATTACK_MODE = false
+let GAME_START_AT = null;
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -91,17 +92,19 @@ socket.on('user_die_update', (payload) => {
   if (payload.killed.name === process.env.BOMBER_NAME) {
     writeLog('user die update', payload)
   }
+
+  if (FROZEN_BOTS.map(b => b.name).includes(payload.killed.name)) {
+    PRIORITY_CHESTS = []
+    FROZEN_BOTS.splice(FROZEN_BOTS.findIndex(b => b.name === payload.killed.name), 1)
+    writeLog(`removed frozen bot ${payload.killed.name}`)
+  }
 })
 
 socket.on('chest_destroyed', (payload) => {
-  writeLog('chest destroyed', payload);
-
   if (PRIORITY_CHESTS.length > 0) {
-    writeLog('check and remove priority chest', PRIORITY_CHESTS)
     PRIORITY_CHESTS = PRIORITY_CHESTS.filter(chest =>
       !(chest.x === (payload.x / helpers.WALL_SIZE) && chest.y === (payload.y / helpers.WALL_SIZE))
     );
-    writeLog('check and remove priority chest after', PRIORITY_CHESTS)
   }
 
   if (FROZEN_BOTS.length > 0 && PRIORITY_CHESTS.length == 0) {
@@ -112,6 +115,7 @@ socket.on('chest_destroyed', (payload) => {
       const findChest = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP)
       const chestToFrozenBots = findChest.sort((a, b) => a.score - b.score)[0]
       PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
+      writeLog('frozenbot', FROZEN_BOTS)
       writeLog('added priority chests', PRIORITY_CHESTS)
     }
   }
@@ -126,6 +130,8 @@ socket.on('connect', async () => {
   while(!GAME_START) {
     await sleep(10)
   }
+
+  GAME_START_AT = Date.now();
 
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
@@ -267,6 +273,8 @@ socket.on('connect', async () => {
             break;
           }
         }
+      } else {
+        writeLog('no all places');
       }
     }
     await (sleep(10));
@@ -414,6 +422,7 @@ function writeLog(...args) {
 function checkBomAvailables(myBomber) {
   // Count active bombs owned by this bomber (tracked by uid)
   const ownedActiveBombs = BOMBS.filter(b => b && b.uid === myBomber.uid).length;
+  const over20Sec = Date.now() - GAME_START_AT > 20000;
 
-  return ownedActiveBombs < myBomber.bombCount
+  return over20Sec ? (ownedActiveBombs < myBomber.bombCount) : (ownedActiveBombs == 0)
 }
