@@ -478,12 +478,12 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
   return safeCount;
 }
 
-function markOwnBombOnMap(myBomber, bombs, map) {
+function markOwnBombOnMap(myBomber, bombs, map, gameStartAt) {
   if (!myBomber || !bombs || !map) return;
 
   for (const bomb of bombs) {
     // chỉ xét bomb của mình
-    if (bomb.ownerName !== myBomber.name) continue;
+    if (bomb.ownerName !== myBomber.name && Date.now() - gameStartAt < 120) continue;
     if (map[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] == 'W') continue;
 
     // Tính bounding box

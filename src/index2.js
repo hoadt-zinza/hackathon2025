@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import fs from 'fs';
 
 dotenv.config();
-const auth = { token: process.env.TOKEN };
+const auth = { token: process.env.TOKEN2 };
 const socket = io(process.env.SOCKET_SERVER, {
   auth: auth,
 });
@@ -89,7 +89,7 @@ socket.on('user_die_update', (payload) => {
     //remove from frozen bot too
   }
 
-  if (payload.killed.name === process.env.BOMBER_NAME) {
+  if (payload.killed.name === process.env.BOMBER_NAME2) {
     writeLog('user die update', payload)
   }
 
@@ -106,16 +106,15 @@ socket.on('chest_destroyed', (payload) => {
       !(chest.x === (payload.x / helpers.WALL_SIZE) && chest.y === (payload.y / helpers.WALL_SIZE))
     );
     writeLog(`priority after remove`, PRIORITY_CHESTS);
-
     setTimeout(() => {
-      if (PRIORITY_CHESTS.length == 1) {
+      if (PRIORITY_CHESTS.length > 0) {
         PRIORITY_CHESTS = []
       }
     }, 10000)
   }
 
   if (FROZEN_BOTS.length > 0 && PRIORITY_CHESTS.length == 0) {
-    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME2);
 
     // no bomb is placing
     if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
@@ -131,7 +130,7 @@ socket.on('chest_destroyed', (payload) => {
 socket.on('connect', async () => {
   console.log('Connected to server');
   socket.emit('join', {});
-  fs.writeFileSync('log.txt', '');
+  fs.writeFileSync('log2.txt', '');
   console.log('Sent join event');
 
   while(!GAME_START) {
@@ -141,7 +140,7 @@ socket.on('connect', async () => {
   GAME_START_AT = Date.now();
 
   while(true) {
-    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+    const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME2);
     writeLog('myboy', myBomber.x, myBomber.y)
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP, GAME_START_AT)
 
@@ -330,7 +329,7 @@ function removeDangerZonesForBomb(bombId) {
 }
 
 function findReachableItem() {
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME2);
   if (ITEMS.length === 0) return null;
 
   // Filter items within Manhattan distance <= 6 grid cells
@@ -376,7 +375,7 @@ function nextStep(path) {
 
 // Wrapper to compute path using helpers with correct inputs
 function findPathToTarget(target, isGrid = true) {
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME2);
 
   return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
 }
@@ -426,7 +425,7 @@ function writeLog(...args) {
   ).join(' ');
 
   const log = `[${new Date().toISOString()}] ${message}\n`;
-  fs.appendFileSync('log.txt', log);
+  fs.appendFileSync('log2.txt', log);
 }
 
 function checkBomAvailables(myBomber) {
