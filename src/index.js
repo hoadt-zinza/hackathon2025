@@ -53,7 +53,6 @@ socket.on('player_move', (payload) => {
 
 socket.on('new_bomb', (payload) => {
   helpers.upsertBomb(BOMBS, payload);
-  writeLog('bombs', BOMBS)
   // Add danger zone tiles for this bomb based on explosion range
   addDangerZonesForBomb(payload);
 });
@@ -64,7 +63,6 @@ socket.on('item_collected', (payload) => {
 });
 
 socket.on('bomb_explode', (payload) => {
-  writeLog('bomb explode', payload);
   for (const area of payload.explosionArea) {
     if (MAP[area.y / helpers.WALL_SIZE][area.x / helpers.WALL_SIZE] == null) continue;
 
@@ -82,7 +80,6 @@ socket.on('map_update', (payload) => {
 });
 
 socket.on('user_die_update', (payload) => {
-  writeLog("user die update")
 
   if (process.env.ENV != 'local') {
     BOMBERS = BOMBERS.filter(b => b.uid === payload.uid)
@@ -90,13 +87,11 @@ socket.on('user_die_update', (payload) => {
   }
 
   if (payload.killed.name === process.env.BOMBER_NAME) {
-    writeLog('user die update', payload)
   }
 
   if (FROZEN_BOTS.map(b => b.name).includes(payload.killed.name)) {
     PRIORITY_CHESTS = []
     FROZEN_BOTS.splice(FROZEN_BOTS.findIndex(b => b.name === payload.killed.name), 1)
-    writeLog(`removed frozen bot ${payload.killed.name}`)
   }
 })
 
@@ -105,7 +100,6 @@ socket.on('chest_destroyed', (payload) => {
     PRIORITY_CHESTS = PRIORITY_CHESTS.filter(chest =>
       !(chest.x === (payload.x / helpers.WALL_SIZE) && chest.y === (payload.y / helpers.WALL_SIZE))
     );
-    writeLog(`priority after remove`, PRIORITY_CHESTS);
 
     setTimeout(() => {
       if (PRIORITY_CHESTS.length == 1) {
@@ -119,11 +113,9 @@ socket.on('chest_destroyed', (payload) => {
 
     // no bomb is placing
     if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
-      writeLog('frozenbot', FROZEN_BOTS)
       const findChest = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP)
       const chestToFrozenBots = findChest.sort((a, b) => a.score - b.score)[0]
       PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
-      writeLog('added priority chests', PRIORITY_CHESTS)
     }
   }
 })
@@ -142,18 +134,15 @@ socket.on('connect', async () => {
 
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-    writeLog('myboy', myBomber.x, myBomber.y)
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP, GAME_START_AT)
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
-      writeLog('In danger! Moving to safety zone...', safetyZone);
       if (safetyZone) {
         const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
           if (path.length == 1) {
             path.push(helpers.toMapCoord(safetyZone))
-            writeLog("path length 1 case")
           }
           const step = nextStep(path);
           if (step) {
@@ -161,18 +150,10 @@ socket.on('connect', async () => {
             await sleep(10);
             continue;
           } else {
-            writeLog('no step', step)
-            writeLog('path to safety', path)
           }
         } else {
-          writeLog('no path to safety', path);
-          writeLog('myBomber', myBomber);
-          writeLog('DANGER_ZONE', DANGER_ZONE);
-          writeLog('MAP', MAP)
-          writeLog('safetyZone', safetyZone);
         }
       } else {
-        writeLog('no safety zone', )
       }
     }
 
@@ -185,7 +166,6 @@ socket.on('connect', async () => {
         })[0]
       const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
       if (!bestPos) {
-        writeLog('no best pos to attack bot', nearestBot)
         await sleep(10);
         continue;
       }
@@ -196,18 +176,15 @@ socket.on('connect', async () => {
       }, MAP, false);
 
       if (pathToBot && pathToBot.length > 1) {
-        if (helpers.isInDanger(pathToBot, DANGER_ZONE)) {
-          writeLog('path 1 in danger zone so dont move ATTACK_MODE');
+        if (helpers.isInDanger(pathToBot[1], DANGER_ZONE)) {
         } else {
           const step = nextStep(pathToBot);
           move(step);
         }
       } else if (pathToBot && pathToBot.length <= 1) {
-        writeLog('touch bot position', pathToBot)
         placeBoom(myBomber);
         updateMapWhenPlaceBoom(myBomber);
       } else {
-        writeLog('no path to bot', pathToBot)
       }
     }
 
@@ -219,14 +196,11 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      writeLog('moving to reachable item');
       if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE)) {
-        writeLog('path 1 in danger zone so dont move');
       } else {
         move(nextStep(reachableItem.path));
       }
     } else {
-      writeLog('no reachable item found');
 
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       let allPlaces = null;
@@ -243,10 +217,7 @@ socket.on('connect', async () => {
             const gridPath = findPathToTarget(helpers.toMapCoord(place))
             if (gridPath && gridPath.length > 1) {
               if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
-                writeLog('path 1 in danger zone so dont move');
-                writeLog('place', place);
                 const last = gridPath[gridPath.length - 1];
-                // writeLog('MAP[last.y][last.x]',last.y, last.x, MAP[last.y][last.x]);
               } else {
                 const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
                 const pathToMidPoint = findPathToTarget(middlePoint, false)
@@ -254,35 +225,27 @@ socket.on('connect', async () => {
                 if (pathToMidPoint) {
                   if (pathToMidPoint.length > 1) {
                     if (helpers.isInDanger(pathToMidPoint[1], DANGER_ZONE)) {
-                      writeLog('path 1 pathToMidPoint in danger zone so dont move');
                     } else {
                       const step = nextStep(pathToMidPoint);
                       if (step) {
                         move(step);
                       } else {
-                        writeLog('no step');
                       }
                     }
                   } else {
-                    writeLog('touch pathToMidPoint', pathToMidPoint)
                     placeBoom(myBomber);
                     updateMapWhenPlaceBoom(myBomber);
                   }
                 } else {
-                  writeLog('no path to mid point', middlePoint)
                 }
               }
             } else if (gridPath && gridPath.length < 2) {
-              writeLog('touch nearest chest', gridPath)
-              writeLog('places', allPlaces)
               placeBoom(myBomber);
               updateMapWhenPlaceBoom(myBomber);
             } else {
-              writeLog('no grid path', gridPath)
             }
             break;
           } else {
-            writeLog('no safe zone after place boom at', place);
           }
         }
       }
@@ -300,15 +263,12 @@ const move = (orient) => {
     orient: orient
   })
 
-  writeLog('moved ', orient)
 }
 
 const placeBoom = (myBomber = null) => {
   if (checkBomAvailables(myBomber)) {
-    writeLog('PLACED BOOM at ', myBomber.x, myBomber.y)
     socket.emit('place_bomb', {})
   } else {
-    writeLog('BOOM REACH MAX ', myBomber, BOMBS)
   }
 
 }
@@ -348,7 +308,6 @@ function findReachableItem() {
     if (path && path.length > 1) {
       validPaths.push({ item, path });
     } else {
-      writeLog('item not reachable or path too short', { item, path });
     }
   }
 
@@ -378,7 +337,7 @@ function nextStep(path) {
 function findPathToTarget(target, isGrid = true) {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
-  return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
+  return helpers.findPathToTargetAStar(myBomber, target, MAP, isGrid);
 }
 
 function updateMapWhenPlaceBoom(bomber) {
@@ -417,17 +376,6 @@ setTimeout(() => {
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
 }, 15000);
-
-function writeLog(...args) {
-  console.log(...args)
-
-  const message = args.map(a =>
-    typeof a === 'object' ? JSON.stringify(a, null) : String(a)
-  ).join(' ');
-
-  const log = `[${new Date().toISOString()}] ${message}\n`;
-  fs.appendFileSync('log.txt', log);
-}
 
 function checkBomAvailables(myBomber) {
   // Count active bombs owned by this bomber (tracked by uid)

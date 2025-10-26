@@ -28,11 +28,7 @@ const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
 function isWalkable(map, x, y, isGrid = true) {
-  if (!map || y < 0 || x < 0) {
-    console.log('map', map);
-    console.log('x y', x, y);
-    throw new Error('something wrong')
-  }
+  if (!map || y < 0 || x < 0) return;
 
   if (isGrid) {
     // Grid coordinate check - simple tile lookup
