@@ -15,7 +15,7 @@ let BOMBS=[]
 let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
-const FROZEN_BOTS = []
+let FROZEN_BOTS = []
 let PRIORITY_CHESTS = []
 const DANGER_ZONE = []
 let ATTACK_MODE = false
@@ -80,13 +80,9 @@ socket.on('map_update', (payload) => {
 });
 
 socket.on('user_die_update', (payload) => {
-
   if (process.env.ENV != 'local') {
     BOMBERS = BOMBERS.filter(b => b.uid === payload.uid)
     //remove from frozen bot too
-  }
-
-  if (payload.killed.name === process.env.BOMBER_NAME) {
   }
 
   if (FROZEN_BOTS.map(b => b.name).includes(payload.killed.name)) {
@@ -102,8 +98,9 @@ socket.on('chest_destroyed', (payload) => {
     );
 
     setTimeout(() => {
-      if (PRIORITY_CHESTS.length == 1) {
+      if (PRIORITY_CHESTS.length <= 1) {
         PRIORITY_CHESTS = []
+        FROZEN_BOTS.pop()
       }
     }, 10000)
   }
@@ -115,7 +112,7 @@ socket.on('chest_destroyed', (payload) => {
     if (BOMBS.filter(b => b.ownerName !== myBomber.name).length === 0) {
       const findChest = helpers.findChestBreakScoresToFrozen(myBomber, FROZEN_BOTS, MAP)
       const chestToFrozenBots = findChest.sort((a, b) => a.score - b.score)[0]
-      PRIORITY_CHESTS.push(...chestToFrozenBots.chests)
+      PRIORITY_CHESTS.push(...chestToFrozenBots?.chests)
     }
   }
 })
@@ -123,7 +120,6 @@ socket.on('chest_destroyed', (payload) => {
 socket.on('connect', async () => {
   console.log('Connected to server');
   socket.emit('join', {});
-  fs.writeFileSync('log.txt', '');
   console.log('Sent join event');
 
   while(!GAME_START) {
@@ -149,15 +145,12 @@ socket.on('connect', async () => {
             move(step);
             await sleep(10);
             continue;
-          } else {
           }
-        } else {
         }
-      } else {
       }
     }
 
-    if (!helpers.hasChestLeft(MAP)) {
+    if (!helpers.hasChestLeft(MAP) || ATTACK_MODE) {
       ATTACK_MODE = true;
       //move to nearest bot and place boom
       const nearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
@@ -201,7 +194,6 @@ socket.on('connect', async () => {
         move(nextStep(reachableItem.path));
       }
     } else {
-
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       let allPlaces = null;
 
@@ -268,9 +260,7 @@ const move = (orient) => {
 const placeBoom = (myBomber = null) => {
   if (checkBomAvailables(myBomber)) {
     socket.emit('place_bomb', {})
-  } else {
   }
-
 }
 
 // Add danger zones for a specific bomb using bomber.explosionRange
@@ -279,7 +269,7 @@ function addDangerZonesForBomb(bomb) {
 
   const placingBomber = BOMBERS.find(b => b && b.uid === bomb.uid);
   const newZones = helpers.createDangerZonesForBomb(bomb, placingBomber.explosionRange, MAP);
-  for (const z of newZones) DANGER_ZONE.push(z);
+  for (const z of newZones) DANGER_ZONE.push({...z, timeExplode: Date.now() + 5000});
 }
 
 function removeDangerZonesForBomb(bombId) {
@@ -375,7 +365,7 @@ function updateMapWhenPlaceBoom(bomber) {
 setTimeout(() => {
   const zeroScoreBombers = BOMBERS.filter(b => b && b.score === 0);
   FROZEN_BOTS.push(...zeroScoreBombers);
-}, 15000);
+}, 20000);
 
 function checkBomAvailables(myBomber) {
   // Count active bombs owned by this bomber (tracked by uid)

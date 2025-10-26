@@ -604,7 +604,6 @@ function coveredTiles(bomber, MAP) {
 }
 
 function findBombPositionsForEnemyArea(myBomber, enemy, map) {
-  // tìm tất cả tile mà enemy phủ
   const tiles = coveredTiles(enemy, map)
   if (tiles.length === 0) return [];
 
@@ -649,7 +648,7 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
 }
 
 function hasChestLeft(map) {
-  return map.some(row => row.includes('C'));
+  return map.flat().filter(tile => tile === 'C').length >= 20;
 }
 
 function bombPositionsForChest(myBomber, chestTile, map, walkableNeighbors) {
