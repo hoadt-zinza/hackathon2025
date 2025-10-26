@@ -105,6 +105,7 @@ socket.on('chest_destroyed', (payload) => {
     PRIORITY_CHESTS = PRIORITY_CHESTS.filter(chest =>
       !(chest.x === (payload.x / helpers.WALL_SIZE) && chest.y === (payload.y / helpers.WALL_SIZE))
     );
+    writeLog(`priority after remove`, PRIORITY_CHESTS);
   }
 
   if (FROZEN_BOTS.length > 0 && PRIORITY_CHESTS.length == 0) {
@@ -219,14 +220,13 @@ socket.on('connect', async () => {
         move(nextStep(reachableItem.path));
       }
     } else {
-      //skip in case no bom available
-      // if (!checkBomAvailables(myBomber)) continue;
+      writeLog('no reachable item found');
 
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       let allPlaces = null;
 
       if (PRIORITY_CHESTS.length > 0)
-        allPlaces = helpers.bombPositionsForChest(myBomber, PRIORITY_CHESTS[0], MAP)
+        allPlaces = helpers.bombPositionsForChest(myBomber, PRIORITY_CHESTS[0], MAP, walkableNeighbors)
       else
         allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
 
@@ -262,6 +262,8 @@ socket.on('connect', async () => {
                     placeBoom(myBomber);
                     updateMapWhenPlaceBoom(myBomber);
                   }
+                } else {
+                  writeLog('no path to mid point', middlePoint)
                 }
               }
             } else if (gridPath && gridPath.length < 2) {
@@ -269,12 +271,14 @@ socket.on('connect', async () => {
               writeLog('places', allPlaces)
               placeBoom(myBomber);
               updateMapWhenPlaceBoom(myBomber);
+            } else {
+              writeLog('no grid path', gridPath)
             }
             break;
+          } else {
+            writeLog('no safe zone after place boom at', place);
           }
         }
-      } else {
-        writeLog('no all places');
       }
     }
     await (sleep(10));
@@ -291,8 +295,6 @@ const move = (orient) => {
   })
 
   writeLog('moved ', orient)
-
-
 }
 
 const placeBoom = (myBomber = null) => {
@@ -339,6 +341,8 @@ function findReachableItem() {
     const path = findPathToTarget(item, false);
     if (path && path.length > 1) {
       validPaths.push({ item, path });
+    } else {
+      writeLog('item not reachable or path too short', { item, path });
     }
   }
 

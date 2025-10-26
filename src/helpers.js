@@ -563,8 +563,17 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
 
     // Lọc các ô chest trên đường
     const chests = path.filter(({ x, y }) => map[y][x] === 'C').reverse();
-    chests.push({ x: target.x, y: target.y }); // thêm ô địch vào cuối
 
+    const lastChest = chests[chests.length - 1];
+    if (!lastChest) {
+      console.log(`lastChest`, chests);
+      throw new Exception('something wrong');
+    } else {
+      chests.push({
+        x: Math.round((target.x + lastChest.x)/ 2),
+        y: Math.round((target.y + lastChest.y) / 2)
+      });
+    }
     results.push({
       id: bot.uid || bot.id,
       score: dist,
@@ -601,18 +610,6 @@ function coveredTiles(bomber, MAP) {
   return tiles;
 }
 
-/**
- * Tìm ô đặt bom có thể tiêu địch khi enemy có kích thước >1 ô.
- *
- * bot: { x, y, explosionRange }  // x,y pixel or tile depending coordsAreTiles
- * enemy: { x, y, width, height } // x,y = center pixel (or tile if coordsAreTiles)
- * map: 2D array map[y][x], 'W' là wall
- * options:
- *  - tileSize (default 40)
- *  - coordsAreTiles (default false) // nếu true, inputs đã là tile coords (và enemy.width/height đo theo tiles)
- *  - requireReachable (default false)
- *  - returnInPixels (default false) // trả center pixel of tile
- */
 function findBombPositionsForEnemyArea(myBomber, enemy, map) {
   // tìm tất cả tile mà enemy phủ
   const tiles = coveredTiles(enemy, map)
@@ -662,7 +659,7 @@ function hasChestLeft(map) {
   return map.some(row => row.includes('C'));
 }
 
-function bombPositionsForChest(myBomber, chestTile, map) {
+function bombPositionsForChest(myBomber, chestTile, map, walkableNeighbors) {
   const { x, y } = chestTile;
   const resultsSet = new Set();
 
@@ -677,7 +674,7 @@ function bombPositionsForChest(myBomber, chestTile, map) {
   }
 
   // chuyển set -> array, có thể trả pixel center nếu cần
-  const out = Array.from(resultsSet, k => {
+  let positions = Array.from(resultsSet, k => {
     const [tx, ty] = k.split(',').map(Number);
     return {
       x: tx,
@@ -685,7 +682,9 @@ function bombPositionsForChest(myBomber, chestTile, map) {
     };
   });
 
-  return out;
+  positions = positions.filter(p => walkableNeighbors.some(w => w.x === p.x && w.y === p.y));
+
+  return positions;
 }
 
 export {
