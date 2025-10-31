@@ -82,12 +82,10 @@ socket.on('map_update', (payload) => {
 socket.on('user_die_update', (payload) => {
   if (process.env.ENV != 'local') {
     BOMBERS = BOMBERS.filter(b => b.name !== payload.killed.name)
-    //remove from frozen bot too
-  }
-
-  if (FROZEN_BOTS.map(b => b.name).includes(payload.killed.name)) {
-    PRIORITY_CHESTS = []
-    FROZEN_BOTS.splice(FROZEN_BOTS.findIndex(b => b.name === payload.killed.name), 1)
+    if (FROZEN_BOTS.map(b => b.name).includes(payload.killed.name)) {
+      PRIORITY_CHESTS = []
+      FROZEN_BOTS = FROZEN_BOTS.filter(b => b.name !== payload.killed.name)
+    }
   }
 })
 
@@ -371,6 +369,6 @@ function checkBomAvailables(myBomber) {
   // Count active bombs owned by this bomber (tracked by uid)
   const ownedActiveBombs = BOMBS.filter(b => b && b.uid === myBomber.uid).length;
   const over20Sec = Date.now() - GAME_START_AT > 20000;
-
-  return over20Sec ? (ownedActiveBombs < myBomber.bombCount) : (ownedActiveBombs == 0)
+  const bomAvailable = ownedActiveBombs < myBomber.bombCount;
+  return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
