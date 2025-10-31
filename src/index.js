@@ -81,7 +81,7 @@ socket.on('map_update', (payload) => {
 
 socket.on('user_die_update', (payload) => {
   if (process.env.ENV != 'local') {
-    BOMBERS = BOMBERS.filter(b => b.uid === payload.uid)
+    BOMBERS = BOMBERS.filter(b => b.name !== payload.killed.name)
     //remove from frozen bot too
   }
 
