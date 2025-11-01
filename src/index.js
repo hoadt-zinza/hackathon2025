@@ -130,6 +130,16 @@ socket.on('connect', async () => {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
     helpers.markOwnBombOnMap(myBomber, BOMBS, MAP, GAME_START_AT)
 
+    if (checkBomAvailables(myBomber)) {
+      for (const bomber of BOMBERS) {
+        if (bomber.name === myBomber.name) continue;
+
+        if (helpers.isDeadCorner(bomber, MAP)) {
+          console.log(`có thằng ${bomber.name} ở góc chết ${bomber.x}, ${bomber.y}`,);
+        }
+      }
+    }
+
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
@@ -174,8 +184,6 @@ socket.on('connect', async () => {
         }
       } else if (pathToBot && pathToBot.length <= 1) {
         placeBoom(myBomber);
-        updateMapWhenPlaceBoom(myBomber);
-      } else {
       }
     }
 
@@ -207,7 +215,7 @@ socket.on('connect', async () => {
             const gridPath = findPathToTarget(helpers.toMapCoord(place))
             if (gridPath && gridPath.length > 1) {
               if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
-                const last = gridPath[gridPath.length - 1];
+                //just wait
               } else {
                 const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
                 const pathToMidPoint = findPathToTarget(middlePoint, false)
@@ -224,18 +232,13 @@ socket.on('connect', async () => {
                     }
                   } else {
                     placeBoom(myBomber);
-                    updateMapWhenPlaceBoom(myBomber);
                   }
-                } else {
                 }
               }
             } else if (gridPath && gridPath.length < 2) {
               placeBoom(myBomber);
-              updateMapWhenPlaceBoom(myBomber);
-            } else {
             }
             break;
-          } else {
           }
         }
       }
@@ -252,12 +255,12 @@ const move = (orient) => {
   socket.emit('move', {
     orient: orient
   })
-
 }
 
 const placeBoom = (myBomber = null) => {
   if (checkBomAvailables(myBomber)) {
     socket.emit('place_bomb', {})
+    updateMapWhenPlaceBoom(myBomber)
   }
 }
 
@@ -295,7 +298,6 @@ function findReachableItem() {
     const path = findPathToTarget(item, false);
     if (path && path.length > 1) {
       validPaths.push({ item, path });
-    } else {
     }
   }
 
@@ -331,14 +333,10 @@ function findPathToTarget(target, isGrid = true) {
 function updateMapWhenPlaceBoom(bomber) {
   const { x: startCol, y: startRow } = helpers.toGridCoord(bomber);
 
-  // Tính cả vị trí bom
-  const inBounds = (r, c) => r >= 0 && c >= 0 && r < 16 && c < 16;
-
   for (const { dx, dy } of helpers.DIRS[0]) {
     for (let step = 1; step <= bomber.explosionRange; step++) {
       const r = startRow + dy * step;
       const c = startCol + dx * step;
-      if (!inBounds(r, c)) break;
 
       const cell = MAP[r][c];
       if (cell === 'W') break; // tường chặn nổ

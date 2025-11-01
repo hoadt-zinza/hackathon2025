@@ -23,7 +23,7 @@ const DIRS = [
 ];
 
 // Constants
-const MAP_SIZE = 640;
+const MAP_SIZE = 16;
 const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
@@ -510,8 +510,8 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
     const target = toGridCoord(bot);
 
     // 0-1 BFS
-    const g = Array.from({ length: 16 }, () => Array(16).fill(INF));
-    const parent = Array.from({ length: 16 }, () => Array(16).fill(null));
+    const g = Array.from({ length: MAP_SIZE }, () => Array(MAP_SIZE).fill(INF));
+    const parent = Array.from({ length: MAP_SIZE }, () => Array(MAP_SIZE).fill(null));
     const deque = [];
 
     g[start.y][start.x] = 0;
@@ -676,6 +676,23 @@ function bombPositionsForChest(myBomber, chestTile, map, walkableNeighbors) {
   return positions;
 }
 
+// helper: dead corner test (count free neighbors excluding danger)
+function isDeadCorner(position, map) {
+  const { x, y } = toGridCoord(position);
+
+  let free = 0;
+  for (const d of DIRS[0]) {
+    const nx = x + d.dx;
+    const ny = y + d.dy;
+    if (
+      isWalkable(map, nx, ny)
+    ) {
+      free++;
+    }
+  }
+  return free < 1;
+}
+
 export {
   DIRS,
   isWalkable,
@@ -707,4 +724,5 @@ export {
   findBombPositionsForEnemyArea,
   hasChestLeft,
   bombPositionsForChest,
+  isDeadCorner,
 };
