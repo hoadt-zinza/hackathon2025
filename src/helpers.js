@@ -679,6 +679,7 @@ function bombPositionsForChest(myBomber, chestTile, map, walkableNeighbors) {
 // helper: dead corner test (count free neighbors excluding danger)
 function isDeadCorner(position, map) {
   const { x, y } = toGridCoord(position);
+  let boomPlace = null;
 
   let free = 0;
   for (const d of DIRS[0]) {
@@ -688,9 +689,14 @@ function isDeadCorner(position, map) {
       isWalkable(map, nx, ny)
     ) {
       free++;
+      boomPlace = { x: nx, y: ny }
     }
   }
-  return free < 1;
+  if (free < 2) {
+    return boomPlace
+  } else {
+    return false
+  }
 }
 
 export {
