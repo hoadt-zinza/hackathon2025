@@ -203,7 +203,7 @@ socket.on('connect', async () => {
       }, MAP, false);
 
       if (pathToBot && pathToBot.length > 1) {
-        if (helpers.isInDanger(pathToBot[1], DANGER_ZONE)) {
+        if (helpers.isInDanger(pathToBot[1], DANGER_ZONE, true)) {
         } else {
           const step = nextStep(pathToBot);
           move(step);
@@ -221,7 +221,7 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE)) {
+      if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE, true)) {
       } else {
         move(nextStep(reachableItem.path));
       }
@@ -240,7 +240,7 @@ socket.on('connect', async () => {
           if (safeZones) {
             const gridPath = findPathToTarget(helpers.toMapCoord(place))
             if (gridPath && gridPath.length > 1) {
-              if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE)) {
+              if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE, true)) {
                 //just wait
               } else {
                 const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
@@ -248,7 +248,7 @@ socket.on('connect', async () => {
 
                 if (pathToMidPoint) {
                   if (pathToMidPoint.length > 1) {
-                    if (helpers.isInDanger(pathToMidPoint[1], DANGER_ZONE)) {
+                    if (helpers.isInDanger(pathToMidPoint[1], DANGER_ZONE, true)) {
                     } else {
                       const step = nextStep(pathToMidPoint);
                       if (step) {
@@ -296,7 +296,7 @@ function addDangerZonesForBomb(bomb) {
 
   const placingBomber = BOMBERS.find(b => b && b.uid === bomb.uid);
   const newZones = helpers.createDangerZonesForBomb(bomb, placingBomber.explosionRange, MAP);
-  for (const z of newZones) DANGER_ZONE.push({...z, timeExplode: Date.now() + 5000});
+  for (const z of newZones) DANGER_ZONE.push({...z, explodeAt: Date.now() + 5000});
 }
 
 function removeDangerZonesForBomb(bombId) {

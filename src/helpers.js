@@ -248,31 +248,25 @@ function upsertBomb(bombsArr, payload) {
   }
 }
 
-function isInDanger(myBomber, DANGER_ZONE) {
-  if (!myBomber || DANGER_ZONE.length == 0) return false;
+function isInDanger(myBomber, DANGER_ZONE, checkTime = false) {
+  if (!myBomber || DANGER_ZONE.length === 0) return false;
 
-  // Bomber position {x, y} is top-left corner of 35x35 square
   const bomberRight = myBomber.x + BOMBER_SIZE;
   const bomberBottom = myBomber.y + BOMBER_SIZE;
 
-  // Check if bomber overlaps with any danger zone tile
-  for (const zone of DANGER_ZONE) {
-    // Danger zone tile occupies pixels [zone.x * WALL_SIZE, (zone.x + 1) * WALL_SIZE)
+  return DANGER_ZONE.some(zone => {
     const tileLeft = zone.x * WALL_SIZE;
     const tileRight = (zone.x + 1) * WALL_SIZE;
     const tileTop = zone.y * WALL_SIZE;
     const tileBottom = (zone.y + 1) * WALL_SIZE;
 
-    // Check if rectangles overlap
     const overlapX = myBomber.x < tileRight && bomberRight > tileLeft;
     const overlapY = myBomber.y < tileBottom && bomberBottom > tileTop;
 
-    if (overlapX && overlapY) {
-      return true;
-    }
-  }
+    if (!overlapX || !overlapY) return false;
 
-  return false;
+    return checkTime ? (zone.explodeAt - Date.now() <= 1000) : true;
+  });
 }
 
 function findNearestSafetyZone(myBomber, map, dangerArr) {
