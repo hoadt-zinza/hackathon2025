@@ -670,9 +670,8 @@ function bombPositionsForChest(myBomber, chestTile, map, walkableNeighbors) {
   return positions;
 }
 
-// helper: dead corner test (count free neighbors excluding danger)
-function isDeadCorner(position, map) {
-  const { x, y } = toGridCoord(position);
+function isDeadCorner(position, map, isGrid = false) {
+  const { x, y } = isGrid ? position : toGridCoord(position);
   let boomPlace = null;
 
   let free = 0;
@@ -693,10 +692,130 @@ function isDeadCorner(position, map) {
   }
 }
 
+/**
+ * Find the nearest safe zone reachable from a given position using BFS.
+ * If multiple zones have the same distance, choose the one with most walkable neighbors.
+ * Excludes dead corners from consideration.
+ * @param {Object} startPos - Starting position {x, y} in grid coordinates
+ * @param {Array<Array>} map - The game map
+ * @param {Array<Object>} dangerZones - Array of dangerous positions to avoid
+ * @param {number} maxDistance - Maximum distance to search (default: 10)
+ * @returns {Object|null} - Nearest safe zone {x, y, distance, walkableNeighbors} or null if none found
+ */
+function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
+  if (!startPos || !map) return null;
+
+  // Create a Set for O(1) danger zone lookups
+  const dangerSet = new Set(dangerZones.map(zone => `${zone.x},${zone.y}`));
+
+  // Queue for BFS: stores {x, y, distance}
+  const queue = [{ x: startPos.x, y: startPos.y, distance: 0 }];
+
+  // Visited set to avoid processing the same cell multiple times
+  const visited = new Set([`${startPos.x},${startPos.y}`]);
+
+  // Store candidates at the nearest distance
+  let nearestDistance = Infinity;
+  const candidates = [];
+
+  // Helper function to count walkable neighbors
+  const countWalkableNeighbors = (x, y) => {
+    let count = 0;
+    for (const dir of DIRS[0]) {
+      const nx = x + dir.dx;
+      const ny = y + dir.dy;
+      if (
+        nx >= 0 && nx < map[0].length &&
+        ny >= 0 && ny < map.length &&
+        isWalkable(map, nx, ny)
+      ) {
+        count++;
+      }
+    }
+    return count;
+  };
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    // If we've found candidates and current distance is greater, stop searching
+    if (current.distance > nearestDistance) {
+      break;
+    }
+
+    // Check if current position is safe and not the start position
+    if (!dangerSet.has(`${current.x},${current.y}`) && current.distance > 0) {
+      // Check if it's a dead corner
+      const deadCornerResult = isDeadCorner(current, map, true);
+
+      // isDeadCorner returns false if NOT a dead corner, or a position if it IS a dead corner
+      if (deadCornerResult === false) {
+        // Not a dead corner, this is a valid safe zone
+        const walkableNeighbors = countWalkableNeighbors(current.x, current.y);
+
+        if (current.distance < nearestDistance) {
+          // Found a closer safe zone, reset candidates
+          nearestDistance = current.distance;
+          candidates.length = 0;
+          candidates.push({
+            x: current.x,
+            y: current.y,
+            distance: current.distance,
+            walkableNeighbors
+          });
+        } else if (current.distance === nearestDistance) {
+          // Same distance, add to candidates
+          candidates.push({
+            x: current.x,
+            y: current.y,
+            distance: current.distance,
+            walkableNeighbors
+          });
+        }
+      }
+    }
+
+    // Stop if we've reached max distance
+    if (current.distance >= maxDistance) {
+      continue;
+    }
+
+    // Check all 4 directions
+    for (const dir of DIRS[0]) {
+      const nx = current.x + dir.dx;
+      const ny = current.y + dir.dy;
+      const key = `${nx},${ny}`;
+
+      // Check if the next position is valid and not visited
+      if (
+        nx >= 0 && nx < map[0].length &&  // within x bounds
+        ny >= 0 && ny < map.length &&     // within y bounds
+        isWalkable(map, nx, ny) &&        // walkable tile
+        !visited.has(key)                 // not visited yet
+      ) {
+        visited.add(key);
+        queue.push({ x: nx, y: ny, distance: current.distance + 1 });
+      }
+    }
+  }
+
+  // If no safe zones found, return null
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  // Sort candidates by walkableNeighbors (most walkable first)
+  candidates.sort((a, b) => b.walkableNeighbors - a.walkableNeighbors);
+
+  // Return the best candidate
+  return candidates;
+}
+
 export {
   DIRS,
   isWalkable,
   heuristic,
+  findAllSafeZones,
   toGridCoord,
   findPathToTarget,
   findPathToTargetAStar,

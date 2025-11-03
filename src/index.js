@@ -21,6 +21,7 @@ const DANGER_ZONE = []
 let ATTACK_MODE = false
 let GAME_START_AT = null;
 let KILL_BOOM = new Set();
+let CAREFUL_MODE = false;
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -167,7 +168,13 @@ socket.on('connect', async () => {
     writeLog(`myBomber`, myBomber.x, myBomber.y);
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+      let safetyZone = null;
+      if (!CAREFUL_MODE)
+        safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+      else
+        safetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)[0]
+
+      writeLog(`safetyzone`, helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE))
       if (safetyZone) {
         const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
@@ -396,6 +403,25 @@ function checkBomAvailables(myBomber) {
   const bomAvailable = ownedActiveBombs < myBomber.bombCount;
   return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
+
+setInterval(() => {
+  //check if we can touch any enemy then turn on careful mode
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  let canTouchEnemy = false;
+  for (const bomber of BOMBERS) {
+    if (bomber.name === myBomber.name) continue;
+    const path = findPathToTarget(bomber, false);
+    if (path && path.length > 1) {
+      canTouchEnemy = true;
+      break;
+    }
+  }
+  if (canTouchEnemy) {
+    CAREFUL_MODE = true;
+  } else {
+    CAREFUL_MODE = false;
+  }
+}, 1000)
 
 function writeLog(...args) {
   console.log(...args)
