@@ -22,6 +22,7 @@ let ATTACK_MODE = false
 let GAME_START_AT = null;
 let KILL_BOOM = new Set();
 let CAREFUL_MODE = false;
+let CAREFUL_MODE_INTERVAL_ID = null;
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -413,7 +414,7 @@ function checkBomAvailables(myBomber) {
   return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
 
-setInterval(() => {
+CAREFUL_MODE_INTERVAL_ID = setInterval(() => {
   //check if we can touch any enemy then turn on careful mode
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   let canTouchEnemy = false;
@@ -427,9 +428,13 @@ setInterval(() => {
   }
   if (canTouchEnemy) {
     CAREFUL_MODE = true;
-  } else {
-    CAREFUL_MODE = false;
+    if (CAREFUL_MODE_INTERVAL_ID) {
+      clearInterval(CAREFUL_MODE_INTERVAL_ID);
+      CAREFUL_MODE_INTERVAL_ID = null;
+    }
   }
+
+  console.log('check careful mode');
 }, 1000)
 
 function writeLog(...args) {
