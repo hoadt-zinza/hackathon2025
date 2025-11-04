@@ -18,11 +18,10 @@ let GAME_START = false
 let FROZEN_BOTS = []
 let PRIORITY_CHESTS = []
 const DANGER_ZONE = []
-let ATTACK_MODE = false
 let GAME_START_AT = null;
 let KILL_BOOM = new Set();
-let CAREFUL_MODE = false;
-let CAREFUL_MODE_INTERVAL_ID = null;
+let ATTACK_MODE = false
+let ATTACK_MODE_INTERVAL_ID = null;
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -419,7 +418,7 @@ function checkBomAvailables(myBomber) {
   return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
 
-CAREFUL_MODE_INTERVAL_ID = setInterval(() => {
+ATTACK_MODE_INTERVAL_ID = setInterval(() => {
   //check if we can touch any enemy then turn on careful mode
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
   let canTouchEnemy = false;
@@ -432,10 +431,10 @@ CAREFUL_MODE_INTERVAL_ID = setInterval(() => {
     }
   }
   if (canTouchEnemy) {
-    CAREFUL_MODE = true;
-    if (CAREFUL_MODE_INTERVAL_ID) {
-      clearInterval(CAREFUL_MODE_INTERVAL_ID);
-      CAREFUL_MODE_INTERVAL_ID = null;
+    ATTACK_MODE = true;
+    if (ATTACK_MODE_INTERVAL_ID) {
+      // clearInterval(ATTACK_MODE_INTERVAL_ID);
+      ATTACK_MODE_INTERVAL_ID = null;
     }
   }
 
