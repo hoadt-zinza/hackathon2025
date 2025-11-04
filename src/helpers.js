@@ -199,21 +199,24 @@ function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
   return null;
 }
 
-
-function createDangerZonesForBomb(bomb, explosionRange, map) {
+function createDangerZonesForBomb(bomb, explosionRange, map, dangerZones) {
   if (!bomb) return [];
 
   const { x, y } = toGridCoord(bomb);
+  const now = Date.now();
+
+  const existingZone = dangerZones && dangerZones.find(z => z.x === x && z.y === y && z.explodeAt > now);
+  const explodeAt = existingZone ? existingZone.explodeAt : now + 5000;
 
   const zones = [];
-  zones.push({ bombId: bomb.id, x: x, y: y });
+  zones.push({ bombId: bomb.id, x, y, explodeAt });
 
   for (const dir of DIRS[0]) {
     for (let i = 1; i <= explosionRange; i++) {
       const nx = x + dir.dx * i;
       const ny = y + dir.dy * i;
       if (!isWalkable(map, nx, ny)) break;
-      zones.push({ bombId: bomb.id, x: nx, y: ny });
+      zones.push({ bombId: bomb.id, x: nx, y: ny, explodeAt });
     }
   }
 

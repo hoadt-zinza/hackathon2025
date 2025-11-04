@@ -236,13 +236,11 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
-      writeLog('go to item')
       if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE, true)) {
       } else {
         move(nextStep(reachableItem.path));
       }
     } else {
-      writeLog('go to chest')
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       let allPlaces = null;
 
@@ -253,9 +251,15 @@ socket.on('connect', async () => {
 
       if (allPlaces && allPlaces.length > 0) {
         for (const place of allPlaces) {
-          const safeZones = helpers.countSafeZonesAfterPlaceBoom(helpers.toMapCoord(place), myBomber.explosionRange, DANGER_ZONE, MAP, walkableNeighbors);
+          const mapCoordPlace = helpers.toMapCoord(place)
+          if (BOMBS.some(b => b.x === mapCoordPlace.x && b.y === mapCoordPlace.y)) {
+            writeLog('oo nay co boom roi chay thoi')
+            continue;
+          }
+
+          const safeZones = helpers.countSafeZonesAfterPlaceBoom(mapCoordPlace, myBomber.explosionRange, DANGER_ZONE, MAP, walkableNeighbors);
           if (safeZones) {
-            const gridPath = findPathToTarget(helpers.toMapCoord(place))
+            const gridPath = findPathToTarget(mapCoordPlace)
             if (gridPath && gridPath.length > 1) {
               if (helpers.isInDanger(helpers.toMapCoord(gridPath[1]), DANGER_ZONE, true)) {
                 //just wait
@@ -312,8 +316,9 @@ function addDangerZonesForBomb(bomb) {
   if (!bomb) return;
 
   const placingBomber = BOMBERS.find(b => b && b.uid === bomb.uid);
-  const newZones = helpers.createDangerZonesForBomb(bomb, placingBomber.explosionRange, MAP);
-  for (const z of newZones) DANGER_ZONE.push({...z, explodeAt: Date.now() + 5000});
+  const newZones = helpers.createDangerZonesForBomb(bomb, placingBomber.explosionRange, MAP, DANGER_ZONE);
+
+  DANGER_ZONE.push(...newZones);
 }
 
 function removeDangerZonesForBomb(bombId) {
@@ -434,7 +439,7 @@ CAREFUL_MODE_INTERVAL_ID = setInterval(() => {
     }
   }
 
-  console.log('check careful mode');
+  writeLog('check careful mode');
 }, 1000)
 
 function writeLog(...args) {
