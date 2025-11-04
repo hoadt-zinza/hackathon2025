@@ -743,8 +743,8 @@ function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
       break;
     }
 
-    // Check if current position is safe and not the start position
-    if (!dangerSet.has(`${current.x},${current.y}`) && current.distance > 0) {
+    // Check if current position is safe (including the start position)
+    if (!dangerSet.has(`${current.x},${current.y}`)) {
       // Check if it's a dead corner
       const deadCornerResult = isDeadCorner(current, map, true);
 

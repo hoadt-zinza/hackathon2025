@@ -144,8 +144,13 @@ socket.on('connect', async () => {
             const middlePoint = helpers.getMidPoint(gridPath, myBomber.speed);
             const pathToMidPoint = findPathToTarget(middlePoint, false)
             if (pathToMidPoint && pathToMidPoint.length > 1) {
-              const step = nextStep(pathToMidPoint);
-              move(step);
+              if (helpers.isInDanger(pathToMidPoint[1], DANGER_ZONE, true)) {
+                writeLog('just wait')
+                //just wait
+              } else {
+                const step = nextStep(pathToMidPoint);
+                move(step);
+              }
               didSomething = true
             } else {
               placeBoom(myBomber);
@@ -167,14 +172,16 @@ socket.on('connect', async () => {
 
     writeLog(`myBomber`, myBomber.x, myBomber.y);
 
-    if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
+    if (helpers.isInDanger(myBomber, DANGER_ZONE, myBomber.speed > 1)) {
+      writeLog('in danger')
       let safetyZone = null;
-      if (!CAREFUL_MODE)
+      const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)
+      if (allSafetyZone) {
+        writeLog('allSafetyZone', allSafetyZone)
+        safetyZone = allSafetyZone[0]
+      } else
         safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
-      else
-        safetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)[0]
 
-      writeLog(`safetyzone`, helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE))
       if (safetyZone) {
         const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
@@ -228,11 +235,13 @@ socket.on('connect', async () => {
     const reachableItem = findReachableItem();
 
     if (reachableItem) {
+      writeLog('go to item')
       if (helpers.isInDanger(reachableItem.path[1], DANGER_ZONE, true)) {
       } else {
         move(nextStep(reachableItem.path));
       }
     } else {
+      writeLog('go to chest')
       const walkableNeighbors = helpers.getWalkableNeighbors(MAP, myBomber);
       let allPlaces = null;
 
