@@ -22,6 +22,7 @@ let GAME_START_AT = null;
 let KILL_BOOM = new Set();
 let ATTACK_MODE = false
 let ATTACK_MODE_INTERVAL_ID = null;
+const FILE_NAME='log.txt'
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -45,16 +46,16 @@ socket.on('finish', () => {
 
 socket.on('new_enemy', (data) => {
   for (const bomber of data.bombers) {
-    helpers.upsertBomber(BOMBERS, bomber);
+    helpers.upsertItem(BOMBERS, bomber, 'uid')
   }
 });
 
 socket.on('player_move', (payload) => {
-  helpers.upsertBomber(BOMBERS, payload);
+  helpers.upsertItem(BOMBERS, payload, 'uid');
 });
 
 socket.on('new_bomb', (payload) => {
-  helpers.upsertBomb(BOMBS, payload);
+  helpers.upsertItem(BOMBS, payload, 'id');
   addDangerZonesForBomb(payload);
 });
 
@@ -119,7 +120,7 @@ socket.on('chest_destroyed', (payload) => {
 socket.on('connect', async () => {
   console.log('Connected to server');
   socket.emit('join', {});
-  fs.writeFileSync('log.txt', '');
+  fs.writeFileSync(FILE_NAME, '');
   console.log('Sent join event');
 
   while(!GAME_START) {
@@ -177,7 +178,6 @@ socket.on('connect', async () => {
       let safetyZone = null;
       const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)
       if (allSafetyZone) {
-        writeLog('allSafetyZone', allSafetyZone)
         safetyZone = allSafetyZone[0]
       } else
         safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
@@ -447,5 +447,5 @@ function writeLog(...args) {
   ).join(' ');
 
   const log = `[${new Date().toISOString()}] ${message}\n`;
-  fs.appendFileSync('log.txt', log);
+  fs.appendFileSync(FILE_NAME, log);
 }

@@ -47,16 +47,16 @@ socket.on('finish', () => {
 
 socket.on('new_enemy', (data) => {
   for (const bomber of data.bombers) {
-    helpers.upsertBomber(BOMBERS, bomber);
+    helpers.upsertItem(BOMBERS, bomber, 'uid')
   }
 });
 
 socket.on('player_move', (payload) => {
-  helpers.upsertBomber(BOMBERS, payload);
+  helpers.upsertItem(BOMBERS, payload, 'uid');
 });
 
 socket.on('new_bomb', (payload) => {
-  helpers.upsertBomb(BOMBS, payload);
+  helpers.upsertItem(BOMBS, payload, 'id');
   addDangerZonesForBomb(payload);
 });
 

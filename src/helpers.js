@@ -38,8 +38,7 @@ function isWalkable(map, x, y, isGrid = true) {
   } else {
     // Real coordinate check - check if bomber's bounding box overlaps with walls
     // Position {x, y} is top-left corner of bomber (35x35 square)
-    const bomberRight = x + BOMBER_SIZE;
-    const bomberBottom = y + BOMBER_SIZE;
+    const { bomberRight, bomberBottom } = getBomberBound({x, y})
 
     // Calculate which grid tiles the bomber overlaps
     const gridRight = Math.floor((bomberRight - 0.5) / WALL_SIZE);
@@ -76,13 +75,21 @@ function toMapCoord(gridPos) {
   return { x: gridPos.x * WALL_SIZE, y: gridPos.y * WALL_SIZE };
 }
 
+function getBomberBound(bomber) {
+  const bomberRight = bomber.x + BOMBER_SIZE;
+  const bomberBottom = bomber.y + BOMBER_SIZE;
+  return {
+    bomberRight,
+    bomberBottom
+  }
+}
 
 // A* Search (improved version of findPathToTarget)
 function findPathToTarget(myBomber, target, map, isGrid = true) {
   if (!myBomber || !target || !map) return null;
 
-  const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
-  const goal = isGrid ? toGridCoord(target, WALL_SIZE) : { x: target.x, y: target.y };
+  const start = isGrid ? toGridCoord(myBomber) : { x: myBomber.x, y: myBomber.y };
+  const goal = isGrid ? toGridCoord(target) : { x: target.x, y: target.y };
 
   const visited = new Set();
   const cameFrom = new Map();
@@ -90,13 +97,14 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
   // Priority queue sorted by f = g + h
   const open = new MinHeap((a, b) => a.f - b.f);
   const openSet = new Set([`${start.x},${start.y}`]);
+  const distance = manhattanDistance(start, goal)
 
   const startNode = {
     x: start.x,
     y: start.y,
     g: 0,
-    h: manhattanDistance(start, goal),
-    f: manhattanDistance(start, goal)
+    h: distance,
+    f: distance
   };
   open.push(startNode);
   const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speed - 1]
@@ -180,34 +188,21 @@ function removeDangerZonesForBomb(dangerArr, bombId) {
   return dangerArr.filter(z => z.bombId !== bombId);
 }
 
-function upsertBomber(bombersArr, payload) {
-  const uid = payload && payload.uid;
-  if (!uid) return;
-
-  const idx = bombersArr.findIndex(b => b && b.uid === uid);
-  if (idx !== -1) {
-    bombersArr[idx] = { ...bombersArr[idx], ...payload };
-  } else {
-    bombersArr.push(payload);
-  }
-}
-
-function upsertBomb(bombsArr, payload) {
-  const id = payload && payload.id;
+function upsertItem(itemsArr, payload, key = 'uid') {
+  const id = payload && payload[key];
   if (!id) return;
-  const idx = bombsArr.findIndex(b => b && b.id === id);
+  const idx = itemsArr.findIndex(i => i && i[key] === id);
   if (idx !== -1) {
-    bombsArr[idx] = { ...bombsArr[idx], ...payload };
+    itemsArr[idx] = { ...itemsArr[idx], ...payload };
   } else {
-    bombsArr.push(payload);
+    itemsArr.push(payload);
   }
 }
 
 function isInDanger(myBomber, DANGER_ZONE, checkTime = false) {
   if (!myBomber || DANGER_ZONE.length === 0) return false;
 
-  const bomberRight = myBomber.x + BOMBER_SIZE;
-  const bomberBottom = myBomber.y + BOMBER_SIZE;
+  const { bomberRight, bomberBottom } = getBomberBound(myBomber)
 
   return DANGER_ZONE.some(zone => {
     const tileLeft = zone.x * WALL_SIZE;
@@ -428,10 +423,11 @@ function markOwnBombOnMap(myBomber, bombs, map, gameStartAt) {
 
   for (const bomb of bombs) {
     if (bomb.ownerName !== myBomber.name && Date.now() - gameStartAt < 60) continue;
-    if (map[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] == 'W') continue;
 
-    const bomberRight = myBomber.x + BOMBER_SIZE;
-    const bomberBottom = myBomber.y + BOMBER_SIZE;
+    const gridCoord = toGridCoord(bomb)
+    if (map[gridCoord.y][gridCoord.x] == 'W') continue;
+
+    const { bomberRight, bomberBottom } = getBomberBound(myBomber)
     const bombRight = bomb.x + WALL_SIZE;
     const bombBottom = bomb.y + WALL_SIZE;
 
@@ -439,7 +435,7 @@ function markOwnBombOnMap(myBomber, bombs, map, gameStartAt) {
     const overlapY = myBomber.y < bombBottom && bomberBottom > bomb.y;
 
     if (!(overlapX && overlapY)) {
-      map[bomb.y / WALL_SIZE][bomb.x / WALL_SIZE] = 'W'
+      map[gridCoord.y][gridCoord.x] = 'W'
       return true;
     }
   }
@@ -529,8 +525,7 @@ function coveredTiles(bomber, MAP) {
   const { x, y } = bomber;
 
   // Tọa độ pixel của khung bao quanh bomber
-  const bomberRight  = x + BOMBER_SIZE;
-  const bomberBottom = y + BOMBER_SIZE;
+  const { bomberRight, bomberBottom } = getBomberBound(bomber)
 
   // Tính các chỉ số ô (tile) mà bomber đang chiếm
   const tx0 = Math.floor(bomber.x / WALL_SIZE);
@@ -776,8 +771,7 @@ export {
   findPathToTarget,
   createDangerZonesForBomb,
   removeDangerZonesForBomb,
-  upsertBomber,
-  upsertBomb,
+  upsertItem,
   isInDanger,
   findNearestSafetyZone,
   MAP_SIZE,
