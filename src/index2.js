@@ -185,7 +185,7 @@ socket.on('connect', async () => {
         safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
 
       if (safetyZone) {
-        const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
+        const path = helpers.findPathToTarget(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
           if (path.length == 1) {
             path.push(helpers.toMapCoord(safetyZone))
@@ -204,16 +204,14 @@ socket.on('connect', async () => {
       ATTACK_MODE = true;
       //move to nearest bot and place boom
       const nearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
-        .sort((a, b) => {
-          helpers.heuristic(myBomber, a) - helpers.heuristic(myBomber, b)
-        })[0]
+        .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
       const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
       if (!bestPos) {
         await sleep(10);
         continue;
       }
 
-      const pathToBot = helpers.findPathToTargetAStar(myBomber, {
+      const pathToBot = helpers.findPathToTarget(myBomber, {
         x: bestPos.x * helpers.WALL_SIZE,
         y: bestPos.y * helpers.WALL_SIZE
       }, MAP, false);
@@ -337,7 +335,7 @@ function findReachableItem() {
   const nearbyItems = ITEMS.filter(item => {
     if (!item) return false;
 
-    const distance = Math.abs(item.x - myBomber.x) + Math.abs(item.y - myBomber.y);
+    const distance = helpers.chebyshevDistance(item, myBomber);
     return distance <= (6 * helpers.WALL_SIZE);
   });
 
@@ -376,7 +374,7 @@ function nextStep(path) {
 function findPathToTarget(target, isGrid = true) {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME2);
 
-  return helpers.findPathToTargetAStar(myBomber, target, MAP, isGrid);
+  return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
 }
 
 function updateMapWhenPlaceBoom(bomber) {

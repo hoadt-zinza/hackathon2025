@@ -60,8 +60,12 @@ function isWalkable(map, x, y, isGrid = true) {
   }
 }
 
-function heuristic(a, b) {
+function manhattanDistance(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+function chebyshevDistance(a, b) {
+  return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 }
 
 function toGridCoord(pos) {
@@ -72,61 +76,9 @@ function toMapCoord(gridPos) {
   return { x: gridPos.x * WALL_SIZE, y: gridPos.y * WALL_SIZE };
 }
 
-// Greedy Best-First Search (kept simple and as in original)
-function findPathToTarget(myBomber, target, map, isGrid = true) {
-  if (!myBomber || !target || !map) return null;
-
-  const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
-  const goal = isGrid ? toGridCoord(target, WALL_SIZE) : { x: target.x, y: target.y };
-
-  const visited = new Set();
-  const cameFrom = new Map();
-
-  // Dùng heap thay vì mảng
-  const open = new MinHeap((a, b) => a.h - b.h);
-  open.push({ ...start, h: heuristic(start, goal) });
-
-  // Để tránh .find() (O(n)), ta có thể thêm một map theo key "x,y"
-  const openSet = new Set([`${start.x},${start.y}`]);
-  const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speed - 1]
-
-  while (!open.isEmpty()) {
-    const current = open.pop();
-    openSet.delete(`${current.x},${current.y}`);
-
-    const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
-    if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= (myBomber.speed - 1)) {
-      const path = [];
-      let step = current;
-      while (step) {
-        path.push({ x: step.x, y: step.y });
-        step = cameFrom.get(`${step.x},${step.y}`);
-      }
-      return path.reverse();
-    }
-
-    visited.add(`${current.x},${current.y}`);
-
-    for (const dir of dirs) {
-      const nx = current.x + dir.dx;
-      const ny = current.y + dir.dy;
-      if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
-      if (visited.has(`${nx},${ny}`)) continue;
-
-      const key = `${nx},${ny}`;
-      if (!openSet.has(key)) {
-        cameFrom.set(key, current);
-        open.push({ x: nx, y: ny, h: heuristic({ x: nx, y: ny }, goal) });
-        openSet.add(key);
-      }
-    }
-  }
-
-  return null;
-}
 
 // A* Search (improved version of findPathToTarget)
-function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
+function findPathToTarget(myBomber, target, map, isGrid = true) {
   if (!myBomber || !target || !map) return null;
 
   const start = isGrid ? toGridCoord(myBomber, WALL_SIZE) : { x: myBomber.x, y: myBomber.y };
@@ -143,8 +95,8 @@ function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
     x: start.x,
     y: start.y,
     g: 0,
-    h: heuristic(start, goal),
-    f: heuristic(start, goal)
+    h: manhattanDistance(start, goal),
+    f: manhattanDistance(start, goal)
   };
   open.push(startNode);
   const dirs = isGrid ? DIRS[0] : DIRS[myBomber.speed - 1]
@@ -153,7 +105,7 @@ function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
     const current = open.pop();
     openSet.delete(`${current.x},${current.y}`);
 
-    const dist = Math.max(Math.abs(current.x - goal.x), Math.abs(current.y - goal.y));
+    const dist = chebyshevDistance(current, goal);
     if (isGrid ? current.x === goal.x && current.y === goal.y : dist <= (myBomber.speed - 1)) {
       // reconstruct path
       const path = [];
@@ -176,7 +128,7 @@ function findPathToTargetAStar(myBomber, target, map, isGrid = true) {
       if (visited.has(key)) continue;
 
       const g = current.g + 1;
-      const h = heuristic({ x: nx, y: ny }, goal);
+      const h = manhattanDistance({ x: nx, y: ny }, goal);
       const f = g + h;
 
       if (!openSet.has(key)) {
@@ -315,7 +267,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
         !visited.has(nextKey)
       ) {
         const g = node.g + 1;
-        const h = heuristic({ x: nx, y: ny }, currentGridPos);
+        const h = manhattanDistance({ x: nx, y: ny }, currentGridPos);
         const f = g + h;
         openSet.push({ x: nx, y: ny, g, h, f });
       }
@@ -409,7 +361,7 @@ function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = []) {
   if (walkableNeighbors.length === 0) return null;
 
   return walkableNeighbors.map(p => {
-    return { x: p.x, y: p.y, score: countChestsDestroyedAt(map, p.x, p.y, range), dist: Math.abs(p.x - start.x) + Math.abs(p.y - start.y) };
+    return { x: p.x, y: p.y, score: countChestsDestroyedAt(map, p.x, p.y, range), dist: chebyshevDistance(p, start) };
   }).sort((a, b) => {
     return b.score - a.score; // higher score first
   }).filter(w => {
@@ -621,11 +573,11 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
   const results = Array.from(resultsSet, k => {
     const [x, y] = k.split(',').map(Number);
     const pos = { x: x, y: y }
-    const h = heuristic({
+    const h = manhattanDistance({
       x: Math.floor(myBomber.x / WALL_SIZE),
       y: Math.floor(myBomber.y / WALL_SIZE)
     }, pos);
-    const enemyH = heuristic({
+    const enemyH = manhattanDistance({
       x: Math.floor(enemy.x / WALL_SIZE),
       y: Math.floor(enemy.y / WALL_SIZE)
     }, pos);
@@ -817,11 +769,11 @@ function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
 export {
   DIRS,
   isWalkable,
-  heuristic,
+  manhattanDistance,
+  chebyshevDistance,
   findAllSafeZones,
   toGridCoord,
   findPathToTarget,
-  findPathToTargetAStar,
   createDangerZonesForBomb,
   removeDangerZonesForBomb,
   upsertBomber,

@@ -183,7 +183,7 @@ socket.on('connect', async () => {
         safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
 
       if (safetyZone) {
-        const path = helpers.findPathToTargetAStar(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
+        const path = helpers.findPathToTarget(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
         if (path && path.length >= 1) {
           if (path.length == 1) {
             path.push(helpers.toMapCoord(safetyZone))
@@ -202,16 +202,14 @@ socket.on('connect', async () => {
       ATTACK_MODE = true;
       //move to nearest bot and place boom
       const nearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
-        .sort((a, b) => {
-          helpers.heuristic(myBomber, a) - helpers.heuristic(myBomber, b)
-        })[0]
+        .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
       const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
       if (!bestPos) {
         await sleep(10);
         continue;
       }
 
-      const pathToBot = helpers.findPathToTargetAStar(myBomber, {
+      const pathToBot = helpers.findPathToTarget(myBomber, {
         x: bestPos.x * helpers.WALL_SIZE,
         y: bestPos.y * helpers.WALL_SIZE
       }, MAP, false);
@@ -335,7 +333,7 @@ function findReachableItem() {
   const nearbyItems = ITEMS.filter(item => {
     if (!item) return false;
 
-    const distance = Math.abs(item.x - myBomber.x) + Math.abs(item.y - myBomber.y);
+    const distance = helpers.chebyshevDistance(item, myBomber);
     return distance <= (6 * helpers.WALL_SIZE);
   });
 
@@ -374,7 +372,7 @@ function nextStep(path) {
 function findPathToTarget(target, isGrid = true) {
   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
 
-  return helpers.findPathToTargetAStar(myBomber, target, MAP, isGrid);
+  return helpers.findPathToTarget(myBomber, target, MAP, isGrid);
 }
 
 function updateMapWhenPlaceBoom(bomber) {
@@ -418,28 +416,28 @@ function checkBomAvailables(myBomber) {
   return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
 
-ATTACK_MODE_INTERVAL_ID = setInterval(() => {
-  //check if we can touch any enemy then turn on careful mode
-  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-  let canTouchEnemy = false;
-  for (const bomber of BOMBERS) {
-    if (bomber.name === myBomber.name) continue;
-    const path = findPathToTarget(bomber, false);
-    if (path && path.length > 1) {
-      canTouchEnemy = true;
-      break;
-    }
-  }
-  if (canTouchEnemy) {
-    ATTACK_MODE = true;
-    if (ATTACK_MODE_INTERVAL_ID) {
-      // clearInterval(ATTACK_MODE_INTERVAL_ID);
-      ATTACK_MODE_INTERVAL_ID = null;
-    }
-  }
+// ATTACK_MODE_INTERVAL_ID = setInterval(() => {
+//   //check if we can touch any enemy then turn on careful mode
+//   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+//   let canTouchEnemy = false;
+//   for (const bomber of BOMBERS) {
+//     if (bomber.name === myBomber.name) continue;
+//     const path = findPathToTarget(bomber, false);
+//     if (path && path.length > 1) {
+//       canTouchEnemy = true;
+//       break;
+//     }
+//   }
+//   if (canTouchEnemy) {
+//     ATTACK_MODE = true;
+//     if (ATTACK_MODE_INTERVAL_ID) {
+//       // clearInterval(ATTACK_MODE_INTERVAL_ID);
+//       ATTACK_MODE_INTERVAL_ID = null;
+//     }
+//   }
 
-  writeLog('check careful mode');
-}, 1000)
+//   writeLog('check careful mode');
+// }, 1000)
 
 function writeLog(...args) {
   console.log(...args)
