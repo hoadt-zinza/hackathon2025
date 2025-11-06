@@ -171,9 +171,7 @@ socket.on('connect', async () => {
       continue;
     }
 
-    writeLog(`myBomber`, myBomber.x, myBomber.y);
-
-    if (helpers.isInDanger(myBomber, DANGER_ZONE, myBomber.speed > 1)) {
+    if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       writeLog('in danger')
       let safetyZone = null;
       const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)
@@ -198,8 +196,7 @@ socket.on('connect', async () => {
       }
     }
 
-    if (!helpers.hasChestLeft(MAP) || ATTACK_MODE) {
-      ATTACK_MODE = true;
+    if (ATTACK_MODE) {
       //move to nearest bot and place boom
       const nearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
         .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
@@ -221,7 +218,7 @@ socket.on('connect', async () => {
           move(step);
         }
       } else if (pathToBot && pathToBot.length <= 1) {
-        placeBoom(myBomber);
+        // placeBoom(myBomber);
       }
     }
 
@@ -416,28 +413,32 @@ function checkBomAvailables(myBomber) {
   return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
 
-// ATTACK_MODE_INTERVAL_ID = setInterval(() => {
-//   //check if we can touch any enemy then turn on careful mode
-//   const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
-//   let canTouchEnemy = false;
-//   for (const bomber of BOMBERS) {
-//     if (bomber.name === myBomber.name) continue;
-//     const path = findPathToTarget(bomber, false);
-//     if (path && path.length > 1) {
-//       canTouchEnemy = true;
-//       break;
-//     }
-//   }
-//   if (canTouchEnemy) {
-//     ATTACK_MODE = true;
-//     if (ATTACK_MODE_INTERVAL_ID) {
-//       // clearInterval(ATTACK_MODE_INTERVAL_ID);
-//       ATTACK_MODE_INTERVAL_ID = null;
-//     }
-//   }
+ATTACK_MODE_INTERVAL_ID = setInterval(() => {
+  //check if we can touch any enemy then turn on attack mode
+  const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
+  let canTouchEnemy = false;
+  for (const bomber of BOMBERS) {
+    if (bomber.name === myBomber.name) continue;
+    const path = findPathToTarget(bomber, false);
+    if (path && path.length > 1) {
+      canTouchEnemy = true;
+      break;
+    }
+  }
+  if (canTouchEnemy) {
+    writeLog('chuyen sang che do danh nhau')
+    ATTACK_MODE = true;
+    if (ATTACK_MODE_INTERVAL_ID) {
+      // clearInterval(ATTACK_MODE_INTERVAL_ID);
+      ATTACK_MODE_INTERVAL_ID = null;
+    }
+  } else {
+    writeLog('chuyen sang che do pha ruong')
+    ATTACK_MODE = false;
+  }
 
-//   writeLog('check careful mode');
-// }, 1000)
+  writeLog('check careful mode');
+}, 1000)
 
 function writeLog(...args) {
   console.log(...args)
