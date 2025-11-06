@@ -82,27 +82,22 @@ socket.on('map_update', (payload) => {
 });
 
 socket.on('user_die_update', (payload) => {
-  if (process.env.ENV != 'local') {
+  // if (process.env.ENV != 'local') {
     BOMBERS = BOMBERS.filter(b => b.name !== payload.killed.name)
     if (FROZEN_BOTS.map(b => b.name).includes(payload.killed.name)) {
       PRIORITY_CHESTS = []
       FROZEN_BOTS = FROZEN_BOTS.filter(b => b.name !== payload.killed.name)
     }
-  }
+  // }
 })
 
 socket.on('chest_destroyed', (payload) => {
-  if (PRIORITY_CHESTS.length > 0) {
-    PRIORITY_CHESTS = PRIORITY_CHESTS.filter(chest =>
-      !(chest.x === (payload.x / helpers.WALL_SIZE) && chest.y === (payload.y / helpers.WALL_SIZE))
-    );
-
-    setTimeout(() => {
-      if (PRIORITY_CHESTS.length <= 1) {
-        PRIORITY_CHESTS = []
-        FROZEN_BOTS.pop()
-      }
-    }, 10000)
+  for (let i = PRIORITY_CHESTS.length - 1; i >= 0; i--) {
+    const chest = PRIORITY_CHESTS[i];
+    if (chest.x === payload.x / helpers.WALL_SIZE &&
+        chest.y === payload.y / helpers.WALL_SIZE) {
+      PRIORITY_CHESTS.splice(i, 1);
+    }
   }
 
   if (FROZEN_BOTS.length > 0 && PRIORITY_CHESTS.length == 0) {
@@ -167,7 +162,7 @@ socket.on('connect', async () => {
     }
 
     if (didSomething) {
-      await sleep(15)
+      await sleep(10)
       continue;
     }
 
@@ -197,10 +192,15 @@ socket.on('connect', async () => {
     }
 
     if (ATTACK_MODE) {
+      let targetBot;
       //move to nearest bot and place boom
-      const nearestBot = BOMBERS.filter(b => b.name !== myBomber.name)
-        .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
-      const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, nearestBot, MAP)[0]
+      if (FROZEN_BOTS.length > 0)
+        targetBot = FROZEN_BOTS[0]
+      else
+        targetBot = BOMBERS.filter(b => b.name !== myBomber.name)
+          .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
+
+      const bestPos = helpers.findBombPositionsForEnemyArea(myBomber, targetBot, MAP)[0]
       if (!bestPos) {
         await sleep(10);
         continue;
@@ -412,6 +412,33 @@ function checkBomAvailables(myBomber) {
   const bomAvailable = ownedActiveBombs < myBomber.bombCount;
   return myBomber.speed == 1 ? (over20Sec ? bomAvailable : ownedActiveBombs == 0) : bomAvailable;
 }
+
+// Check frozen bots every 5s
+setInterval(() => {
+  const prevPositions = new Map();
+
+  // lưu vị trí hiện tại
+  for (const b of BOMBERS) {
+    if (!b) continue;
+    prevPositions.set(b.name, { x: b.x, y: b.y });
+  }
+
+  setTimeout(() => {
+    for (const b of BOMBERS) {
+      if (!b) continue;
+      const prev = prevPositions.get(b.name);
+      if (!prev) continue;
+
+      const notMoved = prev.x === b.x && prev.y === b.y;
+      const alreadyFrozen = FROZEN_BOTS.some(f => f.name === b.name);
+
+      if (notMoved && !alreadyFrozen) {
+        FROZEN_BOTS.push(b);
+        writeLog(`Bot ${b.name} bị đóng băng (không di chuyển 5s)`);
+      }
+    }
+  }, 5000);
+}, 5000);
 
 ATTACK_MODE_INTERVAL_ID = setInterval(() => {
   //check if we can touch any enemy then turn on attack mode

@@ -502,13 +502,6 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
     // Lọc các ô chest trên đường
     const chests = path.filter(({ x, y }) => map[y][x] === 'C').reverse();
 
-    if (chests.length > 0) {
-      const lastChest = chests[chests.length - 1];
-      chests.push({
-        x: Math.round((target.x + lastChest.x)/ 2),
-        y: Math.round((target.y + lastChest.y) / 2)
-      });
-    }
     results.push({
       id: bot.uid || bot.id,
       score: dist,
