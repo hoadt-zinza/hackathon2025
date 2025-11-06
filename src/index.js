@@ -218,7 +218,9 @@ socket.on('connect', async () => {
           move(step);
         }
       } else if (pathToBot && pathToBot.length <= 1) {
-        // placeBoom(myBomber);
+        const ownedActiveBombs = BOMBS.filter(b => b && b.uid === myBomber.uid).length;
+        if (myBomber.bombCount - ownedActiveBombs > 1)
+          placeBoom(myBomber);
       }
     }
 
