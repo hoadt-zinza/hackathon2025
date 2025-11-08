@@ -31,24 +31,28 @@ function isWalkable(map, x, y, isGrid = true, dangerArr = []) {
   if (!map || y < 0 || x < 0) return false;
 
   if (isGrid) {
-    // Grid coordinate check - simple tile lookup
+    // Grid coordinate check
     const v = map[y][x];
-    // Only walls ('W') are non-walkable
-    return v === null || v === 'B' || v === 'R' || v === 'S';
-  } else {
-    // Real coordinate check - check if bomber's bounding box overlaps with walls
-    // Position {x, y} is top-left corner of bomber (35x35 square)
-    const { bomberRight, bomberBottom } = getBomberBound({x, y})
+    // Check if tile is walkable
+    const isWalkableTile = v === null || v === 'B' || v === 'R' || v === 'S';
 
-    // Calculate which grid tiles the bomber overlaps
+    // If dangerArr is provided, also check if position is not in danger zone
+    if (dangerArr.length > 0 && isWalkableTile) {
+      console.log(`comehere`, y, x);
+      console.log(`dangerArr`, dangerArr);
+      return !dangerArr.some(zone => zone.x === x && zone.y === y);
+    }
+
+    return isWalkableTile;
+  } else {
+    // Real coordinate check - unchanged
+    const { bomberRight, bomberBottom } = getBomberBound({x, y});
     const gridRight = Math.floor((bomberRight - 0.5) / WALL_SIZE);
     const gridBottom = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
 
-    // Check all tiles that the bomber overlaps
     for (let gridY = Math.floor(y / WALL_SIZE); gridY <= gridBottom; gridY++) {
       for (let gridX = Math.floor(x / WALL_SIZE); gridX <= gridRight; gridX++) {
         const v = map[gridY][gridX];
-        // If any overlapping tile is a wall ('W'), position is not walkable
         if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
           return false;
         }
@@ -85,7 +89,7 @@ function getBomberBound(bomber) {
 }
 
 // A* Search (improved version of findPathToTarget)
-function findPathToTarget(myBomber, target, map, isGrid = true) {
+function findPathToTarget(myBomber, target, map, isGrid = true, dangerArr = []) {
   if (!myBomber || !target || !map) return null;
 
   const start = isGrid ? toGridCoord(myBomber) : { x: myBomber.x, y: myBomber.y };
@@ -132,7 +136,7 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
       const ny = current.y + dir.dy;
       const key = `${nx},${ny}`;
 
-      if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
+      if (!isWalkable(map, nx, ny, isGrid, dangerArr) && !(nx === goal.x && ny === goal.y)) continue;
       if (visited.has(key)) continue;
 
       const g = current.g + 1;
@@ -287,22 +291,6 @@ function getBombCrossZones(bomb, range = 2) {
     zones.push({ x: bomb.x, y: bomb.y + i }); // down
   }
   return zones;
-}
-
-// Check whether a grid point lies inside the bomb's cross area
-function isPointInBombCross(point, bomb, range = 2) {
-  if (!point || !bomb) return false;
-  const dx = Math.abs(point.x - bomb.x);
-  const dy = Math.abs(point.y - bomb.y);
-  // same column within range or same row within range
-  return (dx === 0 && dy <= range) || (dy === 0 && dx <= range);
-}
-
-// Convenience: check whether a bomber object (world coords) is inside the bomb cross
-function isBomberInBombCross(myBomber, bomb, range = 2) {
-  if (!myBomber || !bomb) return false;
-  const grid = toGridCoord(myBomber);
-  return isPointInBombCross(grid, bomb, range);
 }
 
 // path: array of REAL coordinates [{x, y}, ...]
@@ -764,8 +752,6 @@ export {
   BOMBER_SIZE,
   WALL_SIZE,
   getBombCrossZones,
-  isPointInBombCross,
-  isBomberInBombCross,
   toMapCoord,
   getMidPoint,
   getWalkableNeighbors,
