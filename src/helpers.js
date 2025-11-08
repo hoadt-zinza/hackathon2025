@@ -27,23 +27,13 @@ const MAP_SIZE = 16;
 const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
-function isWalkable(map, x, y, isGrid = true, dangerArr = []) {
+function isWalkable(map, x, y, isGrid = true) {
   if (!map || y < 0 || x < 0) return false;
 
   if (isGrid) {
     // Grid coordinate check
     const v = map[y][x];
-    // Check if tile is walkable
-    const isWalkableTile = v === null || v === 'B' || v === 'R' || v === 'S';
-
-    // If dangerArr is provided, also check if position is not in danger zone
-    if (dangerArr.length > 0 && isWalkableTile) {
-      console.log(`comehere`, y, x);
-      console.log(`dangerArr`, dangerArr);
-      return !dangerArr.some(zone => zone.x === x && zone.y === y);
-    }
-
-    return isWalkableTile;
+    return v === null || v === 'B' || v === 'R' || v === 'S';
   } else {
     // Real coordinate check - unchanged
     const { bomberRight, bomberBottom } = getBomberBound({x, y});
@@ -89,7 +79,7 @@ function getBomberBound(bomber) {
 }
 
 // A* Search (improved version of findPathToTarget)
-function findPathToTarget(myBomber, target, map, isGrid = true, dangerArr = []) {
+function findPathToTarget(myBomber, target, map, isGrid = true) {
   if (!myBomber || !target || !map) return null;
 
   const start = isGrid ? toGridCoord(myBomber) : { x: myBomber.x, y: myBomber.y };
@@ -136,7 +126,7 @@ function findPathToTarget(myBomber, target, map, isGrid = true, dangerArr = []) 
       const ny = current.y + dir.dy;
       const key = `${nx},${ny}`;
 
-      if (!isWalkable(map, nx, ny, isGrid, dangerArr) && !(nx === goal.x && ny === goal.y)) continue;
+      if (!isWalkable(map, nx, ny, isGrid) && !(nx === goal.x && ny === goal.y)) continue;
       if (visited.has(key)) continue;
 
       const g = current.g + 1;
