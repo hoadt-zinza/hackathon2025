@@ -27,8 +27,8 @@ const MAP_SIZE = 16;
 const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
-function isWalkable(map, x, y, isGrid = true) {
-  if (!map || y < 0 || x < 0) return;
+function isWalkable(map, x, y, isGrid = true, dangerArr = []) {
+  if (!map || y < 0 || x < 0) return false;
 
   if (isGrid) {
     // Grid coordinate check - simple tile lookup
@@ -515,21 +515,19 @@ function findChestBreakScoresToFrozen(myBomber, frozenBots, map) {
 function coveredTiles(bomber, MAP) {
   if (!bomber || !MAP) return []
 
-  const { x, y } = bomber;
-
   // Tọa độ pixel của khung bao quanh bomber
   const { bomberRight, bomberBottom } = getBomberBound(bomber)
 
   // Tính các chỉ số ô (tile) mà bomber đang chiếm
-  const tx0 = Math.floor(bomber.x / WALL_SIZE);
-  const ty0 = Math.floor(bomber.y  / WALL_SIZE);
-  const tx1 = Math.floor((bomberRight  - 0.5) / WALL_SIZE);
-  const ty1 = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
+  const tx0 = (bomber.x / WALL_SIZE) | 0;
+  const ty0 = (bomber.y / WALL_SIZE) | 0;
+  const tx1 = ((bomberRight - 0.5) / WALL_SIZE) | 0;
+  const ty1 = ((bomberBottom - 0.5) / WALL_SIZE) | 0;
 
   const tiles = [];
   for (let y = ty0; y <= ty1; y++) {
     for (let x = tx0; x <= tx1; x++) {
-      if (MAP[y][x] === 'W') continue; // bỏ qua tường
+      if (MAP[y]?.[x] === 'W') continue; // bỏ qua tường
       tiles.push({ x, y });
     }
   }
@@ -538,47 +536,42 @@ function coveredTiles(bomber, MAP) {
 }
 
 function findBombPositionsForEnemyArea(myBomber, enemy, map) {
-  const tiles = coveredTiles(enemy, map)
+  const tiles = coveredTiles(enemy, map);
   if (tiles.length === 0) return [];
 
-  const dirs = DIRS[0]
+  const resultsMap = new Map(); // key = x*1000 + y
 
-  const resultsSet = new Set();
+  const myPos = {
+    x: (myBomber.x / WALL_SIZE) | 0,
+    y: (myBomber.y / WALL_SIZE) | 0
+  };
+  const enemyPos = {
+    x: (enemy.x / WALL_SIZE) | 0,
+    y: (enemy.y / WALL_SIZE) | 0
+  };
 
-  // từ mỗi tile địch quét 4 hướng
   for (const tile of tiles) {
-    for (const {dx, dy} of dirs) {
+    for (const { dx, dy } of DIRS[0]) {
       for (let step = 1; step <= myBomber.explosionRange; step++) {
         const tx = tile.x + dx * step;
         const ty = tile.y + dy * step;
-        if (map[ty][tx] === 'W') break; // wall chặn vụ nổ -> dừng quét hướng này
-        resultsSet.add(`${tx},${ty}`);
+        if (map[ty][tx] === 'W') break;
+
+        const key = tx * 1000 + ty;
+        resultsMap.set(key, { x: tx, y: ty });
       }
     }
   }
 
-  // chuyển set -> array
-  const results = Array.from(resultsSet, k => {
-    const [x, y] = k.split(',').map(Number);
-    const pos = { x: x, y: y }
-    const h = manhattanDistance({
-      x: Math.floor(myBomber.x / WALL_SIZE),
-      y: Math.floor(myBomber.y / WALL_SIZE)
-    }, pos);
-    const enemyH = manhattanDistance({
-      x: Math.floor(enemy.x / WALL_SIZE),
-      y: Math.floor(enemy.y / WALL_SIZE)
-    }, pos);
-
-    return {
-      x: x,
-      y: y,
-      h: h,
-      enemyH: enemyH
-    };
-  });
-
-  return results.sort((a, b) => (a.h + a.enemyH) - (b.h + b.enemyH));
+  return Array.from(resultsMap.values())
+    .map((position) => ({
+      x: position.x,
+      y: position.y,
+      h: manhattanDistance(position, myPos),
+      enemyH: manhattanDistance(position, enemyPos),
+    }))
+    .filter(p => p.enemyH < 2)
+    .sort((a, b) => a.h - b.h);
 }
 
 function hasChestLeft(map) {
