@@ -145,7 +145,7 @@ socket.on('connect', async () => {
             const pathToMidPoint = findPathToTarget(middlePoint, false)
             if (pathToMidPoint && pathToMidPoint.length > 1) {
               if (helpers.isInDanger(pathToMidPoint[1], DANGER_ZONE, true)) {
-                writeLog('just wait')
+                // writeLog('just wait')
                 //just wait
               } else {
                 const step = nextStep(pathToMidPoint);
@@ -171,7 +171,6 @@ socket.on('connect', async () => {
     }
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-      writeLog('in danger')
       let safetyZone = null;
       const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)
       if (allSafetyZone) {
@@ -204,8 +203,6 @@ socket.on('connect', async () => {
         targetBot = BOMBERS.filter(b => b.name !== myBomber.name)
           .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
 
-      writeLog('targetBot', targetBot)
-      writeLog('FROZENBOT', FROZEN_BOTS)
       const allPos = helpers.findBombPositionsForEnemyArea(myBomber, targetBot, MAP);
       const bestPos = allPos[0]
       if (!bestPos) {
@@ -253,7 +250,6 @@ socket.on('connect', async () => {
         for (const place of allPlaces) {
           const mapCoordPlace = helpers.toMapCoord(place)
           if (BOMBS.some(b => b.x === mapCoordPlace.x && b.y === mapCoordPlace.y)) {
-            writeLog('oo nay co boom roi chay thoi')
             continue;
           }
 
@@ -308,7 +304,6 @@ const placeBoom = (myBomber = null) => {
   if (checkBomAvailables(myBomber)) {
     socket.emit('place_bomb', {})
     updateMapWhenPlaceBoom(myBomber)
-    writeLog(`Placed Boom at ${myBomber.x}, ${myBomber.y}`)
   }
 }
 
@@ -327,6 +322,33 @@ function removeDangerZonesForBomb(bombId) {
   const filtered = DANGER_ZONE.filter(z => z.bombId !== bombId);
   DANGER_ZONE.length = 0;
   DANGER_ZONE.push(...filtered);
+}
+
+function updateDangerZonesForBomb() {
+  // Clear all existing danger zones
+  DANGER_ZONE.length = 0;
+
+  // Rebuild danger zones from all active bombs
+  for (const bomb of BOMBS) {
+    if (!bomb || bomb.isExploded) continue;
+
+    // Find the bomber who placed this bomb to get explosionRange
+    const placingBomber = BOMBERS.find(b => b && b.uid === bomb.uid);
+    if (!placingBomber) continue;
+
+    // Calculate explodeAt time if not already set
+    const explodeAt = bomb.createdAt + bomb.lifeTime;
+
+    // Create danger zones for this bomb
+    const newZones = helpers.createDangerZonesForBomb(
+      { ...bomb, explodeAt },
+      placingBomber.explosionRange,
+      MAP,
+      []
+    );
+
+    DANGER_ZONE.push(...newZones);
+  }
 }
 
 function findReachableItem() {
@@ -436,7 +458,6 @@ setInterval(() => {
 
       if (notMoved && !alreadyFrozen) {
         FROZEN_BOTS.push(b);
-        writeLog(`Bot ${b.name} bị đóng băng (không di chuyển 5s)`);
       }
     }
   }, 5000);
@@ -465,13 +486,13 @@ ATTACK_MODE_INTERVAL_ID = setInterval(() => {
   }
 }, 1000)
 
-function writeLog(...args) {
-  console.log(...args)
+// function writeLog(...args) {
+//   console.log(...args)
 
-  const message = args.map(a =>
-    typeof a === 'object' ? JSON.stringify(a, null) : String(a)
-  ).join(' ');
+//   const message = args.map(a =>
+//     typeof a === 'object' ? JSON.stringify(a, null) : String(a)
+//   ).join(' ');
 
-  const log = `[${new Date().toISOString()}] ${message}\n`;
-  fs.appendFileSync(FILE_NAME, log);
-}
+//   const log = `[${new Date().toISOString()}] ${message}\n`;
+//   fs.appendFileSync(FILE_NAME, log);
+// }

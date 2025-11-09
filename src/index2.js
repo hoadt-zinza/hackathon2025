@@ -176,13 +176,7 @@ socket.on('connect', async () => {
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE, myBomber.speed > 1)) {
       writeLog('in danger')
-      let safetyZone = null;
-      const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)
-      if (allSafetyZone) {
-        writeLog('allSafetyZone', allSafetyZone)
-        safetyZone = allSafetyZone[0]
-      } else
-        safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+      const safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
 
       if (safetyZone) {
         const path = helpers.findPathToTarget(myBomber, helpers.toMapCoord(safetyZone), MAP, false);
