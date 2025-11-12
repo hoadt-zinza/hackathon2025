@@ -69,6 +69,16 @@ function toMapCoord(gridPos) {
   return { x: gridPos.x * WALL_SIZE, y: gridPos.y * WALL_SIZE };
 }
 
+function toMapCoordAdvance(myBomber, gridPos) {
+  const isBomberRight = myBomber.x > gridPos.x * WALL_SIZE
+  const isBomberDown = myBomber.y > gridPos.y * WALL_SIZE
+
+  return {
+    x: (gridPos.x * WALL_SIZE) + (isBomberRight ? 5 : 0),
+    y: (gridPos.y * WALL_SIZE) + (isBomberDown ? 5 : 0)
+  };
+}
+
 function getBomberBound(bomber) {
   const bomberRight = bomber.x + BOMBER_SIZE;
   const bomberBottom = bomber.y + BOMBER_SIZE;
@@ -283,24 +293,25 @@ function getBombCrossZones(bomb, range = 2) {
   return zones;
 }
 
-// path: array of REAL coordinates [{x, y}, ...]
+// path: array of grid coordinates [{x, y}, ...]
 function getMidPoint(path, bias = 1) {
   const a = path[path.length - 2];
   const b = path[path.length - 1];
+  const first = path[0]
 
   if (a.x === b.x) {
     // di chuyển theo trục Y
     const directionY = Math.sign(b.y - a.y);
     return {
-      x: a.x * WALL_SIZE,
-      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias,
+      x: a.x * WALL_SIZE + (first.x > a.x ? 5 : 0),
+      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias + (first.y > a.y ? 5 : 0),
     };
   } else {
     // di chuyển theo trục X
     const directionX = Math.sign(b.x - a.x);
     return {
-      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias,
-      y: a.y * WALL_SIZE,
+      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias + (first.x > a.x ? 5 : 0),
+      y: a.y * WALL_SIZE + (first.y >= a.y ? 5 : 0),
     };
   }
 }
@@ -342,7 +353,13 @@ function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = [], dangerZ
     if (chestsDestroyed === 0) continue; // Skip positions that don't destroy any chests
 
     // Check if there's a safe zone reachable from this position
-    const safeZoneFound = countSafeZonesAfterPlaceBoom(toMapCoord(position), myBomber.explosionRange, dangerZones, map, walkableNeighbors)
+    const safeZoneFound = countSafeZonesAfterPlaceBoom(
+      toMapCoord(position),
+      myBomber.explosionRange,
+      dangerZones,
+      map,
+      walkableNeighbors
+    )
 
     if (safeZoneFound) {
       results.push({
@@ -394,7 +411,7 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
 
   const dangerSet = new Set();
   const pushToSet = (p) => {
-    const key = `${Math.trunc(p.x)},${Math.trunc(p.y)}`;
+    const key = `${p.x},${p.y}`;
     dangerSet.add(key);
   };
   for (let i = 0; i < updatedDangerZone.length; i++) {
@@ -404,7 +421,7 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
   let safeCount = 0;
   for (const w of walkableNeighbors) {
     if (!w || typeof w.x !== 'number' || typeof w.y !== 'number') continue;
-    const key = `${Math.trunc(w.x)},${Math.trunc(w.y)}`;
+    const key = `${w.x},${w.y}`;
     if (!dangerSet.has(key)) safeCount++;
   }
 
@@ -758,6 +775,7 @@ export {
   WALL_SIZE,
   getBombCrossZones,
   toMapCoord,
+  toMapCoordAdvance,
   getMidPoint,
   getWalkableNeighbors,
   countSafeZonesAfterPlaceBoom,
