@@ -324,22 +324,37 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
   return destroyed;
 }
 
-function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = []) {
-  if (!myBomber || !map) return null;
-  const start = toGridCoord(myBomber);
-  const range = myBomber.explosionRange;
+// Find all possible bomb placement positions that destroy chests and have safe escape routes
+// Returns array of { x, y, score } sorted by score (chests destroyed)
+function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = [], dangerZones = []) {
+  if (!myBomber || !map) return [];
 
-  // Only consider reachable tiles from current position
-  if (!walkableNeighbors) walkableNeighbors = getWalkableNeighbors(map, { x: myBomber.x, y: myBomber.y });
-  if (walkableNeighbors.length === 0) return null;
+  const myGridPos = toGridCoord(myBomber);
+  const results = [];
 
-  return walkableNeighbors.map(p => {
-    return { x: p.x, y: p.y, score: countChestsDestroyedAt(map, p.x, p.y, range), dist: chebyshevDistance(p, start) };
-  }).sort((a, b) => {
-    return b.score - a.score; // higher score first
-  }).filter(w => {
-    return w.score != 0;
-  })
+  // Get all walkable neighbors if not provided
+  const neighbors = walkableNeighbors.length > 0 ? walkableNeighbors : getWalkableNeighbors(map, myGridPos);
+
+  for (const position of neighbors) {
+    // Count chests that would be destroyed at this position
+    const chestsDestroyed = countChestsDestroyedAt(map, position.x, position.y, myBomber.explosionRange || 2);
+
+    if (chestsDestroyed === 0) continue; // Skip positions that don't destroy any chests
+
+    // Check if there's a safe zone reachable from this position
+    const safeZoneFound = countSafeZonesAfterPlaceBoom(toMapCoord(position), myBomber.explosionRange, dangerZones, map, walkableNeighbors)
+
+    if (safeZoneFound) {
+      results.push({
+        x: position.x,
+        y: position.y,
+        score: chestsDestroyed
+      });
+    }
+  }
+
+  // Sort by score (chests destroyed) in descending order
+  return results.sort((a, b) => b.score - a.score);
 }
 
 // Find all walkable neighbors from a position using flood fill BFS.
@@ -755,4 +770,5 @@ export {
   hasChestLeft,
   bombPositionsForChest,
   isDeadCorner,
+  getBomberBound,
 };

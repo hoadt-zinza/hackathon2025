@@ -1,7 +1,7 @@
 export default {
-  x: 40,
+  x: 565,
   y: 40,
-  speed: 3,
+  speed: 1,
   type: 1,
   uid: '1sEo7KS7efpHtJViAAAB',
   orient: 'UP',
