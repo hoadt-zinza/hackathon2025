@@ -40,6 +40,7 @@ socket.on('finish', () => {
   socket.disconnect();
   socket.connect();
   socket.emit('join', {});
+  helpers.clearChestCountCache();
 })
 
 socket.on('new_enemy', (data) => {
@@ -89,10 +90,6 @@ socket.on('user_die_update', (payload) => {
   }
 })
 
-socket.on('chest_destroyed', (payload) => {
-  // Chest destroyed event handler
-})
-
 function blindCodeMode() {
   BOMBERS.push({ ...sampleBomber });
   MAP = sampleMap;
@@ -121,7 +118,7 @@ socket.on('connect', async () => {
   writeLog('Sent join event');
 
   while(!GAME_START) {
-    await sleep(10)
+    await sleep(1)
   }
 
   GAME_START_AT = Date.now();
@@ -141,7 +138,7 @@ socket.on('connect', async () => {
     let action = null; // { type: 'attack' | 'break_chest' | 'idle', path: [...], target: {...} }
 
     // ƯU TIÊN 1: Tấn công kẻ địch
-    if (checkBomAvailables(myBomber)) {
+    if (checkBomAvailables(myBomber) && Date.now() > GAME_START_AT + 30000) {
     // if (false) {
       // Tìm bot gần nhất có thể tấn công
       const enemies = BOMBERS.filter(b => b.name !== myBomber.name);
@@ -169,7 +166,8 @@ socket.on('connect', async () => {
         }
 
         // Kiểm tra tunnel trap
-        const tunnelTrapPositions = findTunnelTrapPositions(enemy, myBomber);
+        // const tunnelTrapPositions = findTunnelTrapPositions(enemy, myBomber);
+        const tunnelTrapPositions = null;
         if (tunnelTrapPositions && tunnelTrapPositions.length > 0) {
           writeLog('Found tunnel trap for enemy:', enemy.name, 'positions:', tunnelTrapPositions.length);
           // Tìm vị trí gần nhất để đặt bom
@@ -229,17 +227,62 @@ socket.on('connect', async () => {
         }
         if (!bestEnemyAction) {
           writeLog('No normal attack found');
+          const itemAction = findReachableItem();
+          if (itemAction) {
+            action = {
+              type: 'collect_item',
+              path: itemAction.path,
+              target: itemAction.item
+            };
+            writeLog("found item instead so move to item")
+          } else {
+            writeLog("no item found either")
+          }
         }
       }
 
+      // Kiểm tra item reachable và so sánh với khoảng cách tấn công
       if (bestEnemyAction) {
-        action = bestEnemyAction;
-        writeLog('Selected attack action:', bestEnemyAction.attackType);
+        const itemAction = findReachableItem();
+        if (itemAction) {
+          // Chuyển đổi path length sang grid cells nếu cần
+          let attackDistance = bestEnemyAction.path.length;
+          // Nếu path là map coord, cần ước tính khoảng cách grid
+          if (bestEnemyAction.attackType === 'normal') {
+            // Path là map coord, ước tính khoảng cách grid
+            const startGrid = helpers.toGridCoord(myBomber);
+            const targetGrid = helpers.toGridCoord(helpers.toMapCoord(bestEnemyAction.target));
+            attackDistance = helpers.manhattanDistance(startGrid, targetGrid);
+          }
+
+          const itemDistance = (itemAction.path.length / helpers.WALL_SIZE) | 0;
+          const distanceDiff = attackDistance - (itemDistance - 2);
+
+          writeLog('Comparing attack vs item. Attack distance:', attackDistance, 'Item distance:', itemDistance, 'Diff:', distanceDiff);
+
+          if (distanceDiff > 0) {
+            // Khoảng cách tấn công > khoảng cách nhặt item - 2, ưu tiên nhặt item
+            writeLog('Item is closer (attack > item - 2), prioritizing item collection');
+            action = {
+              type: 'collect_item',
+              path: itemAction.path,
+              target: itemAction.item
+            };
+          } else {
+            // Ưu tiên tấn công
+            action = bestEnemyAction;
+            writeLog('Selected attack action:', bestEnemyAction.attackType);
+          }
+        } else {
+          // Không có item reachable, ưu tiên tấn công
+          action = bestEnemyAction;
+          writeLog('Selected attack action:', bestEnemyAction.attackType);
+        }
       } else {
         writeLog('No attack action available');
       }
     } else {
-      // writeLog('Bomb not available, skipping attack');
+      writeLog('Bomb not available or less than 30s, skipping attack');
     }
 
     // ƯU TIÊN 2: Phá rương hoặc nhặt item (nếu không có hành động tấn công)
@@ -294,7 +337,7 @@ socket.on('connect', async () => {
         // Nếu vị trí đặt bom rất gần (đã ở đó hoặc chỉ cần 1-2 bước)
         // và không ảnh hưởng đến việc nhặt item, ưu tiên đặt bom trước
         const bombPathLength = bestChestAction.path.length;
-        const itemPathLength = bestItemAction.path.length;
+        const itemPathLength = bestItemAction.path.length / helpers.WALL_SIZE | 0;
         const wouldBlock = wouldBombBlockItem(
           bestChestAction.target,
           bestItemAction.target,
@@ -406,9 +449,12 @@ socket.on('connect', async () => {
           writeLog('No step calculated from path');
         }
       } else {
-        writeLog('Cannot move safely, staying in place. Danger level:', dangerLevel.dangerLevel);
+        writeLog('Cannot move safely to target, attempting to escape to safety zone. Danger level:', dangerLevel.dangerLevel);
+        // Thay vì đứng im, tìm và chạy đến safety zone
+        if (!moveToSafetyZone(myBomber)) {
+          writeLog('Unable to find safety zone, chet ncmr');
+        }
       }
-      // Nếu không thể di chuyển an toàn, bot sẽ dừng lại (không làm gì)
     } else {
       // Không có hành động nào, kiểm tra nếu đang trong nguy hiểm
       writeLog('No action available');
@@ -454,26 +500,26 @@ const placeBoom = (myBomber = null) => {
     updateMapWhenPlaceBoom(myBomber)
 
     //blindcodemode
-  //   const bomID = `random-${Date.now()}`
-  //   const { x: bomx, y: bomy } = myBomber
+    // const bomID = `random-${Date.now()}`
+    // const { x: bomx, y: bomy } = myBomber
 
-  //   const blindBomb = {
-  //     id: bomID,
-  //     x: bomx,
-  //     y: bomy,
-  //     uid: myBomber.uid,
-  //   }
-  //   helpers.upsertItem(BOMBS, blindBomb, 'id')
-  //   addDangerZonesForBomb(blindBomb)
-  //   setTimeout(() => {
-  //     writeLog('BOMB EXPLODE', );
-  //     removeDangerZonesForBomb(bomID);
-  //     BOMBS = BOMBS.filter(b => b.id !== bomID);
-  //     MAP[Math.round(bomy / helpers.WALL_SIZE)][Math.round(bomx / helpers.WALL_SIZE)] = null;
-  //     CHESTS.filter(x => x.isDestroyed).map(c => {
-  //       MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
-  //     })
-  //   }, 5000)
+    // const blindBomb = {
+    //   id: bomID,
+    //   x: bomx,
+    //   y: bomy,
+    //   uid: myBomber.uid,
+    // }
+    // helpers.upsertItem(BOMBS, blindBomb, 'id')
+    // addDangerZonesForBomb(blindBomb)
+    // setTimeout(() => {
+    //   writeLog('BOMB EXPLODE', );
+    //   removeDangerZonesForBomb(bomID);
+    //   BOMBS = BOMBS.filter(b => b.id !== bomID);
+    //   MAP[Math.round(bomy / helpers.WALL_SIZE)][Math.round(bomx / helpers.WALL_SIZE)] = null;
+    //   CHESTS.filter(x => x.isDestroyed).map(c => {
+    //     MAP[c.y / helpers.WALL_SIZE][c.x / helpers.WALL_SIZE] = null
+    //   })
+    // }, 5000)
   } else {
     writeLog('Bomb not available, skipping place bomb');
   }
@@ -791,10 +837,10 @@ function evaluateDangerLevel(position, myBomber, dangerZones) {
   let dangerLevel = 0;
   if (minTimeUntilExplosion < 1000) {
     dangerLevel = 10; // Rất nguy hiểm, sẽ nổ trong 1 giây
-    canMove = true
-  } else if (minTimeUntilExplosion < 2000) {
+    canMove = false
+  } else if (minTimeUntilExplosion < 1500) {
     dangerLevel = 7; // Nguy hiểm
-    canMove = true
+    canMove = false
   } else if (minTimeUntilExplosion < 3000) {
     dangerLevel = 4; // Hơi nguy hiểm
     canMove = true

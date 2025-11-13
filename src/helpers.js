@@ -27,6 +27,11 @@ const MAP_SIZE = 16;
 const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
+// Cache for positions that will never destroy any chests (count = 0)
+// Key: `${x},${y},${range}` - positions that have been checked and found to destroy 0 chests
+// Using Set for O(1) lookup performance
+const zeroChestCache = new Set();
+
 function isWalkable(map, x, y, isGrid = true) {
   if (!map || y < 0 || x < 0) return false;
 
@@ -37,8 +42,8 @@ function isWalkable(map, x, y, isGrid = true) {
   } else {
     // Real coordinate check - unchanged
     const { bomberRight, bomberBottom } = getBomberBound({x, y});
-    const gridRight = Math.floor((bomberRight - 0.5) / WALL_SIZE);
-    const gridBottom = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
+    const gridRight = (bomberRight - 0.5) / WALL_SIZE | 0;
+    const gridBottom = (bomberBottom - 0.5) / WALL_SIZE | 0;
 
     for (let gridY = Math.floor(y / WALL_SIZE); gridY <= gridBottom; gridY++) {
       for (let gridX = Math.floor(x / WALL_SIZE); gridX <= gridRight; gridX++) {
@@ -226,7 +231,7 @@ function isInDanger(myBomber, DANGER_ZONE, checkTime = false) {
 function findNearestSafetyZone(myBomber, map, dangerArr) {
   const currentGridPos = toGridCoord(myBomber);
 
-  if (dangerArr.length === 0) return { x: myBomber.x, y: myBomber.y };
+  if (dangerArr.length === 0) return currentGridPos;
 
   const dangerSet = new Set(dangerArr.map(z => `${z.x},${z.y}`));
   const openSet = new MinHeap((a, b) => a.f - b.f); // hàng đợi ưu tiên theo f = g + h
@@ -273,7 +278,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
     }
   }
 
-  return { x: myBomber.x, y: myBomber.y }; // không tìm được safe zone reachable
+  return null;
 }
 
 // Return array of grid coords that form the cross-shaped danger area for a bomb.
@@ -319,7 +324,16 @@ function getMidPoint(path, bias = 1) {
 // Count how many chests would be destroyed by a bomb placed at grid (x,y)
 // Explosion travels in 4 directions up to `range`, stops at walls ('W') and also
 // stops after destroying a chest ('C'). Walkable tiles are null | 'B' | 'R' | 'S'.
+// Uses Set cache to optimize repeated calls. If position is in cache, it will never destroy any chests.
 function countChestsDestroyedAt(map, x, y, range = 2) {
+  const cacheKey = `${x},${y},${range}`;
+
+  // Check cache first - if key exists, this position will never destroy any chests
+  // (chests can only be destroyed, never created)
+  if (zeroChestCache.has(cacheKey)) {
+    return 0;
+  }
+
   let destroyed = 0;
   for (const dir of DIRS[0]) {
     for (let step = 1; step <= range; step++) {
@@ -332,30 +346,54 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
     }
   }
 
+  // Cache the result if count is 0
+  // If result is 0, it will never increase (chests can only be destroyed)
+  if (destroyed === 0) {
+    zeroChestCache.add(cacheKey);
+  }
+
   return destroyed;
+}
+
+// Clear the chest count cache
+// Only needed when the entire map is reset (e.g., new game, blindCodeMode)
+// Note: We don't need to invalidate cache when individual chests are destroyed because:
+// - If a position had count = 0 (can't destroy any chests), it will still be 0 after chest destruction
+// - Chests can only be destroyed, never created, so count can only decrease or stay the same
+function clearChestCountCache() {
+  zeroChestCache.clear();
 }
 
 // Find all possible bomb placement positions that destroy chests and have safe escape routes
 // Returns array of { x, y, score } sorted by score (chests destroyed)
+// Optimized with cache to skip positions that will never destroy chests
 function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = [], dangerZones = []) {
   if (!myBomber || !map) return [];
 
   const myGridPos = toGridCoord(myBomber);
   const results = [];
+  const explosionRange = myBomber.explosionRange || 2;
 
   // Get all walkable neighbors if not provided
   const neighbors = walkableNeighbors.length > 0 ? walkableNeighbors : getWalkableNeighbors(map, myGridPos);
 
   for (const position of neighbors) {
+    const cacheKey = `${position.x},${position.y},${explosionRange}`;
+
+    // Check cache first - if key exists in Set, skip immediately (count = 0)
+    if (zeroChestCache.has(cacheKey)) {
+      continue; // This position will never destroy any chests
+    }
+
     // Count chests that would be destroyed at this position
-    const chestsDestroyed = countChestsDestroyedAt(map, position.x, position.y, myBomber.explosionRange || 2);
+    const chestsDestroyed = countChestsDestroyedAt(map, position.x, position.y, explosionRange);
 
     if (chestsDestroyed === 0) continue; // Skip positions that don't destroy any chests
 
     // Check if there's a safe zone reachable from this position
     const safeZoneFound = countSafeZonesAfterPlaceBoom(
       toMapCoord(position),
-      myBomber.explosionRange,
+      explosionRange,
       dangerZones,
       map,
       walkableNeighbors
@@ -645,10 +683,9 @@ function isDeadCorner(position, map, isGrid = false) {
  * @param {Object} startPos - Starting position {x, y} in grid coordinates
  * @param {Array<Array>} map - The game map
  * @param {Array<Object>} dangerZones - Array of dangerous positions to avoid
- * @param {number} maxDistance - Maximum distance to search (default: 10)
  * @returns {Object|null} - Nearest safe zone {x, y, distance, walkableNeighbors} or null if none found
  */
-function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
+function findAllSafeZones(startPos, map, dangerZones = []) {
   if (!startPos || !map) return null;
 
   // Create a Set for O(1) danger zone lookups
@@ -721,11 +758,6 @@ function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
       }
     }
 
-    // Stop if we've reached max distance
-    if (current.distance >= maxDistance) {
-      continue;
-    }
-
     // Check all 4 directions
     for (const dir of DIRS[0]) {
       const nx = current.x + dir.dx;
@@ -781,6 +813,7 @@ export {
   countSafeZonesAfterPlaceBoom,
   countChestsDestroyedAt,
   findAllPossiblePlaceBoom,
+  clearChestCountCache,
   markOwnBombOnMap,
   findChestBreakScoresToFrozen,
   coveredTiles,
