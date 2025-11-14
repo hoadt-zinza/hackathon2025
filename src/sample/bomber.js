@@ -1,5 +1,5 @@
 export default {
-  x: 565,
+  x: 40,
   y: 565,
   speed: 1,
   type: 1,

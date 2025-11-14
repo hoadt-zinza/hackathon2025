@@ -15,6 +15,7 @@ let BOMBS=[]
 let CHESTS=[]
 let ITEMS=[]
 let GAME_START = false
+let explosionRange = 2
 let FROZEN_BOTS = []
 let PRIORITY_CHESTS = []
 const DANGER_ZONE = []
@@ -23,6 +24,7 @@ let KILL_BOOM = new Set();
 let ATTACK_MODE = false
 let ATTACK_MODE_INTERVAL_ID = null;
 const FILE_NAME='log2.txt'
+const chestMap = new Map();
 
 socket.on('user', (data) => {
   MAP = data.map;
@@ -30,6 +32,7 @@ socket.on('user', (data) => {
   BOMBS = data.bombs;
   CHESTS = data.chests;
   ITEMS = data.items;
+  updateChestMap()
   if (process.env.ENV == 'local')
     GAME_START = true
 });
@@ -65,6 +68,10 @@ socket.on('new_bomb', (payload) => {
 
 socket.on('item_collected', (payload) => {
   ITEMS = ITEMS.filter(i => !(i && i.x === payload.item.x && i.y === payload.item.y));
+  if (payload.item.type === 'R') {
+    explosionRange += 1
+  }
+  updateChestMap(explosionRange)
 });
 
 socket.on('bomb_explode', (payload) => {
@@ -83,6 +90,7 @@ socket.on('bomb_explode', (payload) => {
 
 socket.on('map_update', (payload) => {
   ITEMS = payload.items;
+  updateChestMap(explosionRange)
 });
 
 socket.on('user_die_update', (payload) => {
@@ -244,7 +252,7 @@ socket.on('connect', async () => {
       if (PRIORITY_CHESTS.length > 0)
         allPlaces = helpers.bombPositionsForChest(myBomber, PRIORITY_CHESTS[0], MAP, walkableNeighbors)
       else
-        allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, walkableNeighbors)
+        allPlaces = helpers.findAllPossiblePlaceBoom(myBomber, MAP, chestMap, walkableNeighbors, DANGER_ZONE);
 
       if (allPlaces && allPlaces.length > 0) {
         for (const place of allPlaces) {
@@ -485,3 +493,16 @@ ATTACK_MODE_INTERVAL_ID = setInterval(() => {
     ATTACK_MODE = false;
   }
 }, 1000)
+
+function updateChestMap(explosionRange = 2) {
+  for (let r = 0; r < 16; r++) {
+    for (let c = 0; c < 16; c++) {
+      const key = `${c},${r}`;
+      if (MAP[r][c] === 'W' || MAP[r][c] === 'C') {
+        continue;
+      } else {
+        chestMap.set(key, helpers.countChestsDestroyedAt(MAP, c, r, explosionRange));
+      }
+    }
+  }
+}

@@ -27,11 +27,6 @@ const MAP_SIZE = 16;
 const BOMBER_SIZE = 35;
 const WALL_SIZE = 40;
 
-// Cache for positions that will never destroy any chests (count = 0)
-// Key: `${x},${y},${range}` - positions that have been checked and found to destroy 0 chests
-// Using Set for O(1) lookup performance
-const zeroChestCache = new Set();
-
 function isWalkable(map, x, y, isGrid = true) {
   if (!map || y < 0 || x < 0) return false;
 
@@ -68,6 +63,14 @@ function chebyshevDistance(a, b) {
 
 function toGridCoord(pos) {
   return { x: Math.round(pos.x / WALL_SIZE), y: Math.round(pos.y / WALL_SIZE) };
+}
+
+function toGridCoordFloor(pos) {
+  return { x: pos.x / WALL_SIZE | 0, y: pos.y / WALL_SIZE | 0 };
+}
+
+function toGridCoordSafe(pos) {
+  return { x: pos.x / WALL_SIZE, y: pos.y / WALL_SIZE }
 }
 
 function toMapCoord(gridPos) {
@@ -299,7 +302,7 @@ function getBombCrossZones(bomb, range = 2) {
 }
 
 // path: array of grid coordinates [{x, y}, ...]
-function getMidPoint(path, bias = 1) {
+function getMidPoint(path, bias = 1, type = 'break_chest') {
   const a = path[path.length - 2];
   const b = path[path.length - 1];
   const first = path[0]
@@ -308,15 +311,15 @@ function getMidPoint(path, bias = 1) {
     // di chuyển theo trục Y
     const directionY = Math.sign(b.y - a.y);
     return {
-      x: a.x * WALL_SIZE + (first.x > a.x ? 5 : 0),
-      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias + (first.y > a.y ? 5 : 0),
+      x: a.x * WALL_SIZE + (first.x > a.x && type != 'break_chest' ? 5 : 0),
+      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias + (first.y >= a.y && type != 'break_chest' ? 5 : 0),
     };
   } else {
     // di chuyển theo trục X
     const directionX = Math.sign(b.x - a.x);
     return {
-      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias + (first.x > a.x ? 5 : 0),
-      y: a.y * WALL_SIZE + (first.y >= a.y ? 5 : 0),
+      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias + (first.x > a.x && type != 'break_chest' ? 5 : 0),
+      y: a.y * WALL_SIZE + (first.y >= a.y && type != 'break_chest' ? 5 : 0),
     };
   }
 }
@@ -326,19 +329,14 @@ function getMidPoint(path, bias = 1) {
 // stops after destroying a chest ('C'). Walkable tiles are null | 'B' | 'R' | 'S'.
 // Uses Set cache to optimize repeated calls. If position is in cache, it will never destroy any chests.
 function countChestsDestroyedAt(map, x, y, range = 2) {
-  const cacheKey = `${x},${y},${range}`;
-
-  // Check cache first - if key exists, this position will never destroy any chests
-  // (chests can only be destroyed, never created)
-  if (zeroChestCache.has(cacheKey)) {
-    return 0;
-  }
-
   let destroyed = 0;
   for (const dir of DIRS[0]) {
     for (let step = 1; step <= range; step++) {
       const nx = x + dir.dx * step;
       const ny = y + dir.dy * step;
+      if (ny == 0) {
+        console.log(map[ny])
+      }
       const tile = map[ny][nx];
       if (tile === 'W') break; // blocked by wall
       if (tile === 'C') { destroyed += 1; break; } // destroy chest and stop
@@ -346,47 +344,21 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
     }
   }
 
-  // Cache the result if count is 0
-  // If result is 0, it will never increase (chests can only be destroyed)
-  if (destroyed === 0) {
-    zeroChestCache.add(cacheKey);
-  }
-
   return destroyed;
-}
-
-// Clear the chest count cache
-// Only needed when the entire map is reset (e.g., new game, blindCodeMode)
-// Note: We don't need to invalidate cache when individual chests are destroyed because:
-// - If a position had count = 0 (can't destroy any chests), it will still be 0 after chest destruction
-// - Chests can only be destroyed, never created, so count can only decrease or stay the same
-function clearChestCountCache() {
-  zeroChestCache.clear();
 }
 
 // Find all possible bomb placement positions that destroy chests and have safe escape routes
 // Returns array of { x, y, score } sorted by score (chests destroyed)
 // Optimized with cache to skip positions that will never destroy chests
-function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = [], dangerZones = []) {
+function findAllPossiblePlaceBoom(myBomber, map, chestMap, walkableNeighbors = [], dangerZones = [], ) {
   if (!myBomber || !map) return [];
 
-  const myGridPos = toGridCoord(myBomber);
   const results = [];
   const explosionRange = myBomber.explosionRange || 2;
 
-  // Get all walkable neighbors if not provided
-  const neighbors = walkableNeighbors.length > 0 ? walkableNeighbors : getWalkableNeighbors(map, myGridPos);
-
-  for (const position of neighbors) {
-    const cacheKey = `${position.x},${position.y},${explosionRange}`;
-
-    // Check cache first - if key exists in Set, skip immediately (count = 0)
-    if (zeroChestCache.has(cacheKey)) {
-      continue; // This position will never destroy any chests
-    }
-
+  for (const position of walkableNeighbors) {
     // Count chests that would be destroyed at this position
-    const chestsDestroyed = countChestsDestroyedAt(map, position.x, position.y, explosionRange);
+    const chestsDestroyed = chestMap.get(`${position.x},${position.y}`)
 
     if (chestsDestroyed === 0) continue; // Skip positions that don't destroy any chests
 
@@ -598,9 +570,12 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
     y: (enemy.y / WALL_SIZE) | 0
   };
 
+  const explosionRange = myBomber.explosionRange || 2;
+
+  // Tìm tất cả vị trí có thể đặt bom để reach enemy (trong phạm vi explosion range)
   for (const tile of tiles) {
     for (const { dx, dy } of DIRS[0]) {
-      for (let step = 1; step <= myBomber.explosionRange; step++) {
+      for (let step = 1; step <= explosionRange; step++) {
         const tx = tile.x + dx * step;
         const ty = tile.y + dy * step;
         if (map[ty][tx] === 'W') break;
@@ -611,15 +586,34 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
     }
   }
 
-  return Array.from(resultsMap.values())
+  const positions = Array.from(resultsMap.values())
     .map((position) => ({
       x: position.x,
       y: position.y,
-      h: manhattanDistance(position, myPos),
-      enemyH: manhattanDistance(position, enemyPos),
+      h: manhattanDistance(position, myPos), // Khoảng cách từ myBomber đến vị trí đặt bom
+      enemyH: manhattanDistance(position, enemyPos), // Khoảng cách từ enemy đến vị trí đặt bom
     }))
-    .filter(p => p.enemyH < 2)
-    .sort((a, b) => a.h - b.h);
+    .filter(p => p.enemyH <= explosionRange); // Chỉ lấy vị trí có thể reach enemy
+
+  // Ưu tiên vị trí xa enemy hơn (giữ khoảng cách) nhưng vẫn trong phạm vi
+  // Sort: 1) Xa enemy hơn (enemyH lớn hơn), 2) Gần myBomber hơn (h nhỏ hơn)
+  return positions.sort((a, b) => {
+    // Ưu tiên vị trí cách enemy ít nhất 2 grid cells
+    const aIsSafe = a.enemyH >= 2;
+    const bIsSafe = b.enemyH >= 2;
+
+    if (aIsSafe !== bIsSafe) {
+      return bIsSafe - aIsSafe; // Vị trí an toàn (>= 2) trước
+    }
+
+    // Nếu cả 2 đều an toàn hoặc cả 2 đều không an toàn, ưu tiên xa enemy hơn
+    if (b.enemyH !== a.enemyH) {
+      return b.enemyH - a.enemyH; // Xa enemy trước
+    }
+
+    // Nếu cùng khoảng cách với enemy, chọn gần myBomber hơn
+    return a.h - b.h;
+  });
 }
 
 function hasChestLeft(map) {
@@ -796,6 +790,8 @@ export {
   chebyshevDistance,
   findAllSafeZones,
   toGridCoord,
+  toGridCoordSafe,
+  toGridCoordFloor,
   findPathToTarget,
   createDangerZonesForBomb,
   removeDangerZonesForBomb,
@@ -813,7 +809,6 @@ export {
   countSafeZonesAfterPlaceBoom,
   countChestsDestroyedAt,
   findAllPossiblePlaceBoom,
-  clearChestCountCache,
   markOwnBombOnMap,
   findChestBreakScoresToFrozen,
   coveredTiles,
