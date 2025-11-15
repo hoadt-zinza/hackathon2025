@@ -24,14 +24,3 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-for(let x = 0; x < 1000; x++) {
-  const timeStartLoop = Date.now()
-
-  for (let y = 0; y < 10000; y++) {
-    helpers.createDangerZonesForBomb({x : 40, y: 40}, 5, sampleMap)
-  }
-
-  console.log(`--------${timeStartLoop}-------------`, )
-
-  await sleep(20 - (Date.now() - timeStartLoop));
-}

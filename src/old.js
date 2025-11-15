@@ -138,7 +138,7 @@ socket.on('connect', async () => {
 
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME2);
-    helpers.markOwnBombOnMap(myBomber, BOMBS, MAP, GAME_START_AT)
+    helpers.markOwnBombOnMap(myBomber, BOMBS, MAP, Date.now () - GAME_START_AT > 60000)
 
     let didSomething = false
     if (checkBomAvailables(myBomber)) {
@@ -180,11 +180,7 @@ socket.on('connect', async () => {
 
     if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
       let safetyZone = null;
-      const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE)
-      if (allSafetyZone) {
-        safetyZone = allSafetyZone[0]
-      } else
-        safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
+      safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
 
       if (safetyZone) {
         const path = helpers.findPathToTarget(myBomber, helpers.toMapCoord(safetyZone), MAP, false);

@@ -40,8 +40,8 @@ function isWalkable(map, x, y, isGrid = true) {
     const gridRight = (bomberRight - 0.5) / WALL_SIZE | 0;
     const gridBottom = (bomberBottom - 0.5) / WALL_SIZE | 0;
 
-    for (let gridY = Math.floor(y / WALL_SIZE); gridY <= gridBottom; gridY++) {
-      for (let gridX = Math.floor(x / WALL_SIZE); gridX <= gridRight; gridX++) {
+    for (let gridY = y / WALL_SIZE | 0; gridY <= gridBottom; gridY++) {
+      for (let gridX = x / WALL_SIZE | 0; gridX <= gridRight; gridX++) {
         const v = map[gridY][gridX];
         if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
           return false;
@@ -78,13 +78,17 @@ function toMapCoord(gridPos) {
 }
 
 function toMapCoordAdvance(myBomber, gridPos) {
-  const isBomberRight = myBomber.x > gridPos.x * WALL_SIZE
-  const isBomberDown = myBomber.y > gridPos.y * WALL_SIZE
+  if (myBomber.speed == 3) {
+    return toMapCoord(gridPos)
+  } else {
+    const isBomberRight = myBomber.x > gridPos.x * WALL_SIZE
+    const isBomberDown = myBomber.y > gridPos.y * WALL_SIZE
 
-  return {
-    x: (gridPos.x * WALL_SIZE) + (isBomberRight ? 5 : 0),
-    y: (gridPos.y * WALL_SIZE) + (isBomberDown ? 5 : 0)
-  };
+    return {
+      x: (gridPos.x * WALL_SIZE) + (isBomberRight ? 5 : 0),
+      y: (gridPos.y * WALL_SIZE) + (isBomberDown ? 5 : 0)
+    };
+  }
 }
 
 function getBomberBound(bomber) {
@@ -174,7 +178,7 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 function createDangerZonesForBomb(bomb, explosionRange, map, dangerZones) {
   if (!bomb) return [];
 
-  const { x, y } = toGridCoord(bomb);
+  const { x, y } = toGridCoordFloor(bomb);
   const now = Date.now();
 
   const existingZone = dangerZones && dangerZones.find(z => z.x === x && z.y === y && z.explodeAt > now);
@@ -334,9 +338,6 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
     for (let step = 1; step <= range; step++) {
       const nx = x + dir.dx * step;
       const ny = y + dir.dy * step;
-      if (ny == 0) {
-        console.log(map[ny])
-      }
       const tile = map[ny][nx];
       if (tile === 'W') break; // blocked by wall
       if (tile === 'C') { destroyed += 1; break; } // destroy chest and stop
@@ -438,13 +439,13 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
   return safeCount;
 }
 
-function markOwnBombOnMap(myBomber, bombs, map, gameStartAt) {
+function markOwnBombOnMap(myBomber, bombs, map, connectedMap = false) {
   if (!myBomber || !bombs || !map) return;
 
   for (const bomb of bombs) {
-    if (bomb.ownerName !== myBomber.name && Date.now() - gameStartAt < 60) continue;
+    if (bomb.ownerName !== myBomber.name && !connectedMap) continue;
 
-    const gridCoord = toGridCoord(bomb)
+    const gridCoord = toGridCoordFloor(bomb)
     if (map[gridCoord.y][gridCoord.x] == 'W') continue;
 
     const { bomberRight, bomberBottom } = getBomberBound(myBomber)
@@ -555,22 +556,22 @@ function coveredTiles(bomber, MAP) {
   return tiles;
 }
 
-function findBombPositionsForEnemyArea(myBomber, enemy, map) {
+function findBombPositionsForEnemyArea(myBomber, enemy, map, booms = [], bombs = []) {
   const tiles = coveredTiles(enemy, map);
   if (tiles.length === 0) return [];
 
   const resultsMap = new Map(); // key = x*1000 + y
 
-  const myPos = {
-    x: (myBomber.x / WALL_SIZE) | 0,
-    y: (myBomber.y / WALL_SIZE) | 0
-  };
-  const enemyPos = {
-    x: (enemy.x / WALL_SIZE) | 0,
-    y: (enemy.y / WALL_SIZE) | 0
-  };
+  const myPos = toGridCoordFloor(myBomber);
+  const enemyPos = toGridCoordFloor(enemy);
 
   const explosionRange = myBomber.explosionRange || 2;
+
+  // build set of existing bombs (grid coords) to exclude positions that already have a bomb
+  const bombSet = new Set((bombs || []).map(b => {
+    const g = toGridCoordFloor(b);
+    return `${g.x},${g.y}`;
+  }));
 
   // Tìm tất cả vị trí có thể đặt bom để reach enemy (trong phạm vi explosion range)
   for (const tile of tiles) {
@@ -579,6 +580,8 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map) {
         const tx = tile.x + dx * step;
         const ty = tile.y + dy * step;
         if (map[ty][tx] === 'W') break;
+        // skip if there's already a bomb at that grid cell
+        if (bombSet.has(`${tx},${ty}`)) continue;
 
         const key = tx * 1000 + ty;
         resultsMap.set(key, { x: tx, y: ty });
