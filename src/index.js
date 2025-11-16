@@ -41,6 +41,9 @@ socket.on('start', () => {
 })
 
 socket.on('finish', () => {
+  // Reset connection-related state on finish before reconnecting
+  connectedMap = false;
+  CONNECTED_AT = 0;
   socket.disconnect();
   socket.connect();
   socket.emit('join', {});
@@ -145,6 +148,9 @@ function blindCodeMode() {
 }
 
 socket.on('connect', async () => {
+  // Reset connection-related state on (re)connect so timing restarts
+  connectedMap = false;
+  CONNECTED_AT = 0;
   socket.emit('join', {});
   // blindCodeMode()
   fs.writeFileSync(FILE_NAME, '');
