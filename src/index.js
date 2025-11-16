@@ -64,27 +64,27 @@ socket.on('player_move', (payload) => {
 });
 
 socket.on('new_bomb', (payload) => {
+  payload = {...payload, createdAt: Date.now()}
   helpers.upsertItem(BOMBS, payload, 'id');
   addDangerZonesForBomb(payload);
   markBombOnMap();
 });
 
 socket.on('user_disconnect', (payload) => {
-  writeLog(' A player left ')
   BOMBERS = payload.bombers
 })
 
 socket.on('item_collected', (payload) => {
   ITEMS = ITEMS.filter(i => !(i && i.x === payload.item.x && i.y === payload.item.y));
   if (payload.item.type === 'R' && payload.bomber && payload.bomber.name === process.env.BOMBER_NAME) {
-    writeLog("Update chest map")
+    // writeLog("Update chest map")
     globalExplosionRange += 1
     updateChestMap(globalExplosionRange)
   }
 });
 
 socket.on('bomb_explode', (payload) => {
-  writeLog('bomb explode', payload)
+  // writeLog('bomb explode', payload)
   for (const area of payload.explosionArea) {
     if (MAP[area.y / helpers.WALL_SIZE][area.x / helpers.WALL_SIZE] == null) continue;
 
@@ -92,7 +92,6 @@ socket.on('bomb_explode', (payload) => {
   }
 
   BOMBS = BOMBS.filter(b => b.id !== payload.id);
-  writeLog(`bombs`, BOMBS);
   removeDangerZonesForBomb(payload.id);
   DANGER_ZONE.length = 0
   for (const bomb of BOMBS) {
@@ -102,12 +101,9 @@ socket.on('bomb_explode', (payload) => {
       MAP,
     ))
   }
-
-  writeLog('dangerzone', DANGER_ZONE)
 });
 
 socket.on('map_update', (payload) => {
-  writeLog('map update')
   ITEMS = payload.items;
   for (let i = 0; i < ITEMS.length; i++) {
     const gridCoord = helpers.toGridCoordFloor(ITEMS[i])
@@ -123,7 +119,7 @@ socket.on('map_update', (payload) => {
 
 socket.on('user_die_update', (payload) => {
   if (payload.killed.name == process.env.BOMBER_NAME) {
-    writeLog('user_die_update', payload)
+    // writeLog('user_die_update', payload)
   }
   if (process.env.ENV != 'local') {
     BOMBERS = BOMBERS.filter(b => b.name !== payload.killed.name)
@@ -151,11 +147,11 @@ function blindCodeMode() {
 }
 
 socket.on('connect', async () => {
-  writeLog('Connected to server');
+  // writeLog('Connected to server');
   socket.emit('join', {});
   // blindCodeMode()
   fs.writeFileSync(FILE_NAME, '');
-  writeLog('Sent join event');
+  // writeLog('Sent join event');
 
   while(!GAME_START) {
     await sleep(1)
@@ -164,8 +160,8 @@ socket.on('connect', async () => {
   while(true) {
     const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
     const timeStartLoop = Date.now()
-    writeLog(`--------------${timeStartLoop}---------------`)
-    writeLog('MY BOMBER', myBomber.x, myBomber.y)
+    // writeLog(`--------------${timeStartLoop}---------------`)
+    // writeLog('MY BOMBER', myBomber.x, myBomber.y)
     const bombAvailable = checkBomAvailables(myBomber);
 
     // Xác định hành vi muốn thực hiện
@@ -184,7 +180,7 @@ socket.on('connect', async () => {
         if (deadCornerBoomPlace) {
           const gridPath = helpers.findPathToTarget(myBomber, helpers.toMapCoord(deadCornerBoomPlace), MAP, true);
           if (gridPath && gridPath.length > 0) {
-            writeLog('Found dead corner target:', enemy.name, 'at', deadCornerBoomPlace, 'path length:', gridPath.length);
+            // writeLog('Found dead corner target:', enemy.name, 'at', deadCornerBoomPlace, 'path length:', gridPath.length);
             bestEnemyAction = {
               type: 'attack',
               path: gridPath,
@@ -194,7 +190,7 @@ socket.on('connect', async () => {
             };
             break; // Ưu tiên dead corner cao nhất
           } else {
-            writeLog('Dead corner found but no path to target:', deadCornerBoomPlace);
+            // writeLog('Dead corner found but no path to target:', deadCornerBoomPlace);
           }
         }
       }
@@ -202,13 +198,13 @@ socket.on('connect', async () => {
       // Ưu tiên 2: Tấn công bình thường nếu không có dead corner
       if (!bestEnemyAction) {
         const attackStartTime = Date.now();
-        writeLog('No dead corner, trying normal attack');
+        // writeLog('No dead corner, trying normal attack');
         for (const enemy of enemies) {
           const getAllPosStart = Date.now();
           const allPos = helpers.getAllAttackPositions(myBomber, enemy, MAP, BOMBS, DANGER_ZONE);
           const getAllPosTime = Date.now() - getAllPosStart;
           if (getAllPosTime > 10) {
-            writeLog(`getAllAttackPositions took ${getAllPosTime}ms for enemy ${enemy.name}, positions: ${allPos?.length || 0}`);
+            // writeLog(`getAllAttackPositions took ${getAllPosTime}ms for enemy ${enemy.name}, positions: ${allPos?.length || 0}`);
           }
 
           if (allPos && allPos.length > 0) {
@@ -219,7 +215,7 @@ socket.on('connect', async () => {
             const isAtCurrentPos = posSet.has(currentPosKey);
 
             if (isAtCurrentPos) {
-              writeLog('Found normal attack at current position ', gridCoord)
+              // writeLog('Found normal attack at current position ', gridCoord)
               bestEnemyAction = {
                 type: 'attack',
                 path: [gridCoord],
@@ -234,11 +230,11 @@ socket.on('connect', async () => {
               const pathToEnemy = helpers.findPathToTarget(myBomber, helpers.toMapCoord(bestPos), MAP, false);
               const pathTime = Date.now() - pathStart;
               if (pathTime > 10) {
-                writeLog(`findPathToTarget took ${pathTime}ms, target:`, bestPos);
+                // writeLog(`findPathToTarget took ${pathTime}ms, target:`, bestPos);
               }
 
               if (pathToEnemy && pathToEnemy.length > 0) {
-                writeLog('Found normal attack target:', enemy.name, 'path length:', pathToEnemy.length);
+                // writeLog('Found normal attack target:', enemy.name, 'path length:', pathToEnemy.length);
                 bestEnemyAction = {
                   type: 'attack',
                   path: pathToEnemy,
@@ -253,10 +249,10 @@ socket.on('connect', async () => {
         }
         const totalAttackTime = Date.now() - attackStartTime;
         if (totalAttackTime > 20) {
-          writeLog(`Total normal attack search took ${totalAttackTime}ms, enemies checked: ${enemies.length}`);
+          // writeLog(`Total normal attack search took ${totalAttackTime}ms, enemies checked: ${enemies.length}`);
         }
         if (!bestEnemyAction) {
-          writeLog('No normal attack found');
+          // writeLog('No normal attack found');
           const itemAction = findReachableItem();
           if (itemAction) {
             action = {
@@ -264,9 +260,9 @@ socket.on('connect', async () => {
               path: itemAction.path,
               target: itemAction.item
             };
-            writeLog("found item instead so move to item")
+            // writeLog("found item instead so move to item")
           } else {
-            writeLog("no item found either")
+            // writeLog("no item found either")
           }
         }
       }
@@ -288,11 +284,11 @@ socket.on('connect', async () => {
           const itemDistance = (itemAction.path.length / helpers.WALL_SIZE) | 0;
           const distanceDiff = attackDistance - (itemDistance - 2);
 
-          writeLog('Comparing attack vs item. Attack distance:', attackDistance, 'Item distance:', itemDistance, 'Diff:', distanceDiff);
+          // writeLog('Comparing attack vs item. Attack distance:', attackDistance, 'Item distance:', itemDistance, 'Diff:', distanceDiff);
 
           if (distanceDiff > 0) {
             // Khoảng cách tấn công > khoảng cách nhặt item - 2, ưu tiên nhặt item
-            writeLog('Item is closer (attack > item - 2), prioritizing item collection');
+            // writeLog('Item is closer (attack > item - 2), prioritizing item collection');
             action = {
               type: 'collect_item',
               path: itemAction.path,
@@ -301,18 +297,18 @@ socket.on('connect', async () => {
           } else {
             // Ưu tiên tấn công
             action = bestEnemyAction;
-            writeLog('Selected attack action:', bestEnemyAction.attackType);
+            // writeLog('Selected attack action:', bestEnemyAction.attackType);
           }
         } else {
           // Không có item reachable, ưu tiên tấn công
           action = bestEnemyAction;
-          writeLog('Selected attack action:', bestEnemyAction.attackType);
+          // writeLog('Selected attack action:', bestEnemyAction.attackType);
         }
       } else {
-        writeLog('No attack action available');
+        // writeLog('No attack action available');
       }
     } else {
-      writeLog('Bomb not available or map not connected, skipping attack');
+      // writeLog('Bomb not available or map not connected, skipping attack');
     }
 
     // ƯU TIÊN 2: Phá rương hoặc nhặt item (nếu không có hành động tấn công)
@@ -328,7 +324,7 @@ socket.on('connect', async () => {
           for (const place of allPlaces) {
             const mapCoordPlace = helpers.toMapCoord(place);
             if (BOMBS.some(b => b.x === mapCoordPlace.x && b.y === mapCoordPlace.y)) {
-              writeLog(`Skip place ${place.x},${place.y} because we have bomb here`)
+              // writeLog(`Skip place ${place.x},${place.y} because we have bomb here`)
               continue;
             }
 
@@ -372,28 +368,28 @@ socket.on('connect', async () => {
           myBomber
         );
 
-        writeLog('Both chest and item available. Bomb path:', bombPathLength, 'Item path:', itemPathLength, 'Would block:', wouldBlock);
+        // writeLog('Both chest and item available. Bomb path:', bombPathLength, 'Item path:', itemPathLength, 'Would block:', wouldBlock);
 
         if (wouldBlock) {
           action = bestItemAction
         } else if (bombPathLength <= 2) {
-          writeLog('Choosing chest action (bomb is very close and won\'t block item)');
+          // writeLog('Choosing chest action (bomb is very close and won\'t block item)');
           action = bestChestAction;
         } else if (itemPathLength < bombPathLength) {
-          writeLog('Choosing item action (item is closer)');
+          // writeLog('Choosing item action (item is closer)');
           action = bestItemAction;
         } else {
-          writeLog('Choosing chest action (bomb is closer and wont block)');
+          // writeLog('Choosing chest action (bomb is closer and wont block)');
           action = bestChestAction;
         }
       } else if (bestChestAction) {
-        writeLog('Only chest action available, chests:', bestChestAction.chestCount);
+        // writeLog('Only chest action available, chests:', bestChestAction.chestCount);
         action = bestChestAction;
       } else if (bestItemAction) {
-        writeLog('Only item action available');
+        // writeLog('Only item action available');
         action = bestItemAction;
       } else {
-        writeLog('No chest or item action available');
+        // writeLog('No chest or item action available');
       }
     }
 
@@ -403,35 +399,41 @@ socket.on('connect', async () => {
     if (hasPath && action.path.length <= 1) {
       // Đã ở tại vị trí mục tiêu
       const requiresBomb = action.type === 'attack' || action.type === 'break_chest';
-      if (requiresBomb && !bombAvailable) {
-        writeLog('Bomb unavailable at target, deferring action and searching for safety.');
+      const gridCoordPlace = helpers.toGridCoord(action.path[0]);
+      const isBombHere = BOMBS.some(b => {
+        const gridCoordBomber = helpers.toGridCoordSafe(b);
+        return gridCoordBomber.x === gridCoordPlace.x && gridCoordBomber.y === gridCoordPlace.y
+      });
+
+      if (requiresBomb && (!bombAvailable || isBombHere)) {
+        // writeLog('Bomb unavailable at target, deferring action and searching for safety.', isBombHere);
         if (!moveToSafetyZone(myBomber)) {
-          writeLog('Unable to move to safety while bomb unavailable');
+          // writeLog('Unable to move to safety while bomb unavailable');
         }
         await sleep(15 - (Date.now() - timeStartLoop));
         continue;
       }
 
-      writeLog('Already at target position, executing action immediately. Action type:', action.type);
+      // writeLog('Already at target position, executing action immediately. Action type:', action.type);
       if (action.type === 'attack' && action.target) {
-        writeLog('Placing bomb for attack, target:', action.target, 'attack type:', action.attackType);
+        // writeLog('Placing bomb for attack, target:', action.target, 'attack type:', action.attackType);
         placeBoom(myBomber, action.attackType === '');
         // Sau khi đặt bom, ưu tiên di chuyển tới vùng an toàn
         if (!moveToSafetyZone(myBomber)) {
-          writeLog('No immediate safety move after placing attack bomb');
+          // writeLog('No immediate safety move after placing attack bomb');
         }
       } else if (action.type === 'break_chest') {
-        writeLog('Placing bomb to break chest, chest count:', action.chestCount);
+        // writeLog('Placing bomb to break chest, chest count:', action.chestCount);
         placeBoom(myBomber);
       } else if (action.type === 'collect_item') {
-        writeLog('At item position, will collect automatically');
+        // writeLog('At item position, will collect automatically');
       }
 
       const currentlyInDanger = helpers.isInDanger(myBomber, DANGER_ZONE);
       if (currentlyInDanger) {
-        writeLog('Target position is in danger, attempting to escape before action.');
+        // writeLog('Target position is in danger, attempting to escape before action.');
         if (!moveToSafetyZone(myBomber)) {
-          writeLog('Unable to escape danger from target position');
+          // writeLog('Unable to escape danger from target position');
         }
         await sleep(15 - (Date.now() - timeStartLoop));
         continue;
@@ -445,14 +447,14 @@ socket.on('connect', async () => {
       if (finalPath[0] && finalPath[0].x < helpers.WALL_SIZE * 2) {
         isGridPath = true;
       } else {
-        writeLog('finalPath', finalPath[0], finalPath[finalPath.length - 1])
+        // writeLog('finalPath', finalPath[0], finalPath[finalPath.length - 1])
       }
 
       if (action.path.length >= 2 && isGridPath) {
         const middlePoint = helpers.getMidPoint(action.path, 0, action.type);
         const pathToMidPoint = helpers.findPathToTarget(myBomber, middlePoint, MAP, false);
         if (pathToMidPoint && pathToMidPoint.length > 1) {
-          writeLog('pathToMidPoint', pathToMidPoint[0], pathToMidPoint[pathToMidPoint.length - 1]);
+          // writeLog('pathToMidPoint', pathToMidPoint[0], pathToMidPoint[pathToMidPoint.length - 1]);
           finalPath = pathToMidPoint;
           isGridPath = false; // pathToMidPoint luôn là map coord
         }
@@ -464,37 +466,37 @@ socket.on('connect', async () => {
       const mapCoordPos = isGridPath ? helpers.toMapCoord(nextStepPos) : nextStepPos;
       const dangerLevel = evaluateDangerLevel(mapCoordPos, myBomber, DANGER_ZONE);
 
-      writeLog('Action:', action.type, 'Danger level:', dangerLevel.dangerLevel, 'Can move:', dangerLevel.canMove, 'Time until explosion:', dangerLevel.timeUntilExplosion);
+      // writeLog('Action:', action.type, 'Danger level:', dangerLevel.dangerLevel, 'Can move:', dangerLevel.canMove, 'Time until explosion:', dangerLevel.timeUntilExplosion);
       if (dangerLevel.timeUntilExplosion < 0) {
-        writeLog("mapCoordPos", mapCoordPos)
-        writeLog("myBomber", myBomber)
-        writeLog("DANGER_ZONE", DANGER_ZONE)
+        // writeLog("mapCoordPos", mapCoordPos)
+        // writeLog("myBomber", myBomber)
+        // writeLog("DANGER_ZONE", DANGER_ZONE)
       }
       if (dangerLevel.canMove) {
         const step = nextStep(finalPath);
         if (step) {
-          writeLog('Moving:', step, 'Action type:', action.type);
+          // writeLog('Moving:', step, 'Action type:', action.type);
           move(step);
         } else {
-          writeLog('No step calculated from path');
+          // writeLog('No step calculated from path');
         }
       } else {
-        writeLog('Cannot move safely to target, attempting to escape to safety zone. Danger level:', dangerLevel.dangerLevel);
+        // writeLog('Cannot move safely to target, attempting to escape to safety zone. Danger level:', dangerLevel.dangerLevel);
         // Thay vì đứng im, tìm và chạy đến safety zone
         if (!moveToSafetyZone(myBomber)) {
-          writeLog('Unable to find safety zone, chet ncmr');
+          // writeLog('Unable to find safety zone, chet ncmr');
         }
       }
     } else {
       // Không có hành động nào, kiểm tra nếu đang trong nguy hiểm
-      writeLog('No action available');
+      // writeLog('No action available');
       if (helpers.isInDanger(myBomber, DANGER_ZONE)) {
-        writeLog('In danger, looking for safety zone');
+        // writeLog('In danger, looking for safety zone');
         if (!moveToSafetyZone(myBomber, 'no_action_available')) {
-          writeLog('Unable to move to safety');
+          // writeLog('Unable to move to safety');
         }
       } else {
-        writeLog('Not in danger, no action');
+        // writeLog('Not in danger, no action');
       }
     }
 
@@ -511,7 +513,7 @@ const move = (orient) => {
     orient: orient
   })
 
-  writeLog('moved ', orient)
+  // writeLog('moved ', orient)
 
   //blindcodemode
   // const myBomber = BOMBERS.find(b => b.name === process.env.BOMBER_NAME);
@@ -526,7 +528,7 @@ const move = (orient) => {
 const placeBoom = (myBomber = null) => {
   if (checkBomAvailables(myBomber)) {
     socket.emit('place_bomb', {})
-    writeLog('PLACED BOOM at ', myBomber.x, myBomber.y)
+    // writeLog('PLACED BOOM at ', myBomber.x, myBomber.y)
     updateMapWhenPlaceBoom(myBomber)
     updateChestMap(globalExplosionRange)
 
@@ -557,7 +559,7 @@ const placeBoom = (myBomber = null) => {
   //     updateChestMap()
   //   }, 5000)
   } else {
-    writeLog('Bomb not available, skipping place bomb');
+    // writeLog('Bomb not available, skipping place bomb');
   }
 }
 
@@ -600,7 +602,7 @@ function findReachableItem() {
     const path = helpers.findPathToTarget(myBomber, copyItem, MAP, false);
     const pathTime = Date.now() - pathStart;
     if (pathTime > 20) {
-      writeLog(`findPathToTarget for item took ${pathTime}ms`);
+      // writeLog(`findPathToTarget for item took ${pathTime}ms`);
     }
 
     if (path && path.length > 1) {
@@ -613,14 +615,14 @@ function findReachableItem() {
     validPaths.sort((a, b) => a.path.length - b.path.length);
     const totalTime = Date.now() - itemSearchStart;
     if (totalTime > 30) {
-      writeLog(`findReachableItem took ${totalTime}ms, checked ${ITEMS.length} items, found ${validPaths.length} reachable`);
+      // writeLog(`findReachableItem took ${totalTime}ms, checked ${ITEMS.length} items, found ${validPaths.length} reachable`);
     }
     return validPaths[0];
   }
 
   const totalTime = Date.now() - itemSearchStart;
   if (totalTime > 30) {
-    writeLog(`findReachableItem took ${totalTime}ms, checked ${ITEMS.length} items, found 0 reachable`);
+    // writeLog(`findReachableItem took ${totalTime}ms, checked ${ITEMS.length} items, found 0 reachable`);
   }
   return null;
 }
@@ -635,8 +637,8 @@ function findReachableItem() {
 function wouldBombBlockItem(bombPlace, item, myBomber) {
   if (!bombPlace || !item || !myBomber) return false;
 
-  writeLog("bombPlace", bombPlace)
-  writeLog("item", item)
+  // writeLog("bombPlace", bombPlace)
+  // writeLog("item", item)
 
   const bombGridCoord = bombPlace;
   const itemGridCoord = helpers.toGridCoord(item);
@@ -767,6 +769,7 @@ function evaluateDangerLevel(position, myBomber, dangerZones) {
   const { bomberRight, bomberBottom } = helpers.getBomberBound(testBomber);
 
   let minTimeUntilExplosion = Infinity;
+  let minExplosionAt = Infinity;
   let isInDanger = false;
 
   // Kiểm tra tất cả các danger zones
@@ -784,6 +787,7 @@ function evaluateDangerLevel(position, myBomber, dangerZones) {
       const timeUntilExplosion = zone.explodeAt - Date.now();
       if (timeUntilExplosion < minTimeUntilExplosion) {
         minTimeUntilExplosion = timeUntilExplosion;
+        minExplosionAt = zone.explodeAt;
       }
     }
   }
@@ -792,36 +796,65 @@ function evaluateDangerLevel(position, myBomber, dangerZones) {
     return { canMove: true, dangerLevel: 0, timeUntilExplosion: Infinity };
   }
 
+  // writeLog('evaluateDangerLevel: in danger at position', position, 'bomber speed', myBomber.speed, 'minTimeUntilExplosion', minTimeUntilExplosion);
+
   // Tính toán thời gian cần thiết để di chuyển ra khỏi vùng nguy hiểm
   // Dựa vào tốc độ của bot
-  // const moveSpeed = myBomber.speed; // pixels per step
-  // const timePerStep = 17; // milliseconds (ước tính, có thể cần điều chỉnh)
-  // const stepsToEscape = 2; // Ước tính số bước cần để thoát
-  // const estimatedEscapeTime = stepsToEscape * timePerStep;
-
-  // const canMove = minTimeUntilExplosion > (estimatedEscapeTime + safetyMargin);
+  let estimatedEscapeTime = Infinity;
   let canMove = false;
+
+  // Tìm safety zone gần nhất từ vị trí hiện tại
+  const nearestSafetyZone = helpers.findNearestSafetyZone(testBomber, MAP, DANGER_ZONE);
+  if (nearestSafetyZone) {
+    // Đổi safety zone sang map coord mục tiêu giống moveToSafetyZone
+    const safetyTargetMapCoord = helpers.toMapCoordAdvance(testBomber, nearestSafetyZone);
+
+    // Khoảng cách Manhattan theo pixel giữa vị trí hiện tại và vị trí an toàn
+    const distancePixels = helpers.manhattanDistance(position, safetyTargetMapCoord);
+
+    // writeLog('evaluateDangerLevel: nearestSafetyZone', nearestSafetyZone, 'safetyTargetMapCoord', safetyTargetMapCoord, 'distancePixels', distancePixels);
+
+    // Số bước di chuyển cần thiết dựa trên tốc độ (pixel mỗi bước)
+    const moveSpeed = myBomber.speed || 1;
+    const stepsToEscape = distancePixels / moveSpeed;
+
+    // Mỗi bước ~20ms như yêu cầu + 500ms buffer
+    estimatedEscapeTime = stepsToEscape * 20 + 500;
+
+    // Nếu thời gian cần thiết cộng với thời gian hiện tại lớn hơn thời điểm nổ => không kịp chạy
+    if (minExplosionAt !== Infinity) {
+      const arriveTime = Date.now() + estimatedEscapeTime;
+      canMove = arriveTime <= minExplosionAt;
+    } else {
+      // Phòng trường hợp dữ liệu nổ không hợp lệ, cho phép di chuyển
+      canMove = true;
+      // writeLog('evaluateDangerLevel: invalid explosionAt, allow move, estimatedEscapeTime', estimatedEscapeTime);
+    }
+  } else {
+    // Không tìm được safety zone thì coi như không thể chạy kịp
+    canMove = false;
+    // writeLog('evaluateDangerLevel: no nearestSafetyZone, cannot move');
+  }
 
   // Tính danger level (0-10, 10 là nguy hiểm nhất)
   let dangerLevel = 0;
   if (minTimeUntilExplosion < 1400) {
-    dangerLevel = 10; // Rất nguy hiểm, sẽ nổ trong 1 giây
-    canMove = false
+    dangerLevel = 10; // Rất nguy hiểm, sắp nổ
   } else if (minTimeUntilExplosion < 1900) {
     dangerLevel = 7; // Nguy hiểm
-    canMove = myBomber.speed > 1
   } else if (minTimeUntilExplosion < 2900) {
     dangerLevel = 4; // Hơi nguy hiểm
-    canMove = true
   } else {
     dangerLevel = 1; // Ít nguy hiểm
-    canMove = true
   }
+
+  // writeLog('evaluateDangerLevel: result', {position,minTimeUntilExplosion,minExplosionAt,dangerLevel,estimatedEscapeTime,canMove});
 
   return {
     canMove,
     dangerLevel,
-    timeUntilExplosion: minTimeUntilExplosion
+    timeUntilExplosion: minTimeUntilExplosion,
+    estimatedEscapeTime
   };
 }
 
@@ -835,12 +868,12 @@ function moveToSafetyZone(myBomber, action = null) {
     if (action) {
       safetyZone = safeZones.get(action)
       if (safetyZone) {
-        writeLog('Found safety zone from cached (early game):', safetyZone);
+        // writeLog('Found safety zone from cached (early game):', safetyZone);
       } else {
         safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
         if (safetyZone) {
-          writeLog('Found safety zone from findNearestSafetyZone (early game):', safetyZone);
-          writeLog('cached this safetyzone with action ', action)
+          // writeLog('Found safety zone from findNearestSafetyZone (early game):', safetyZone);
+          // writeLog('cached this safetyzone with action ', action)
           safeZones.set(action, safetyZone)
         }
       }
@@ -848,53 +881,53 @@ function moveToSafetyZone(myBomber, action = null) {
     else {
       safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
-        writeLog('Found safety zone from findNearestSafetyZone (early game):', safetyZone);
+        // writeLog('Found safety zone from findNearestSafetyZone (early game):', safetyZone);
       }
     }
   } else {
     const allSafetyZone = helpers.findAllSafeZones(helpers.toGridCoord(myBomber), MAP, DANGER_ZONE);
     if (allSafetyZone && allSafetyZone.length > 0) {
       safetyZone = allSafetyZone[0];
-      writeLog('Found safety zone from findAllSafeZones (late game):', safetyZone);
+      // writeLog('Found safety zone from findAllSafeZones (late game):', safetyZone);
     } else {
       safetyZone = helpers.findNearestSafetyZone(myBomber, MAP, DANGER_ZONE);
       if (safetyZone) {
-        writeLog('Found safety zone from findNearestSafetyZone (fallback):', safetyZone);
+        // writeLog('Found safety zone from findNearestSafetyZone (fallback):', safetyZone);
       }
     }
   }
 
   if (!safetyZone) {
-    writeLog('No safety zone found');
+    // writeLog('No safety zone found');
     return false;
   }
 
   const safetyTargetMapCoord = helpers.toMapCoordAdvance(myBomber, safetyZone)
-  writeLog('safetyTargetMapCoord', safetyTargetMapCoord)
+  // writeLog('safetyTargetMapCoord', safetyTargetMapCoord)
   const path = helpers.findPathToTarget(myBomber, safetyTargetMapCoord, MAP, false);
   if (path && path.length >= 1) {
-    writeLog('path detail', path[0], path[path.length - 1])
+    // writeLog('path detail', path[0], path[path.length - 1])
     if (path.length === 1 && helpers.isInDanger(myBomber, DANGER_ZONE, true)) {
       path.push(helpers.toMapCoordAdvance(myBomber, safetyZone));
     }
     const step = nextStep(path);
     if (step) {
-      writeLog('Moving to safety zone:', step);
+      // writeLog('Moving to safety zone:', step);
       move(step);
       return true;
     }
-    writeLog('No step to safety zone');
+    // writeLog('No step to safety zone');
     return false;
   } else {
     safeZones.clear();
   }
 
-  writeLog('No path to safety zone');
+  // writeLog('No path to safety zone');
   return false;
 }
 
 function updateChestMap(explosionRange = 2) {
-  writeLog("updateChestMap with explosionRange " + explosionRange)
+  // writeLog("updateChestMap with explosionRange " + explosionRange)
   for (let r = 0; r < 16; r++) {
     for (let c = 0; c < 16; c++) {
       const key = `${c},${r}`;
@@ -923,7 +956,6 @@ function updateConnectedMap() {
       const pathToOtherBot = helpers.findPathToTarget(myBomber, bomber, MAP)
       if (pathToOtherBot) {
         connectedMap = true
-        writeLog("MAP đã thông")
         break;
       }
     }
