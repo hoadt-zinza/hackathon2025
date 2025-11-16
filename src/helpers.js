@@ -37,11 +37,11 @@ function isWalkable(map, x, y, isGrid = true) {
   } else {
     // Real coordinate check - unchanged
     const { bomberRight, bomberBottom } = getBomberBound({x, y});
-    const gridRight = Math.floor((bomberRight - 0.5) / WALL_SIZE);
-    const gridBottom = Math.floor((bomberBottom - 0.5) / WALL_SIZE);
+    const gridRight = (bomberRight - 0.5) / WALL_SIZE | 0;
+    const gridBottom = (bomberBottom - 0.5) / WALL_SIZE | 0;
 
-    for (let gridY = Math.floor(y / WALL_SIZE); gridY <= gridBottom; gridY++) {
-      for (let gridX = Math.floor(x / WALL_SIZE); gridX <= gridRight; gridX++) {
+    for (let gridY = y / WALL_SIZE | 0; gridY <= gridBottom; gridY++) {
+      for (let gridX = x / WALL_SIZE | 0; gridX <= gridRight; gridX++) {
         const v = map[gridY][gridX];
         if (v !== null && v !== 'B' && v !== 'R' && v !== 'S') {
           return false;
@@ -65,8 +65,30 @@ function toGridCoord(pos) {
   return { x: Math.round(pos.x / WALL_SIZE), y: Math.round(pos.y / WALL_SIZE) };
 }
 
+function toGridCoordFloor(pos) {
+  return { x: pos.x / WALL_SIZE | 0, y: pos.y / WALL_SIZE | 0 };
+}
+
+function toGridCoordSafe(pos) {
+  return { x: pos.x / WALL_SIZE, y: pos.y / WALL_SIZE }
+}
+
 function toMapCoord(gridPos) {
   return { x: gridPos.x * WALL_SIZE, y: gridPos.y * WALL_SIZE };
+}
+
+function toMapCoordAdvance(myBomber, gridPos) {
+  if (myBomber.speed == 3) {
+    return toMapCoord(gridPos)
+  } else {
+    const isBomberRight = myBomber.x > gridPos.x * WALL_SIZE
+    const isBomberDown = myBomber.y > gridPos.y * WALL_SIZE
+
+    return {
+      x: (gridPos.x * WALL_SIZE) + (isBomberRight ? 5 : 0),
+      y: (gridPos.y * WALL_SIZE) + (isBomberDown ? 5 : 0)
+    };
+  }
 }
 
 function getBomberBound(bomber) {
@@ -156,11 +178,11 @@ function findPathToTarget(myBomber, target, map, isGrid = true) {
 function createDangerZonesForBomb(bomb, explosionRange, map, dangerZones) {
   if (!bomb) return [];
 
-  const { x, y } = toGridCoord(bomb);
+  const { x, y } = toGridCoordFloor(bomb);
   const now = Date.now();
 
   const existingZone = dangerZones && dangerZones.find(z => z.x === x && z.y === y && z.explodeAt > now);
-  const explodeAt = existingZone ? existingZone.explodeAt : now + 5000;
+  const explodeAt = existingZone ? existingZone.explodeAt : bomb.createdAt + 5000;
 
   const zones = [];
   zones.push({ bombId: bomb.id, x, y, explodeAt });
@@ -189,7 +211,7 @@ function upsertItem(itemsArr, payload, key = 'uid') {
   if (idx !== -1) {
     itemsArr[idx] = { ...itemsArr[idx], ...payload };
   } else {
-    itemsArr.push(payload);
+    itemsArr.push({...payload, createdAt: Date.now()});
   }
 }
 
@@ -216,7 +238,7 @@ function isInDanger(myBomber, DANGER_ZONE, checkTime = false) {
 function findNearestSafetyZone(myBomber, map, dangerArr) {
   const currentGridPos = toGridCoord(myBomber);
 
-  if (dangerArr.length === 0) return { x: myBomber.x, y: myBomber.y };
+  if (dangerArr.length === 0) return currentGridPos;
 
   const dangerSet = new Set(dangerArr.map(z => `${z.x},${z.y}`));
   const openSet = new MinHeap((a, b) => a.f - b.f); // hàng đợi ưu tiên theo f = g + h
@@ -248,10 +270,6 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
       const nextKey = `${nx},${ny}`;
 
       if (
-        ny >= 0 &&
-        ny < map.length &&
-        nx >= 0 &&
-        nx < map[0].length &&
         isWalkable(map, nx, ny) &&
         !visited.has(nextKey)
       ) {
@@ -263,7 +281,7 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
     }
   }
 
-  return { x: myBomber.x, y: myBomber.y }; // không tìm được safe zone reachable
+  return null;
 }
 
 // Return array of grid coords that form the cross-shaped danger area for a bomb.
@@ -283,24 +301,25 @@ function getBombCrossZones(bomb, range = 2) {
   return zones;
 }
 
-// path: array of REAL coordinates [{x, y}, ...]
-function getMidPoint(path, bias = 1) {
+// path: array of grid coordinates [{x, y}, ...]
+function getMidPoint(path, bias = 1, type = 'break_chest') {
   const a = path[path.length - 2];
   const b = path[path.length - 1];
+  const first = path[0]
 
   if (a.x === b.x) {
     // di chuyển theo trục Y
     const directionY = Math.sign(b.y - a.y);
     return {
-      x: a.x * WALL_SIZE,
-      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias,
+      x: a.x * WALL_SIZE + (first.x > a.x && type != 'break_chest' ? 5 : 0),
+      y: ((a.y + b.y) / 2) * WALL_SIZE + directionY * bias + (first.y >= a.y && type != 'break_chest' ? 5 : 0),
     };
   } else {
     // di chuyển theo trục X
     const directionX = Math.sign(b.x - a.x);
     return {
-      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias,
-      y: a.y * WALL_SIZE,
+      x: ((a.x + b.x) / 2) * WALL_SIZE + directionX * bias + (first.x > a.x && type != 'break_chest' ? 5 : 0),
+      y: a.y * WALL_SIZE + (first.y >= a.y && type != 'break_chest' ? 5 : 0),
     };
   }
 }
@@ -308,6 +327,7 @@ function getMidPoint(path, bias = 1) {
 // Count how many chests would be destroyed by a bomb placed at grid (x,y)
 // Explosion travels in 4 directions up to `range`, stops at walls ('W') and also
 // stops after destroying a chest ('C'). Walkable tiles are null | 'B' | 'R' | 'S'.
+// Uses Set cache to optimize repeated calls. If position is in cache, it will never destroy any chests.
 function countChestsDestroyedAt(map, x, y, range = 2) {
   let destroyed = 0;
   for (const dir of DIRS[0]) {
@@ -324,22 +344,41 @@ function countChestsDestroyedAt(map, x, y, range = 2) {
   return destroyed;
 }
 
-function findAllPossiblePlaceBoom(myBomber, map, walkableNeighbors = []) {
-  if (!myBomber || !map) return null;
-  const start = toGridCoord(myBomber);
-  const range = myBomber.explosionRange;
+// Find all possible bomb placement positions that destroy chests and have safe escape routes
+// Returns array of { x, y, score } sorted by score (chests destroyed)
+// Optimized with cache to skip positions that will never destroy chests
+function findAllPossiblePlaceBoom(myBomber, map, chestMap, walkableNeighbors = [], dangerZones = [], ) {
+  if (!myBomber || !map) return [];
 
-  // Only consider reachable tiles from current position
-  if (!walkableNeighbors) walkableNeighbors = getWalkableNeighbors(map, { x: myBomber.x, y: myBomber.y });
-  if (walkableNeighbors.length === 0) return null;
+  const results = [];
+  const explosionRange = myBomber.explosionRange || 2;
 
-  return walkableNeighbors.map(p => {
-    return { x: p.x, y: p.y, score: countChestsDestroyedAt(map, p.x, p.y, range), dist: chebyshevDistance(p, start) };
-  }).sort((a, b) => {
-    return b.score - a.score; // higher score first
-  }).filter(w => {
-    return w.score != 0;
-  })
+  for (const position of walkableNeighbors) {
+    // Count chests that would be destroyed at this position
+    const chestsDestroyed = chestMap.get(`${position.x},${position.y}`)
+
+    if (chestsDestroyed === 0) continue; // Skip positions that don't destroy any chests
+
+    // Check if there's a safe zone reachable from this position
+    const safeZoneFound = countSafeZonesAfterPlaceBoom(
+      toMapCoord(position),
+      explosionRange,
+      dangerZones,
+      map,
+      walkableNeighbors
+    )
+
+    if (safeZoneFound) {
+      results.push({
+        x: position.x,
+        y: position.y,
+        score: chestsDestroyed
+      });
+    }
+  }
+
+  // Sort by score (chests destroyed) in descending order
+  return results.sort((a, b) => b.score - a.score);
 }
 
 // Find all walkable neighbors from a position using flood fill BFS.
@@ -379,7 +418,7 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
 
   const dangerSet = new Set();
   const pushToSet = (p) => {
-    const key = `${Math.trunc(p.x)},${Math.trunc(p.y)}`;
+    const key = `${p.x},${p.y}`;
     dangerSet.add(key);
   };
   for (let i = 0; i < updatedDangerZone.length; i++) {
@@ -389,20 +428,20 @@ function countSafeZonesAfterPlaceBoom(position, explosionRange, dangerArr, map, 
   let safeCount = 0;
   for (const w of walkableNeighbors) {
     if (!w || typeof w.x !== 'number' || typeof w.y !== 'number') continue;
-    const key = `${Math.trunc(w.x)},${Math.trunc(w.y)}`;
+    const key = `${w.x},${w.y}`;
     if (!dangerSet.has(key)) safeCount++;
   }
 
   return safeCount;
 }
 
-function markOwnBombOnMap(myBomber, bombs, map, gameStartAt) {
+function markOwnBombOnMap(myBomber, bombs, map, connectedMap = false) {
   if (!myBomber || !bombs || !map) return;
 
   for (const bomb of bombs) {
-    if (bomb.ownerName !== myBomber.name && Date.now() - gameStartAt < 60) continue;
+    if (bomb.ownerName !== myBomber.name && !connectedMap) continue;
 
-    const gridCoord = toGridCoord(bomb)
+    const gridCoord = toGridCoordFloor(bomb)
     if (map[gridCoord.y][gridCoord.x] == 'W') continue;
 
     const { bomberRight, bomberBottom } = getBomberBound(myBomber)
@@ -513,43 +552,76 @@ function coveredTiles(bomber, MAP) {
   return tiles;
 }
 
-function findBombPositionsForEnemyArea(myBomber, enemy, map) {
+function findBombPositionsForEnemyArea(myBomber, enemy, map, bombs = [], dangerZones = []) {
   const tiles = coveredTiles(enemy, map);
   if (tiles.length === 0) return [];
 
-  const resultsMap = new Map(); // key = x*1000 + y
+  const myPos = toGridCoordFloor(myBomber);
+  const enemyPos = toGridCoordFloor(enemy);
 
-  const myPos = {
-    x: (myBomber.x / WALL_SIZE) | 0,
-    y: (myBomber.y / WALL_SIZE) | 0
-  };
-  const enemyPos = {
-    x: (enemy.x / WALL_SIZE) | 0,
-    y: (enemy.y / WALL_SIZE) | 0
-  };
+  const explosionRange = myBomber.explosionRange || 2;
 
+  // build set of existing bombs (grid coords) to exclude positions that already have a bomb
+  const bombSet = new Set((bombs || []).map(b => {
+    const g = toGridCoordSafe(b);
+    return `${g.x},${g.y}`;
+  }));
+
+  const dangerSet = new Set((dangerZones || []).map(d => {
+    return `${d.x},${d.y}`;
+  }));
+
+  const resultsMap = new Map(); // key = x*1000 + y, value = {x, y, h, enemyH}
+
+  // Tìm tất cả vị trí có thể đặt bom để reach enemy (trong phạm vi explosion range)
+  // Tính toán h và enemyH ngay trong vòng lặp để tránh phải map lại sau
   for (const tile of tiles) {
     for (const { dx, dy } of DIRS[0]) {
-      for (let step = 1; step <= myBomber.explosionRange; step++) {
+      for (let step = 1; step <= explosionRange; step++) {
         const tx = tile.x + dx * step;
         const ty = tile.y + dy * step;
+
         if (map[ty][tx] === 'W') break;
 
+        // Skip nếu đã có bomb hoặc danger zone
+        const posKey = `${tx},${ty}`;
+        if (bombSet.has(posKey) || dangerSet.has(posKey)) continue;
+
+        // Tính toán khoảng cách ngay
+        const enemyH = Math.abs(tx - enemyPos.x) + Math.abs(ty - enemyPos.y);
+        // Chỉ thêm nếu trong phạm vi explosion range
+        if (enemyH > explosionRange) continue;
+
+        const h = Math.abs(tx - myPos.x) + Math.abs(ty - myPos.y);
         const key = tx * 1000 + ty;
-        resultsMap.set(key, { x: tx, y: ty });
+
+        // Chỉ lưu nếu chưa có hoặc có khoảng cách tốt hơn
+        resultsMap.set(key, { x: tx, y: ty, h, enemyH });
       }
     }
   }
 
-  return Array.from(resultsMap.values())
-    .map((position) => ({
-      x: position.x,
-      y: position.y,
-      h: manhattanDistance(position, myPos),
-      enemyH: manhattanDistance(position, enemyPos),
-    }))
-    .filter(p => p.enemyH < 2)
-    .sort((a, b) => a.h - b.h);
+  const positions = Array.from(resultsMap.values());
+
+  // Ưu tiên vị trí xa enemy hơn (giữ khoảng cách) nhưng vẫn trong phạm vi
+  // Sort: 1) Xa enemy hơn (enemyH lớn hơn), 2) Gần myBomber hơn (h nhỏ hơn)
+  return positions.sort((a, b) => {
+    // Ưu tiên vị trí cách enemy ít nhất 2 grid cells
+    const aIsSafe = a.enemyH >= 2;
+    const bIsSafe = b.enemyH >= 2;
+
+    if (aIsSafe !== bIsSafe) {
+      return bIsSafe - aIsSafe; // Vị trí an toàn (>= 2) trước
+    }
+
+    // Nếu cả 2 đều an toàn hoặc cả 2 đều không an toàn, ưu tiên xa enemy hơn
+    if (b.enemyH !== a.enemyH) {
+      return b.enemyH - a.enemyH; // Xa enemy trước
+    }
+
+    // Nếu cùng khoảng cách với enemy, chọn gần myBomber hơn
+    return a.h - b.h;
+  });
 }
 
 function hasChestLeft(map) {
@@ -606,6 +678,71 @@ function isDeadCorner(position, map, isGrid = false) {
   }
 }
 
+// Find trap positions as the two outer tiles around a 3-consecutive-walkable segment.
+// Example: if (x-1, x, x+1) are all walkable, then (x-1) and (x+1) are trap positions.
+// Works for both horizontal and vertical lines.
+// Returns array of unique grid coords: [{x, y}]
+function findTrapPositions(map) {
+  const results = [];
+  const seen = new Set();
+
+  for (let y = 0; y < MAP_SIZE; y++) {
+    for (let x = 0; x < MAP_SIZE; x++) {
+      if (!isWalkable(map, x, y)) continue;
+
+      // Neighbor helpers (1 step)
+      const leftWalk = (dx=1) => x - dx >= 0 && isWalkable(map, x - dx, y);
+      const rightWalk = (dx=1) => x + dx < MAP_SIZE && isWalkable(map, x + dx, y);
+      const upWalk = (dy=1) => y - dy >= 0 && isWalkable(map, x, y - dy);
+      const downWalk = (dy=1) => y + dy < MAP_SIZE && isWalkable(map, x, y + dy);
+
+      const l1 = leftWalk(1), r1 = rightWalk(1), u1 = upWalk(1), d1 = downWalk(1);
+
+      // Exclude pure tunnel cells: only two neighbors walkable on same axis
+      const isPureHorizontalTunnel = l1 && r1 && !u1 && !d1;
+      const isPureVerticalTunnel = u1 && d1 && !l1 && !r1;
+      const isPureTunnel = isPureHorizontalTunnel || isPureVerticalTunnel;
+      if (isPureTunnel) continue;
+
+      // Choke-based criteria
+      // Horizontal trap candidate: corridor exists along X (at least one of L/R walkable)
+      // and perpendicular (up or down) center is walkable while both side-perpendiculars are blocked.
+      const downChoke = d1 && !(x-1>=0 && isWalkable(map,x-1,y+1)) && !(x+1<MAP_SIZE && isWalkable(map,x+1,y+1));
+      const upChoke = u1 && !(x-1>=0 && isWalkable(map,x-1,y-1)) && !(x+1<MAP_SIZE && isWalkable(map,x+1,y-1));
+      const horizontalTrap = (l1 || r1) && (downChoke || upChoke);
+
+      // Vertical trap candidate: corridor exists along Y (at least one of U/D walkable)
+      // and perpendicular (left or right) center is walkable while both side-perpendiculars are blocked.
+      const rightChoke = r1 && !(y-1>=0 && isWalkable(map,x+1,y-1)) && !(y+1<MAP_SIZE && isWalkable(map,x+1,y+1));
+      const leftChoke = l1 && !(y-1>=0 && isWalkable(map,x-1,y-1)) && !(y+1<MAP_SIZE && isWalkable(map,x-1,y+1));
+      const verticalTrap = (u1 || d1) && (rightChoke || leftChoke);
+
+      if (horizontalTrap || verticalTrap) {
+        // Build trap positions: immediate walkable neighbors around wait
+        const neighbors = [];
+        if (leftWalk(1)) neighbors.push({ x: x - 1, y });
+        if (rightWalk(1)) neighbors.push({ x: x + 1, y });
+        if (upWalk(1)) neighbors.push({ x, y: y - 1 });
+        if (downWalk(1)) neighbors.push({ x, y: y + 1 });
+
+        // Only add if there is at least one trap entry neighbor
+        if (neighbors.length > 0) {
+          const key = `${x},${y}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            results.push({
+              waitPosition: { x, y },
+              trapPositions: neighbors,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
 /**
  * Find the nearest safe zone reachable from a given position using BFS.
  * If multiple zones have the same distance, choose the one with most walkable neighbors.
@@ -613,10 +750,9 @@ function isDeadCorner(position, map, isGrid = false) {
  * @param {Object} startPos - Starting position {x, y} in grid coordinates
  * @param {Array<Array>} map - The game map
  * @param {Array<Object>} dangerZones - Array of dangerous positions to avoid
- * @param {number} maxDistance - Maximum distance to search (default: 10)
  * @returns {Object|null} - Nearest safe zone {x, y, distance, walkableNeighbors} or null if none found
  */
-function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
+function findAllSafeZones(startPos, map, dangerZones = []) {
   if (!startPos || !map) return null;
 
   // Create a Set for O(1) danger zone lookups
@@ -689,11 +825,6 @@ function findAllSafeZones(startPos, map, dangerZones = [], maxDistance = 10) {
       }
     }
 
-    // Stop if we've reached max distance
-    if (current.distance >= maxDistance) {
-      continue;
-    }
-
     // Check all 4 directions
     for (const dir of DIRS[0]) {
       const nx = current.x + dir.dx;
@@ -732,6 +863,8 @@ export {
   chebyshevDistance,
   findAllSafeZones,
   toGridCoord,
+  toGridCoordSafe,
+  toGridCoordFloor,
   findPathToTarget,
   createDangerZonesForBomb,
   removeDangerZonesForBomb,
@@ -743,6 +876,7 @@ export {
   WALL_SIZE,
   getBombCrossZones,
   toMapCoord,
+  toMapCoordAdvance,
   getMidPoint,
   getWalkableNeighbors,
   countSafeZonesAfterPlaceBoom,
@@ -751,8 +885,10 @@ export {
   markOwnBombOnMap,
   findChestBreakScoresToFrozen,
   coveredTiles,
-  findBombPositionsForEnemyArea,
+  findBombPositionsForEnemyArea as getAllAttackPositions,
   hasChestLeft,
   bombPositionsForChest,
   isDeadCorner,
+  getBomberBound,
+  findTrapPositions,
 };
