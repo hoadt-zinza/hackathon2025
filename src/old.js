@@ -207,7 +207,7 @@ socket.on('connect', async () => {
         targetBot = BOMBERS.filter(b => b.name !== myBomber.name)
           .sort((a, b) => helpers.manhattanDistance(myBomber, a) - helpers.manhattanDistance(myBomber, b))[0]
 
-      const allPos = helpers.findBombPositionsForEnemyArea(myBomber, targetBot, MAP);
+      const allPos = helpers.getAllAttackPositions(myBomber, targetBot, MAP);
       const bestPos = allPos[0]
       if (!bestPos) {
         await sleep(10);

@@ -182,7 +182,7 @@ function createDangerZonesForBomb(bomb, explosionRange, map, dangerZones) {
   const now = Date.now();
 
   const existingZone = dangerZones && dangerZones.find(z => z.x === x && z.y === y && z.explodeAt > now);
-  const explodeAt = existingZone ? existingZone.explodeAt : now + 5000;
+  const explodeAt = existingZone ? existingZone.explodeAt : bomb.createdAt + 5000;
 
   const zones = [];
   zones.push({ bombId: bomb.id, x, y, explodeAt });
@@ -270,10 +270,6 @@ function findNearestSafetyZone(myBomber, map, dangerArr) {
       const nextKey = `${nx},${ny}`;
 
       if (
-        ny >= 0 &&
-        ny < map.length &&
-        nx >= 0 &&
-        nx < map[0].length &&
         isWalkable(map, nx, ny) &&
         !visited.has(nextKey)
       ) {
@@ -556,7 +552,7 @@ function coveredTiles(bomber, MAP) {
   return tiles;
 }
 
-function findBombPositionsForEnemyArea(myBomber, enemy, map, booms = [], bombs = []) {
+function findBombPositionsForEnemyArea(myBomber, enemy, map, bombs = [], dangerZones = []) {
   const tiles = coveredTiles(enemy, map);
   if (tiles.length === 0) return [];
 
@@ -569,8 +565,12 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map, booms = [], bombs =
 
   // build set of existing bombs (grid coords) to exclude positions that already have a bomb
   const bombSet = new Set((bombs || []).map(b => {
-    const g = toGridCoordFloor(b);
+    const g = toGridCoordSafe(b);
     return `${g.x},${g.y}`;
+  }));
+
+  const dangerSet = new Set((dangerZones || []).map(d => {
+    return `${d.x},${d.y}`;
   }));
 
   // Tìm tất cả vị trí có thể đặt bom để reach enemy (trong phạm vi explosion range)
@@ -582,6 +582,8 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map, booms = [], bombs =
         if (map[ty][tx] === 'W') break;
         // skip if there's already a bomb at that grid cell
         if (bombSet.has(`${tx},${ty}`)) continue;
+        // skip if there's danger zone at that grid cell
+        if (dangerSet.has(`${tx},${ty}`)) continue;
 
         const key = tx * 1000 + ty;
         resultsMap.set(key, { x: tx, y: ty });
@@ -815,7 +817,7 @@ export {
   markOwnBombOnMap,
   findChestBreakScoresToFrozen,
   coveredTiles,
-  findBombPositionsForEnemyArea,
+  findBombPositionsForEnemyArea as getAllAttackPositions,
   hasChestLeft,
   bombPositionsForChest,
   isDeadCorner,
