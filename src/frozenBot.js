@@ -158,3 +158,9 @@ function evaluateDangerLevel(position, myBomber, dangerZones) {
 // const position = { x: 118, y: 85 }
 // const dangerZone = { x: 3, y: 3, explodeAt: Date.now() + 1000 }
 // console.log("check", evaluateDangerLevel(position, myBomber, [dangerZone]))
+
+const traps = helpers.findTrapPositions(sampleMap)
+for (const t of traps) {
+  console.log('t', t.waitPosition);
+  console.log('tposs', t.trapPositions);
+}

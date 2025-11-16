@@ -678,6 +678,71 @@ function isDeadCorner(position, map, isGrid = false) {
   }
 }
 
+// Find trap positions as the two outer tiles around a 3-consecutive-walkable segment.
+// Example: if (x-1, x, x+1) are all walkable, then (x-1) and (x+1) are trap positions.
+// Works for both horizontal and vertical lines.
+// Returns array of unique grid coords: [{x, y}]
+function findTrapPositions(map) {
+  const results = [];
+  const seen = new Set();
+
+  for (let y = 0; y < MAP_SIZE; y++) {
+    for (let x = 0; x < MAP_SIZE; x++) {
+      if (!isWalkable(map, x, y)) continue;
+
+      // Neighbor helpers (1 step)
+      const leftWalk = (dx=1) => x - dx >= 0 && isWalkable(map, x - dx, y);
+      const rightWalk = (dx=1) => x + dx < MAP_SIZE && isWalkable(map, x + dx, y);
+      const upWalk = (dy=1) => y - dy >= 0 && isWalkable(map, x, y - dy);
+      const downWalk = (dy=1) => y + dy < MAP_SIZE && isWalkable(map, x, y + dy);
+
+      const l1 = leftWalk(1), r1 = rightWalk(1), u1 = upWalk(1), d1 = downWalk(1);
+
+      // Exclude pure tunnel cells: only two neighbors walkable on same axis
+      const isPureHorizontalTunnel = l1 && r1 && !u1 && !d1;
+      const isPureVerticalTunnel = u1 && d1 && !l1 && !r1;
+      const isPureTunnel = isPureHorizontalTunnel || isPureVerticalTunnel;
+      if (isPureTunnel) continue;
+
+      // Choke-based criteria
+      // Horizontal trap candidate: corridor exists along X (at least one of L/R walkable)
+      // and perpendicular (up or down) center is walkable while both side-perpendiculars are blocked.
+      const downChoke = d1 && !(x-1>=0 && isWalkable(map,x-1,y+1)) && !(x+1<MAP_SIZE && isWalkable(map,x+1,y+1));
+      const upChoke = u1 && !(x-1>=0 && isWalkable(map,x-1,y-1)) && !(x+1<MAP_SIZE && isWalkable(map,x+1,y-1));
+      const horizontalTrap = (l1 || r1) && (downChoke || upChoke);
+
+      // Vertical trap candidate: corridor exists along Y (at least one of U/D walkable)
+      // and perpendicular (left or right) center is walkable while both side-perpendiculars are blocked.
+      const rightChoke = r1 && !(y-1>=0 && isWalkable(map,x+1,y-1)) && !(y+1<MAP_SIZE && isWalkable(map,x+1,y+1));
+      const leftChoke = l1 && !(y-1>=0 && isWalkable(map,x-1,y-1)) && !(y+1<MAP_SIZE && isWalkable(map,x-1,y+1));
+      const verticalTrap = (u1 || d1) && (rightChoke || leftChoke);
+
+      if (horizontalTrap || verticalTrap) {
+        // Build trap positions: immediate walkable neighbors around wait
+        const neighbors = [];
+        if (leftWalk(1)) neighbors.push({ x: x - 1, y });
+        if (rightWalk(1)) neighbors.push({ x: x + 1, y });
+        if (upWalk(1)) neighbors.push({ x, y: y - 1 });
+        if (downWalk(1)) neighbors.push({ x, y: y + 1 });
+
+        // Only add if there is at least one trap entry neighbor
+        if (neighbors.length > 0) {
+          const key = `${x},${y}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            results.push({
+              waitPosition: { x, y },
+              trapPositions: neighbors,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
 /**
  * Find the nearest safe zone reachable from a given position using BFS.
  * If multiple zones have the same distance, choose the one with most walkable neighbors.
@@ -825,4 +890,5 @@ export {
   bombPositionsForChest,
   isDeadCorner,
   getBomberBound,
+  findTrapPositions,
 };
