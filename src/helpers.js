@@ -211,7 +211,7 @@ function upsertItem(itemsArr, payload, key = 'uid') {
   if (idx !== -1) {
     itemsArr[idx] = { ...itemsArr[idx], ...payload };
   } else {
-    itemsArr.push(payload);
+    itemsArr.push({...payload, createdAt: Date.now()});
   }
 }
 
@@ -556,8 +556,6 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map, bombs = [], dangerZ
   const tiles = coveredTiles(enemy, map);
   if (tiles.length === 0) return [];
 
-  const resultsMap = new Map(); // key = x*1000 + y
-
   const myPos = toGridCoordFloor(myBomber);
   const enemyPos = toGridCoordFloor(enemy);
 
@@ -573,32 +571,37 @@ function findBombPositionsForEnemyArea(myBomber, enemy, map, bombs = [], dangerZ
     return `${d.x},${d.y}`;
   }));
 
+  const resultsMap = new Map(); // key = x*1000 + y, value = {x, y, h, enemyH}
+
   // Tìm tất cả vị trí có thể đặt bom để reach enemy (trong phạm vi explosion range)
+  // Tính toán h và enemyH ngay trong vòng lặp để tránh phải map lại sau
   for (const tile of tiles) {
     for (const { dx, dy } of DIRS[0]) {
       for (let step = 1; step <= explosionRange; step++) {
         const tx = tile.x + dx * step;
         const ty = tile.y + dy * step;
-        if (map[ty][tx] === 'W') break;
-        // skip if there's already a bomb at that grid cell
-        if (bombSet.has(`${tx},${ty}`)) continue;
-        // skip if there's danger zone at that grid cell
-        if (dangerSet.has(`${tx},${ty}`)) continue;
 
+        if (map[ty][tx] === 'W') break;
+
+        // Skip nếu đã có bomb hoặc danger zone
+        const posKey = `${tx},${ty}`;
+        if (bombSet.has(posKey) || dangerSet.has(posKey)) continue;
+
+        // Tính toán khoảng cách ngay
+        const enemyH = Math.abs(tx - enemyPos.x) + Math.abs(ty - enemyPos.y);
+        // Chỉ thêm nếu trong phạm vi explosion range
+        if (enemyH > explosionRange) continue;
+
+        const h = Math.abs(tx - myPos.x) + Math.abs(ty - myPos.y);
         const key = tx * 1000 + ty;
-        resultsMap.set(key, { x: tx, y: ty });
+
+        // Chỉ lưu nếu chưa có hoặc có khoảng cách tốt hơn
+        resultsMap.set(key, { x: tx, y: ty, h, enemyH });
       }
     }
   }
 
-  const positions = Array.from(resultsMap.values())
-    .map((position) => ({
-      x: position.x,
-      y: position.y,
-      h: manhattanDistance(position, myPos), // Khoảng cách từ myBomber đến vị trí đặt bom
-      enemyH: manhattanDistance(position, enemyPos), // Khoảng cách từ enemy đến vị trí đặt bom
-    }))
-    .filter(p => p.enemyH <= explosionRange); // Chỉ lấy vị trí có thể reach enemy
+  const positions = Array.from(resultsMap.values());
 
   // Ưu tiên vị trí xa enemy hơn (giữ khoảng cách) nhưng vẫn trong phạm vi
   // Sort: 1) Xa enemy hơn (enemyH lớn hơn), 2) Gần myBomber hơn (h nhỏ hơn)
